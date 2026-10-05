@@ -6,6 +6,7 @@ import {Modal} from './components';
 import {buildShareLink} from './buildShare';
 import {plain} from './model';
 import {SHARD_LABELS} from './shards';
+import {ShardIcon} from './AttributeLabel';
 import {useAuth} from './auth/AuthProvider';
 import ProModal from './auth/ProModal';
 const CDN='https://ddragon.leagueoflegends.com';
@@ -31,7 +32,7 @@ export function ShareBuildModal({scenario:s,data,close}:{scenario:Scenario;data:
  <div className="share-matchup">{([s.player,s.enemy] as const).map((f,i)=><div key={i}><img crossOrigin="anonymous" src={`${CDN}/cdn/${data.version}/img/champion/${data.champions[f.champion].image.full}`} alt=""/><span><small>{i===0?'SEU CAMPEÃO':'ADVERSÁRIO'}</small><h2>{data.champions[f.champion].name}</h2><p>Nível {f.level} · {f.lane}</p></span></div>)}</div>
  <h3>Sua build · ordem dos itens</h3>{items(s.player)}<h3>Build adversária</h3>{items(s.enemy)}
  <section className="share-runes">{runes(s.player.runes.primary)}{runes(s.player.runes.secondary)}</section>
- <p className="share-shards">{s.player.runes.shards.map(k=>SHARD_LABELS[k]??k).join(' · ')}</p>
+ <div className="share-shards">{s.player.runes.shards.map((k,i)=><span key={i}><ShardIcon shard={k}/>{SHARD_LABELS[k]??k}</span>)}</div>
  <footer><div><strong>{Math.round(s.weights.offense)}% Dano · {Math.round(s.weights.defense)}% Defesa</strong><p>Leia o QR Code para abrir esta build.</p><small>Estimativa exploratória · Não endossado pela Riot Games</small></div>{qr?<img className="share-qr" src={qr} alt="QR Code para abrir a build e o matchup"/>:<span>Gerando QR Code…</span>}</footer>
  </div></div><div className="share-actions"><button disabled={busy||!qr} onClick={()=>void download()}>{busy?<LoaderCircle size={16} className="auth-spinner"/>:<Download size={16}/>}Baixar Card como Imagem</button><button disabled={!link||busy} onClick={()=>void copyLink()}><Copy size={16}/>Copiar Link</button></div>
  {link&&<input className="share-link" aria-label="Link desta build" readOnly value={link} onFocus={e=>e.currentTarget.select()}/>}
