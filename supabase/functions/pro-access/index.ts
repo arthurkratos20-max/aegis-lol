@@ -1,0 +1,3 @@
+import {service,identity,json} from '../_shared/runtime.ts';
+import {entitlement} from '../../../src/billing.ts';
+Deno.serve(async(req:Request)=>{if(req.method==='OPTIONS')return json({});try{const user=await identity(req);const {data,error}=await service().from('accounts').select('role,trial_end,pro_until').eq('id',user.id).single();if(error)throw error;if(!entitlement(data,Date.now()))return json({error:'PRO required'},403);return json({authorized:true,serverComputeAvailable:false,notice:'Protected joint optimization is not deployed. Local analysis only.'});}catch{return json({error:'Unauthorized'},401);}});

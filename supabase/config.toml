@@ -1,0 +1,6 @@
+[functions.checkout]
+verify_jwt = false
+[functions.billing-webhook]
+verify_jwt = false
+[functions.pro-access]
+verify_jwt = false

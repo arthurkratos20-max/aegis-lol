@@ -1,0 +1,73 @@
+import type {Dataset,Scenario} from './contracts.ts';
+import {itemEligible,isBoot} from './model.ts';
+import {itemCompatible,kitFor} from './compatibility.ts';
+import {recommend,profileFor,type TacticalMode} from './recommendation.ts';
+import {evaluateBuild,exclusiveGroupsValid,normalizeMetric,type BuildMetrics} from './buildEvaluation.ts';
+import {championForCounter,counterItemCandidates} from './counterAdapters.ts';
+import {calculateMatchupCounter,calculateDraftCounter,rankCounterCandidates} from './counterEvaluation.ts';
+
+export function recipeContains(final:string,component:string,data:Dataset,seen=new Set<string>()):boolean {
+ if(final===component)return true;if(seen.has(final))return false;
+ return (data.items[final]?.from??[]).some(id=>recipeContains(id,component,data,new Set(seen).add(final)));
+}
+export interface ItemScore {id:string;normalizedDPS:number;normalizedEHP:number;counterBonus:number;score:number;coverage:'modeled'|'estimated'}
+export function continuousWeights(sliderValue:number){
+ const value=Math.max(0,Math.min(100,sliderValue));
+ return {weightDamage:value/100,weightDefense:(100-value)/100};
+}
+export function scoreItems(rows:{id:string;metrics:BuildMetrics;counter?:number}[],sliderValue:number):ItemScore[]{
+ const {weightDamage,weightDefense}=continuousWeights(sliderValue);
+ const bounds=(key:'dps'|'ehp')=>rows.reduce((b,r)=>({min:Math.min(b.min,r.metrics[key]),max:Math.max(b.max,r.metrics[key])}),{min:Infinity,max:-Infinity});
+ const d=bounds('dps'),h=bounds('ehp');
+ return rows.map(row=>{
+  const normalizedDPS=normalizeMetric(row.metrics.dps,d.min,d.max),normalizedEHP=normalizeMetric(row.metrics.ehp,h.min,h.max);
+  // Counter is a bounded contextual preference, with zero influence at both pure endpoints.
+  const counterBonus=.05*4*weightDamage*weightDefense*Math.max(0,Math.min(1,row.counter??0));
+  return {id:row.id,normalizedDPS,normalizedEHP,counterBonus,score:weightDamage*normalizedDPS+weightDefense*normalizedEHP+counterBonus,coverage:'estimated' as const};
+ }).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+}
+export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced'){
+ const neutral={...s,player:{...s.player,locked:[],owned:[]},weights:{offense:50,defense:50,utility:0}},base=recommend(neutral,data,mode);
+  const compatible=(id:string)=>itemEligible(id,data,s.player.champion)&&itemCompatible(id,s.player,data).allowed;
+ const completed=(id:string)=>compatible(id)&&!isBoot(id,data)&&(data.items[id].gold.total>=2000||id==='3041')&&Number(id)<10000;
+ const pool=Object.keys(data.items).filter(completed);
+ const mine=championForCounter(s.player.champion,data,s.player),enemy=championForCounter(s.enemy.champion,data,s.enemy);
+ const draft=s.counterPreset?.source.includes('Draft')?s.draft?.enemy:undefined;
+ const evaluation=draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
+ const ranks=rankCounterCandidates(mine,counterItemCandidates(s.player,data),evaluation),maxCounter=Math.max(1,...ranks.map(r=>r.score));
+ const counters=new Map(ranks.map(r=>[r.candidate.id,r.score/maxCounter]));
+ const fixed=[...new Set([...s.player.locked,...(!s.allowSell?s.player.owned:[])])];
+ const lockedBoot=fixed.find(id=>isBoot(id,data)&&id!=='1001');
+ const bootAllowed=kitFor(s.player,data).boots&&s.player.boots!=='none';
+ let boot=bootAllowed?(s.player.boots==='fixed'?s.player.fixedBoot:lockedBoot??((evaluation.priorities['magic-resist']??0)>(evaluation.priorities.armor??0)||enemy.hasHardCC?'3111':base.boots)):null;
+ if(boot==='1001')boot='3158';
+ if(boot&&!compatible(boot))throw Error('Bota fixa incompatível com o campeão ou snapshot.');
+ if(s.player.boots==='fixed'&&lockedBoot&&lockedBoot!==boot)throw Error('Bota fixada conflita com o inventário travado.');
+ if(!bootAllowed&&fixed.some(id=>isBoot(id,data)))throw Error('A regra Sem Botas conflita com uma bota travada ou possuída.');
+ const required=fixed.filter(id=>!isBoot(id,data)&&data.items[id]&&(data.items[id].gold.total>=2000||id==='3041'));
+ if(!exclusiveGroupsValid(fixed,data))throw Error('Itens travados ou possuídos conflitam em grupos exclusivos.');
+ const coreEligible=(id:string)=>completed(id)&&exclusiveGroupsValid([...required,...(required.includes(id)?[]:[id])],data);
+ const preferredCore=base.cores.find(coreEligible)??pool.find(coreEligible);
+ if(!preferredCore)throw Error('Nenhum item-chave compatível com os grupos travados.');
+ const core=required.length+(boot?1:0)>=6&&!required.includes(preferredCore)?required[0]:preferredCore;
+ if(!core)throw Error('Nenhum item-chave elegível no catálogo.');
+ const chosen=[...(boot?[boot]:[]),core,...required.filter(id=>id!==core)];
+ if(chosen.length>6||!exclusiveGroupsValid(chosen,data))throw Error('O core e os itens travados não cabem em seis slots ou conflitam em grupos únicos.');
+ const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
+ const rank=(ids:string[])=>scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...chosen,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),sliderValue);
+ const legal=(id:string)=>!chosen.includes(id)&&exclusiveGroupsValid([...chosen,id],data);
+ let evaluated=0;const scores:ItemScore[]=[];
+ // Keep each owned/locked component represented by a legal final upgrade.
+ for(const component of fixed.filter(id=>!isBoot(id,data)&&!required.includes(id))){
+  if(chosen.some(id=>!required.includes(id)&&recipeContains(id,component,data)))continue;
+  const upgrades=pool.filter(id=>legal(id)&&recipeContains(id,component,data));evaluated+=upgrades.length;
+  const best=rank(upgrades)[0];if(!best||chosen.length===6)throw Error('Não há espaço para um upgrade compatível do componente travado.');
+  chosen.push(best.id);scores.push(best);
+ }
+ while(chosen.length<6){
+  const candidates=pool.filter(legal);evaluated+=candidates.length;
+  const best=rank(candidates)[0];if(!best)throw Error('Grupos únicos impedem completar os seis slots.');
+  chosen.push(best.id);scores.push(best);
+ }
+ return {base,boot,core,target:chosen,scores,evaluated,metrics:evaluateBuild(chosen,s,data),sliderValue};
+}

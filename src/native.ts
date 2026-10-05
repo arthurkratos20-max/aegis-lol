@@ -1,0 +1,38 @@
+import type {Action,CalcNode,Dataset,Fighter,NativeSpell,Stats,SkillKey} from './contracts.ts';
+import {EMPTY_FORMULA} from './contracts.ts';
+import {statsFor} from './model.ts';
+export function calculateNative(node:CalcNode,spell:NativeSpell,rank:number,level:number,stats:Stats,base:Stats,depth=0):number{
+ if(depth>12)throw Error('Calculation depth exceeded');
+ const child=(v:unknown)=>calculateNative(v as CalcNode,spell,rank,level,stats,base,depth+1);
+ const dataValue=(name:unknown)=>{const v=spell.values[String(name)];if(!v||v[rank]===undefined)throw Error(`DataValue not found: ${String(name)}`);return v[rank];};
+ const stat=()=>{const code=Number(node.mStat??0),total=code===0?stats.ap:code===2?stats.ad:code===12?stats.hp:code===9?stats.critMultiplier:NaN;const original=code===0?base.ap:code===2?base.ad:code===12?base.hp:code===9?base.critMultiplier:NaN;if(!Number.isFinite(total))throw Error(`Unsupported stat ${code}`);return Number(node.mStatFormula??0)===2?total-original:total;};
+ switch(node.__type){
+ case 'GameCalculation':return (node.mFormulaParts as CalcNode[]).reduce((a,n)=>a+child(n),0)*(node.mMultiplier?child(node.mMultiplier):1);
+ case 'GameCalculationModified':{const ref=spell.calculations[String(node.mModifiedGameCalculation)];if(!ref)throw Error('Missing calculation reference');return child(ref)*(node.mMultiplier?child(node.mMultiplier):1);}
+ case 'NamedDataValueCalculationPart':return dataValue(node.mDataValue);
+ case 'NumberCalculationPart':return Number(node.mNumber??0);
+ case 'StatByCoefficientCalculationPart':return stat()*Number(node.mCoefficient??0);
+ case 'StatByNamedDataValueCalculationPart':return stat()*dataValue(node.mDataValue);
+ case 'StatBySubPartCalculationPart':return stat()*child(node.mSubpart);
+ case 'ProductOfSubPartsCalculationPart':return child(node.mPart1)*child(node.mPart2);
+ case 'SumOfSubPartsCalculationPart':return (node.mSubparts as CalcNode[]).reduce((a,n)=>a+child(n),0);
+ case 'ByCharLevelInterpolationCalculationPart':if(node.mScaleByStatProgressionMultiplier)throw Error('Stat progression interpolation not validated');return Number(node.mStartValue)+(Number(node.mEndValue)-Number(node.mStartValue))*(level-1)/17;
+ case 'ByCharLevelBreakpointsCalculationPart':{let v=Number(node.mLevel1Value??0),per=Number(node.mInitialBonusPerLevel??0);const bp=(node.mBreakpoints??[]) as {mLevel:number;mAdditionalBonusAtThisLevel?:number;mBonusPerLevelAtAndAfter?:number}[];for(let l=2;l<=level;l++){const b=bp.find(b=>b.mLevel===l);if(b?.mBonusPerLevelAtAndAfter!==undefined)per=b.mBonusPerLevelAtAndAfter;v+=per+(b?.mAdditionalBonusAtThisLevel??0);}return v;}
+ default:throw Error(`Calculation not implemented: ${node.__type}`);
+ }
+}
+export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:string;type:'physical'|'magic'|'true';label:string;kind?:'shield';targetHP?:boolean;flatCalculation?:string;note:string}[]>={
+ Shen:[{key:'Q',spell:'ShenQ',calculation:'BasePercentHealth',flatCalculation:'BaseFlatDamage',targetHP:true,type:'magic',label:'Q · bônus de um ataque normal',note:'Somente bônus mágico de um dos 3 ataques; ataque físico, shield, energia e AS não são duplicados.'},{key:'Q',spell:'ShenQ',calculation:'EmpPercentHealth',flatCalculation:'BaseFlatDamage',targetHP:true,type:'magic',label:'Q · bônus de um ataque fortalecido',note:'Requer lâmina atravessando o alvo; somente dano extra isolado.'},{key:'E',spell:'ShenE',calculation:'TauntDamage',type:'physical',label:'E · impacto',note:'Taunt e reembolso de energia não automatizados.'}],
+ Ezreal:[{key:'Q',spell:'EzrealQ',calculation:'Damage',type:'physical',label:'Q · impacto',note:'Redução de cooldown 1.5s; procs on-hit e passive AS ainda não incluídos.'},{key:'E',spell:'EzrealE',calculation:'Damage',type:'magic',label:'E · impacto',note:'Sem reposicionamento geométrico.'},{key:'R',spell:'EzrealR',calculation:'Damage',type:'magic',label:'R · impacto em campeão',note:'Sem colisões com outros alvos.'}],
+ Yasuo:[{key:'Q',spell:'YasuoQ1Wrapper',calculation:'TotalDamage',type:'physical',label:'Q · sem crítico',note:'Q/AS, stacks, on-hit e modificadores de crítico não automatizados.'},{key:'E',spell:'YasuoE',calculation:'TotalDamage',type:'magic',label:'E · zero stacks',note:'Stacks e bloqueio por alvo precisam de validação.'}],
+ Yone:[{key:'Q',spell:'YoneQ',calculation:'QDamage',type:'physical',label:'Q · sem crítico',note:'Sem Q3, cooldown por AS ou on-hit.'}],
+ Riven:[{key:'Q',spell:'RivenTriCleave',calculation:'FirstSlashDamage',type:'physical',label:'Q · primeiro golpe',note:'Recasts, passiva, cancelamentos e R não automatizados.'},{key:'W',spell:'RivenMartyr',calculation:'TotalDamage',type:'physical',label:'W · impacto',note:'Stun pode ser configurado como ação separada.'},{key:'E',spell:'RivenFeint',calculation:'TotalShield',kind:'shield',type:'physical',label:'E · escudo',note:'Duração 1.5s do snapshot; sem dash geométrico.'}],
+ Darius:[{key:'Q',spell:'DariusCleave',calculation:'BladeDamage',type:'physical',label:'Q · lâmina externa',note:'Cura e geração de Hemorragia não automatizadas.'},{key:'R',spell:'DariusExecute',calculation:'Damage',type:'true',label:'R · zero stacks',note:'Sem Hemorragia ou Noxian Might automático; stacks podem ser usados no controle do impacto isolado.'}],
+};
+export function nativeAction(f:Fighter,data:Dataset,index:number):Action{
+ const opt=nativeOptions[f.champion]?.[index];if(!opt)throw Error('Adapter not found');const spell=data.mechanics?.[f.champion]?.spells[opt.spell];if(!spell)throw Error('Source snapshot absent');const rank=f.skills.slice(0,f.level).filter(k=>k===opt.key).length;if(!rank)throw Error('Habilidade não evoluída no nível atual');const uiSpell=data.champions[f.champion].spells[['Q','W','E','R'].indexOf(opt.key)];
+ return {id:crypto.randomUUID(),at:0,kind:opt.kind??'spell',key:opt.key,name:opt.label,type:opt.type,formula:{...EMPTY_FORMULA},cooldown:uiSpell.cooldown[rank-1]??0,cost:uiSpell.cost[rank-1]??0,cast:0,duration:opt.kind==='shield'?1.5:0,hit:1,onHit:f.champion==='Ezreal'&&opt.key==='Q',custom:false,coverage:'testing',cooldownReduction:f.champion==='Ezreal'&&opt.key==='Q'?1.5:undefined,native:{spell:opt.spell,calculation:opt.calculation,targetHP:opt.targetHP,flatCalculation:opt.flatCalculation}};
+}
+export function nativeDamage(a:Action,f:Fighter,data:Dataset,actor:Stats,target:Stats):number{
+ if(!a.native)return 0;const spell=data.mechanics?.[f.champion]?.spells[a.native.spell];if(!spell)throw Error('Missing native snapshot');const rank=f.skills.slice(0,f.level).filter(k=>k===a.key).length;if(!rank)throw Error('Native skill rank is zero');const base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data);const calc=spell.calculations[a.native.calculation];if(!calc)throw Error('Calculation missing');let damage=calculateNative(calc,spell,rank,f.level,actor,base);if(a.native.targetHP)damage*=target.hp;if(a.native.flatCalculation)damage+=calculateNative(spell.calculations[a.native.flatCalculation],spell,rank,f.level,actor,base);return damage*(a.native.multiplier??1);
+}

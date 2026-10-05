@@ -1,0 +1,6 @@
+import {createClient} from 'npm:@supabase/supabase-js@2.117.2';
+export const service=()=>createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+export const cors={'Access-Control-Allow-Origin':Deno.env.get('APP_ORIGIN')??'http://localhost:3000','Access-Control-Allow-Headers':'authorization, apikey, content-type, x-client-info','Access-Control-Allow-Methods':'POST, OPTIONS','Cache-Control':'no-store'};
+export const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...cors,'Content-Type':'application/json'}});
+export async function identity(req:Request){const token=req.headers.get('Authorization')?.replace(/^Bearer /,'');if(!token)throw Error('Unauthorized');const {data,error}=await service().auth.getUser(token);if(error||!data.user)throw Error('Unauthorized');return data.user;}
+export async function api(url:string,key:string,body?:unknown,headers:Record<string,string>={}){const r=await fetch(url,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${key}`,...(body?{'Content-Type':'application/json'}:{}),...headers},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error(`Provider rejected request (${r.status})`);return r.json();}

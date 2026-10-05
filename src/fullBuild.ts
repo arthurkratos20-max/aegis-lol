@@ -1,0 +1,28 @@
+import {calculateOptimalRunes} from './runeOptimizer.ts';
+import {greedyContinuousBuild} from './continuousBuild.ts';
+import type {Dataset,Scenario} from './contracts.ts';
+import {itemEligible,isBoot} from './model.ts';
+import {type QuickRecommendation,type TacticalMode} from './recommendation.ts';
+export function completedItem(id:string,data:Dataset):boolean{return !!data.items[id]&&!isBoot(id,data)&&(data.items[id].gold.total>=2000||id==='3041');}
+export function recipeContains(final:string,component:string,data:Dataset,seen=new Set<string>()):boolean{if(final===component)return true;if(seen.has(final))return false;return (data.items[final]?.from??[]).some(id=>recipeContains(id,component,data,new Set(seen).add(final)));}
+export function itemReason(id:string,data:Dataset):string{
+ const named:Record<string,string>={'3748':'Dano em área baseado em Vida e ataque fortalecido para a troca.','3084':'Acumule Vida permanente em trocas próximas e prolongue sua presença.','3157':'Armadura e estase para sobreviver à entrada e reposicionar.','3102':'Resistência mágica e proteção contra a primeira habilidade inimiga.','3065':'Vida e resistência mágica para sustentar trocas contra dano mágico.','2502':'Vida e armadura para permanecer perto dos adversários.','3075':'Armadura e resposta à cura de inimigos que atacam você.','3165':'AP e resposta à cura durante a aplicação de dano mágico.','3033':'Penetração de armadura e resposta à cura para seu dano físico.','6695':'Letalidade e pressão sobre escudos em uma build de dano físico.','3047':'Mobilidade e armadura contra pressão de ataques.','3111':'Resistência mágica e tenacidade contra controle de grupo.','3006':'Velocidade de ataque para aumentar a frequência de ataques.','3020':'Mobilidade e penetração para ameaçar com dano mágico.','3158':'Aceleração e mobilidade para acessar habilidades com mais frequência.'};
+ if(named[id])return named[id];const i=data.items[id];return i.stats.FlatMagicDamageMod?'AP para fortalecer suas escalas mágicas.':i.stats.FlatPhysicalDamageMod?'AD para fortalecer ataques e escalas físicas.':i.stats.FlatArmorMod?'Armadura para reduzir a pressão física.':i.stats.FlatSpellBlockMod?'Resistência mágica para absorver pressão de habilidades.':i.tags.includes('Health')?'Vida para manter presença e ampliar sua margem de troca.':'Utilidade e atributos compatíveis com sua função.';
+}
+export function fullBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced',_previous?:string[]):QuickRecommendation{
+ const result=greedyContinuousBuild(s,data,mode),target=result.target;
+ 
+ return {...result.base,cores:target.filter(id=>!isBoot(id,data)),boots:result.boot,target,
+  runes:calculateOptimalRunes(s,data,result.sliderValue),
+  total:target.reduce((n,id)=>n+data.items[id].gold.total,0),
+  reasons:Object.fromEntries(target.map(id=>[id,id===result.boot?'Bota contextual fixa durante o slider.':id===result.core?'Item-chave fixo para preservar o perfil do campeão.':itemReason(id,data)])),
+  warnings:[`Pesos contínuos: ${(result.sliderValue).toFixed(0)}% dano / ${(100-result.sliderValue).toFixed(0)}% defesa. Greedy: ${result.evaluated} avaliações no catálogo elegível; core fixo e grupos exclusivos preservados. Ouro disponível limita compras, não a meta.`,
+   `DPS modelado ${result.metrics.dps.toFixed(1)} · EHP ${result.metrics.ehp.toFixed(0)}. Melhor escolha gulosa por slot, não ótimo global. Pool de itens por escalas de kit, com elegibilidade/sinergia estimadas onde faltam coeficientes; DPS inclui apenas ações e atributos modelados. Runas por scores heurísticos, não DPS/EHP medidos. Contra-bônus limitado a 5% e nulo nos extremos. Passivas sem fórmula excluídas; sem habilidades configuradas, DPS considera apenas ataques básicos.`]};
+}
+export interface PurchaseStep {id:string;cost:number;credit:number;available:boolean;owned:boolean;remaining:number;consumed:string[]}
+export function sequentialPurchases(target:string[],s:Scenario,data:Dataset){
+ const unused=[...s.player.owned],steps:PurchaseStep[]=[];let remaining=s.budget,blocked=false;
+ function consume(id:string,seen=new Set<string>()):{credit:number;ids:string[]}{const index=unused.indexOf(id);if(index>=0){unused.splice(index,1);return {credit:data.items[id].gold.total,ids:[id]};}if(seen.has(id))return {credit:0,ids:[]};let credit=0,ids:string[]=[];for(const child of data.items[id]?.from??[]){const c=consume(child,new Set(seen).add(id));credit+=c.credit;ids.push(...c.ids);}return {credit:Math.min(data.items[id]?.gold.total??0,credit),ids};}
+ for(const id of target){const c=consume(id),cost=Math.max(0,data.items[id].gold.total-c.credit),owned=cost===0,available=owned||(!blocked&&cost<=remaining);if(!owned&&!available)blocked=true;if(available&&!owned)remaining-=cost;steps.push({id,cost,credit:c.credit,available,owned,remaining,consumed:c.ids});}
+ return {steps,remaining,total:target.reduce((n,id)=>n+data.items[id].gold.total,0),completion:steps.reduce((n,p)=>n+p.cost,0),purchase:steps.filter(p=>p.available&&!p.owned).reduce((n,p)=>n+p.cost,0),unassigned:unused};
+}

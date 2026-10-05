@@ -1,0 +1,13 @@
+'use client';
+import {useEffect,useState} from 'react';
+import type {Scenario,Dataset} from './contracts';
+import {validateScenario} from './model';
+import {useAuth} from './auth/AuthProvider';
+import ProModal from './auth/ProModal';
+import {listPresets,createPreset,savePreset,deletePreset,PresetLimitError,type BuildPreset} from './services/presets';
+export default function PresetPanel({scenario,data,onLoad}:{scenario:Scenario;data:Dataset;onLoad:(s:Scenario)=>void}){
+ const {user,isPro,mode,loading}=useAuth();const [rows,setRows]=useState<BuildPreset[]>([]),[name,setName]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[upgrade,setUpgrade]=useState(false);
+ useEffect(()=>{let cancelled=false;setRows([]);if(!loading&&(mode==='local'||user))void listPresets(user).then(r=>{if(!cancelled)setRows(r);}).catch(e=>{if(!cancelled)setMessage(e.message);});return()=>{cancelled=true;};},[user?.id,user?.email,mode,loading]);
+ async function operation(action:()=>Promise<void>){setBusy(true);setMessage('');try{await action();setRows(await listPresets(user));}catch(e){if(e instanceof PresetLimitError)setUpgrade(true);else setMessage(e instanceof Error?e.message:'Operação indisponível.');}finally{setBusy(false);}}
+ return <section className="panel preset-panel"><div className="panel-head"><h3>Meus presets</h3><span>{isPro?'PRO · sem limite':`${rows.length} / 3 FREE`}</span></div><div className="preset-controls"><input aria-label="Nome do preset" maxLength={160} placeholder={`${data.champions[scenario.player.champion].name} vs ${data.champions[scenario.enemy.champion].name}`} value={name} onChange={e=>setName(e.target.value)}/><button disabled={busy||loading} onClick={()=>void operation(()=>savePreset(user,createPreset(scenario,name||`${scenario.player.champion} vs ${scenario.enemy.champion}`)))}>{busy?'Salvando…':'Salvar preset'}</button></div><p className="hint">{mode==='local'?'Salvo neste navegador. O modo local é FREE.':user?'Presets privados na sua conta Supabase.':'Entre na conta para salvar na nuvem.'}</p>{rows.map(row=><div className="saved-row" key={row.id}><span>{row.name}<small>{new Date(row.created_at).toLocaleDateString('pt-BR')}</small></span><button disabled={busy} onClick={()=>{const errors=validateScenario(row.scenario,data);if(errors.length||row.scenario.patch!==data.version){setMessage('Preset de outro patch ou com dados inválidos. Revise antes de carregar.');return;}onLoad(structuredClone(row.scenario));setMessage('Preset carregado.');}}>Carregar</button><button disabled={busy} onClick={()=>void operation(()=>deletePreset(user,row.id))}>Excluir</button></div>)}{message&&<p role="status">{message}</p>}{upgrade&&<ProModal close={()=>setUpgrade(false)}/>}</section>;
+}
