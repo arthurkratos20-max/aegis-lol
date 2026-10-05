@@ -1,4 +1,4 @@
-export interface User {id:string;username:string;email:string;isPro:boolean;role:'user'|'admin';source:'mock'|'supabase'}
+export interface User {id:string;username:string;email:string;isPro:boolean;role:'user'|'admin';source:'mock'|'supabase';plan?:'free'|'pro';billingCycle?:'monthly'|'annual'|null}
 export interface Registration {username:string;email:string;password:string;confirmation:string}
 export const validEmail=(email:string)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 export function registrationErrors(values:Registration):string[]{
