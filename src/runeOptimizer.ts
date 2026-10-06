@@ -1,3 +1,4 @@
+import {preferenceWeights} from './preferenceWeights.ts';
 import type {Dataset,Scenario,RunePage,RuneTree,Rune} from './contracts.ts';
 import {kitFor,runeCompatible} from './compatibility.ts';
 import {continuousWeights} from './continuousBuild.ts';
@@ -5,7 +6,7 @@ import {SHARD_ROWS} from './shards.ts';
 import {kitRuneEstimate,runeAffinity} from './runeAffinity.ts';
 import {championForCounter} from './counterAdapters.ts';
 export interface HeuristicRuneScore {
- id:number; normalizedDPS:number; normalizedEHP:number; counterBonus:number; score:number;
+ id:number; normalizedDPS:number; normalizedEHP:number;normalizedUtility:number; counterBonus:number; score:number;
  coverage:'heuristic'; // Relative affinity, NOT measured DPS, EHP or a simulated rune effect.
 }
 const estimates:Record<number,[number,number]>={
@@ -19,17 +20,18 @@ function runeThreats(s:Scenario,data:Dataset){
  const ids=s.counterPreset?.mode==='draft'||s.counterPreset?.source.includes('Draft')?s.draft?.enemy:undefined;
  return (ids?[...new Set(ids)].filter(id=>data.champions[id]).slice(0,5):[s.enemy.champion]).map(id=>championForCounter(id,data,id===s.enemy.champion?s.enemy:undefined));
 }
-export function heuristicRuneScore(rune:Rune,s:Scenario,data:Dataset,sliderValue:number):HeuristicRuneScore {
- const k=kitFor(s.player,data),enemies=runeThreats(s,data),w=continuousWeights(sliderValue);
+export function heuristicRuneScore(rune:Rune,s:Scenario,data:Dataset,sliderValue:number|Scenario['weights']):HeuristicRuneScore {
+ const k=kitFor(s.player,data),enemies=runeThreats(s,data),w=preferenceWeights(sliderValue);
  let [normalizedDPS,normalizedEHP]=kitRuneEstimate(rune.id,s.player,data)??estimates[rune.id]??[.1,.1];
  if([8008,9923,9104].includes(rune.id)&&!k.autoAttack)normalizedDPS*=.15;
  if(rune.id===8437&&k.healthScaling)normalizedDPS+=.1;
  if([8214,8465,8453].includes(rune.id)&&!k.healShield&&!(rune.id===8465&&['engage','warden'].includes(runeAffinity(s.player,data))))normalizedEHP*=.2;
  const counter=!s.matchupUnknown&&enemies.some(enemy=>rune.id===8473&&enemy.isBurst||rune.id===8242&&enemy.hasHardCC||rune.id===8017&&enemy.isTank||rune.id===8444&&enemy.hasHealing)?1:0;
  const counterBonus=.05*4*w.weightDamage*w.weightDefense*counter;
- return {id:rune.id,normalizedDPS,normalizedEHP,counterBonus,score:w.weightDamage*normalizedDPS+w.weightDefense*normalizedEHP+counterBonus,coverage:'heuristic'};
+ const normalizedUtility=({8210:1,8106:1,8347:1,8234:1,8232:1,8275:1,8230:1,8226:k.mana?1:0,8009:k.mana||k.energy?1:0,8214:k.healShield?1:.2,8453:k.healShield?1:0,8465:k.healShield?1:.5} as Record<number,number>)[rune.id]??0;
+ return {id:rune.id,normalizedUtility,normalizedDPS,normalizedEHP,counterBonus,score:w.weightDamage*normalizedDPS+w.weightDefense*normalizedEHP+w.weightUtility*normalizedUtility+counterBonus,coverage:'heuristic'};
 }
-export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense)):RunePage {
+export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number|Scenario['weights']=s.weights):RunePage {
  const page=s.player.runes;if(page.locked)return structuredClone(page);
  const locks=page.locks??{},locked=new Set(locks.runes??[]),k=kitFor(s.player,data);
  const viable=(r:Rune)=>runeCompatible(r.id,s.player,data).allowed&&(r.id!==8465||k.healShield||['engage','warden'].includes(runeAffinity(s.player,data)))&&(r.id!==8401||k.healShield);
@@ -53,10 +55,10 @@ export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue=100*s.
   return [{tree,selected,score:selected.reduce((sum,v)=>sum+heuristicRuneScore(v.r,s,data,sliderValue).score,0)}];
  }).sort((a,b)=>b.score-a.score||a.tree.id-b.tree.id);
  const secondary=alternatives[0];if(!secondary)throw Error('Nenhuma árvore secundária legal com as travas atuais.');
- const w=continuousWeights(sliderValue);
+ const w=preferenceWeights(sliderValue);
  const shardScore=(id:string)=>{
   const values:Record<string,[number,number]>={adaptive:[.9,0],as:[k.autoAttack?1:.1,0],haste:[k.autoAttack?.65:1,.1],move:[.05,.35],scalingHP:[k.healthScaling?.25:0,s.player.level>=7?1:.4],hp:[k.healthScaling?.1:0,.65],tenacity:[0,!s.matchupUnknown&&runeThreats(s,data).some(enemy=>enemy.hasHardCC)?1:.2]};
-  const [d,h]=values[id]??[0,0];return w.weightDamage*d+w.weightDefense*h;
+  const [d,h]=values[id]??[0,0];return w.weightDamage*d+w.weightDefense*h+w.weightUtility*(id==='haste'||id==='move'?1:0);
  };
  const shards=SHARD_ROWS.map((row,i)=>{
   if(locks.shards?.includes(i)){if(!row.includes(page.shards[i]))throw Error('Fragmento travado inválido para este slot.');return page.shards[i];}

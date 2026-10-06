@@ -2,7 +2,7 @@ import type {Dataset,Fighter,Scenario,Stats} from './contracts.ts';
 import {statsFor,effectiveResistance,mitigate} from './model.ts';
 import {evaluateBuild} from './buildEvaluation.ts';
 import {championForCounter} from './counterAdapters.ts';
-export interface DuelSide {stats:Stats;physicalReduction:number;magicReduction:number;ehp:number;dps:number;ttk:number;basis:'combo'|'attacks';omitted:number}
+export interface DuelSide {stats:Stats;physicalReduction:number;magicReduction:number;ehp:number;dps:number;ttk:number;basis:'combo'|'attacks'|'class';omitted:number}
 export interface ResponseBadge {id:string;icon:string;label:string;tooltip:string}
 /** Negative resistance amplifies damage; penetration alone cannot push positive resistance below zero. */
 export function matchupMitigation(defender:Stats,attacker:Stats){
@@ -14,7 +14,7 @@ function offense(f:Fighter,target:Fighter,s:Scenario,data:Dataset){
  const combo=f.actions.some(a=>a.kind==='spell');
  const attacker=combo?f:{...f,actions:[],automaticAttacks:true};
  const metrics=evaluateBuild(attacker.items,{...s,player:attacker,enemy:target},data);
- return {metrics,basis:combo?'combo' as const:'attacks' as const};
+ return {metrics,basis:combo?'combo' as const:metrics.estimatedRotationDPS!==undefined?'class' as const:'attacks' as const};
 }
 export function attributeDifference(mine:number,enemy:number){
  const absolute=mine-enemy;

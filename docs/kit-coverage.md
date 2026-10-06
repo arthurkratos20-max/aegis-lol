@@ -1,6 +1,6 @@
 # Cobertura de kits — 6 de outubro de 2026
 
-O pedido de considerar integralmente os kits dos 173 campeões **não está concluído**.
+O processamento dos 173 campeões agora conta com um fallback de classe. A cobertura exata e integral dos kits **não está concluída**. Veja `attribute-preferences.md` para a versão híbrida atual.
 
 Patch do catálogo: 16.19.1. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados.
 
@@ -37,4 +37,4 @@ Para reproduzir o inventário de cobertura:
 
 O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403. O espelho alternativo acessível expõe dados do patch 14.10.1 e apenas 167 campeões; esses coeficientes não foram incorporados ao catálogo 16.19.1. Uma consulta adicional ao CDN original de Meraki encontrou 171 campeões, com últimas alterações até 25.15; não confirma compatibilidade com 16.19 e não foi incorporada. A base de fórmulas atuais por campeão precisa ser obtida antes de implementar e validar os adapters restantes.
 
-Ainda faltam os adapters de passivas, múltiplos impactos/DoT, recasts, cargas, formas, pets, conversões de atributos, cura/escudos, CC, efeitos de itens/runas e interações específicas não modeladas. O índice de kit parcial não corrige sozinho os objetivos avançados ou o peso de Utilidade que a auditoria anterior identificou como desconectados da montagem ao vivo.
+Ainda faltam os adapters de passivas, múltiplos impactos/DoT, recasts, cargas, formas, pets, conversões de atributos, cura/escudos, CC, efeitos de itens/runas e interações específicas não modeladas. Os pesos de Utilidade e os objetivos de Dano/Defesa foram conectados à montagem ao vivo na implementação híbrida descrita em `attribute-preferences.md`.

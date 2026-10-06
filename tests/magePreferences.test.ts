@@ -16,12 +16,12 @@ test('magic comparison index has independently calculable AP, haste and resistan
  assert.ok(Math.abs(magicalPotential(100,20,-50)-160)<1e-12);
  assert.equal(magicalPotential(0,100,0),0);
 });
-test('empty mage actions distinguish AP items without inventing spell DPS or TTK',()=>{
+test('empty mage actions disclose estimated rotation DPS and respond to AP',()=>{
  for(const champion of ['Lux','Ahri','Syndra','Cassiopeia','Annie','Veigar','Karthus','Ryze']){
   const s={...initialScenario(data),matchupUnknown:true,player:fighter(data,champion)};
   const empty=evaluateBuild([],s,data),ap=evaluateBuild(['3089'],s,data);
-  assert.equal(empty.dps,ap.dps,champion);assert.equal(empty.ttk,ap.ttk,champion);
-  assert.equal(ap.rawDPSByType?.magic,0);
+  assert.ok(ap.dps>empty.dps,champion);assert.ok(ap.ttk<empty.ttk,champion);assert.equal(ap.isExactFormula,false);
+  assert.ok(ap.rawDPSByType!.magic>0);
   assert.ok(offensiveMetric(ap)>offensiveMetric(empty),champion);
  }
 });
@@ -64,5 +64,5 @@ test('mage builds change inside the slider while boots, core and owned items rem
 test('fallback is disclosed and complete-candidate ranking uses the same criterion',()=>{
  const s={...initialScenario(data),matchupUnknown:true,player:fighter(data,'Lux'),weights:{offense:100,defense:0,utility:0}};
  assert.deepEqual(calculateOptimalBuild([['3089'],['3083']],s,data).items,['3089']);
- assert.ok(fullBuild(s,data).warnings.some(w=>w.includes('potencial mágico estimado')&&w.includes('não DPS do combo')));
+ assert.ok(fullBuild(s,data).warnings.some(w=>w.includes('Rotação de classe estimada')&&w.includes('isExactFormula=false')));
 });

@@ -1,0 +1,41 @@
+{
+  "champions": 173,
+  "matchups": 29929,
+  "lanes": 5,
+  "weights": [
+    0,
+    50,
+    100
+  ],
+  "baseScenarios": 451530,
+  "pureUtilityScenarios": 865,
+  "seconds": 813.074,
+  "checked": 452395,
+  "errors": [],
+  "mathErrors": [],
+  "unchangedExtremes": 0,
+  "unitTests": {
+    "passed": 187,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "runeMath": {
+    "pages": 3460,
+    "scores": 20760,
+    "errors": []
+  },
+  "uiSmoke": {
+    "pureUtility": {
+      "offense": 0,
+      "defense": 0,
+      "utility": 100
+    },
+    "presetThenSlider": {
+      "offense": 0,
+      "defense": 0,
+      "utility": 100
+    },
+    "label": "DPS Estimado por Classe"
+  }
+}

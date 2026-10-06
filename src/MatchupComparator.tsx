@@ -21,9 +21,9 @@ function Metrics({side,name,advantage}:{side:DuelSide;name:string;advantage:bool
  <div><dt><AttributeLabel attribute="armor">Redução física</AttributeLabel></dt><dd>{format(side.physicalReduction*100)}%</dd></div>
  <div><dt><AttributeLabel attribute="mr">Redução mágica</AttributeLabel></dt><dd>{format(side.magicReduction*100)}%</dd></div>
  <div><dt><AttributeLabel attribute="hp">EHP vs matchup</AttributeLabel></dt><dd>{format(side.ehp,0)}</dd></div>
- <div><dt><AttributeLabel attribute="damage">DPS efetivo</AttributeLabel></dt><dd>{format(side.dps)}</dd></div>
+ <div><dt><AttributeLabel attribute="damage">DPS estimado</AttributeLabel></dt><dd>{format(side.dps)}</dd></div>
  <div className={advantage?'duel-advantage':''}><dt><AttributeLabel attribute="window">TTK estimado</AttributeLabel></dt><dd>{side.dps>0?`${format(side.ttk)} s`:'Sem dano na janela'}</dd></div>
- </dl><p className="duel-basis" title={side.basis==='combo'?'Dano médio da sequência configurada dividido pela duração do cenário. Extrapolação a DPS constante; não é um tempo de execução garantido.':'AD × velocidade de ataque × crítico esperado × aproveitamento, após mitigação e alcance.'}>{side.basis==='combo'?'Estimativa pela sequência configurada':'Estimativa baseada em ataques básicos'}</p>
+ </dl><p className="duel-basis" title={side.basis==='combo'?'Dano médio da sequência configurada dividido pela duração do cenário. Extrapolação a DPS constante; não é um tempo de execução garantido.':'Ataques mais rotação de classe por cooldowns, AH e recurso. Fórmulas do kit não integralmente validadas.'}>{side.basis==='combo'?'Estimativa pela sequência configurada':'Modelo de classe + ataques · fórmula aproximada'}</p>
  {side.omitted>0&&<p className="duel-basis">{side.omitted} efeito(s) de dano sem cálculo completo.</p>}</article>;
 }
 export default function MatchupComparator({scenario,data}:MatchupComparatorProps){

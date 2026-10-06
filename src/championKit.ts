@@ -1,12 +1,12 @@
 import type {Dataset,Fighter,SkillKey,Stats} from './contracts.ts';
 import {nativeAction,nativeDamage,nativeOptions} from './native.ts';
 import {effectiveResistance,mitigate} from './model.ts';
-export interface KitCoverage {champion:string;status:'partial'|'missing';covered:SkillKey[];missing:('P'|SkillKey)[];source:string|null}
+export interface KitCoverage {champion:string;isExactFormula:boolean;status:'partial'|'missing';covered:SkillKey[];missing:('P'|SkillKey)[];source:string|null}
 /** Availability is not full validation: passives and stateful interactions remain separate. */
 export function championKitCoverage(champion:string,data:Dataset):KitCoverage {
  const mechanics=data.mechanics?.[champion];
  const covered=[...new Set((nativeOptions[champion]??[]).filter(o=>mechanics?.spells[o.spell]?.calculations[o.calculation]&&(!o.flatCalculation||mechanics.spells[o.spell].calculations[o.flatCalculation])).map(o=>o.key))];
- return {champion,status:covered.length?'partial':'missing',covered,missing:(['P','Q','W','E','R'] as const).filter(k=>k==='P'||!covered.includes(k)),source:mechanics?.source??null};
+ return {champion,isExactFormula:false,status:covered.length?'partial':'missing',covered,missing:(['P','Q','W','E','R'] as const).filter(k=>k==='P'||!covered.includes(k)),source:mechanics?.source??null};
 }
 /** One legal isolated impact per supported skill. This is an index, never combo DPS. */
 export function kitImpactPotential(f:Fighter,data:Dataset,actor:Stats,target:Stats,distance=0):{damage:number;shield:number;covered:SkillKey[];omitted:number}|null {

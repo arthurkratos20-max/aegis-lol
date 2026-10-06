@@ -8,11 +8,11 @@ import {attributeDifference,compareMatchup,matchupMitigation} from '../src/match
 const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
 function scenario(){const s=initialScenario(data);s.duration=10;s.distance=0;for(const f of [s.player,s.enemy]){f.items=[];f.actions=[];f.uptime=1;f.overrides={hp:1000,ad:100,as:1,crit:0,armor:100,mr:100,armorPen:0,magicPen:0,armorPenPercent:0,magicPenPercent:0};}return s;}
 const spell=(type:Action['type']):Action=>({id:'q',key:'Q',at:0,kind:'spell',name:'Q',type,formula:{...EMPTY_FORMULA,base:1000},cooldown:0,cost:0,cast:0,duration:0,hit:1,onHit:false,custom:true,coverage:'testing'});
-test('AA fallback computes effective DPS, reciprocal TTK and matchup EHP',()=>{
+test('class fallback computes estimated DPS, reciprocal TTK and matchup EHP',()=>{
  const s=scenario();s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;
- const r=compareMatchup(s,data);assert.equal(r.player.basis,'attacks');assert.equal(r.player.dps,50);assert.equal(r.player.ttk,20);assert.equal(r.enemy.ehp,2000);
+ const r=compareMatchup(s,data);assert.equal(r.player.basis,'class');assert.ok(r.player.dps>50);assert.equal(r.player.ttk,1000/r.player.dps);assert.equal(r.enemy.ehp,2000);
  s.player.overrides.armorPenPercent=.5;s.player.overrides.armorPen=20;
- const penetrated=compareMatchup(s,data);assert.ok(Math.abs(penetrated.enemy.physicalReduction-30/130)<1e-12);assert.ok(Math.abs(penetrated.enemy.ehp-1300)<1e-9);assert.ok(Math.abs(penetrated.player.ttk-13)<1e-9);
+ const penetrated=compareMatchup(s,data);assert.ok(Math.abs(penetrated.enemy.physicalReduction-30/130)<1e-12);assert.ok(Math.abs(penetrated.enemy.ehp-1300)<1e-9);assert.equal(penetrated.player.ttk,1000/penetrated.player.dps);
 });
 test('configured magic and true combos define EHP composition; no assumed repeated cast',()=>{
  const s=scenario();s.player.actions=[spell('magic')];s.player.automaticAttacks=false;

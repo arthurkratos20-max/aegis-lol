@@ -19,8 +19,8 @@ test('Shen native index uses the real AP/HP formulas and does not invent magical
  const s={...initialScenario(data),player:fighter(data,'Shen'),matchupUnknown:true};
  const base=evaluateBuild([],s,data),ap=evaluateBuild(['3089'],s,data),hp=evaluateBuild(['3083'],s,data);
  assert.ok(ap.kitPotential!>base.kitPotential!);assert.ok(hp.kitPotential!>base.kitPotential!);
- assert.equal(ap.dps,base.dps);assert.equal(ap.rawDPSByType?.magic,0);
- assert.equal(offensiveMetric(ap),ap.kitPotential);
+ assert.ok(Number.isFinite(ap.dps));assert.equal(ap.isExactFormula,false);
+ assert.equal(offensiveMetric(ap),ap.offenseValue);
  s.player.automaticAttacks=false;s.distance=1000;const x=statsFor(s.player,data),e=statsFor(s.enemy,data);
  assert.ok(!kitImpactPotential(s.player,data,x,e,s.distance)?.covered.includes('Q'));
 });
