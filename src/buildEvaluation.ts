@@ -8,7 +8,7 @@ export function normalizeMetric(value:number,min:number,max:number):number{retur
 export interface BuildMetrics {rawDPSByType?:Record<'physical'|'magic'|'true',number>;dps:number;ehp:number;utility:number;ttk:number;omitted:number}
 /** Uncapped offensive throughput vs fixed target resistances. No invented combo or proc frequency. */
 export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
- const f={...s.player,items},x=statsFor(f,data),base=statsFor({...f,items:[]},data),e=statsFor(s.enemy,data),T=Math.max(.1,s.duration);
+ const f={...s.player,items},x=statsFor(f,data),base=statsFor({...f,items:[]},data),e=s.matchupUnknown?{...statsFor(s.enemy,data),hp:2500,armor:100,mr:100,armorPen:0,armorPenPercent:0,magicPen:0,magicPenPercent:0}:statsFor(s.enemy,data),T=Math.max(.1,s.duration);
  const resistance=(type:string)=>type==='physical'?effectiveResistance(e.armor,x.armorPenPercent,x.armorPen):effectiveResistance(e.mr,x.magicPenPercent,x.magicPen);
  const rawDPSByType={physical:0,magic:0,true:0};
  let damage=0,omitted=0,resource=x.mana*f.initialResource,lockedUntil=0;const cooldown=new Map<string,number>();
@@ -24,7 +24,7 @@ export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetri
  }
  if(!f.actions.length){damage=f.automaticAttacks&&s.distance<=x.range?aa*rate*T:0;rawDPSByType.physical=f.automaticAttacks&&s.distance<=x.range?rawAA*rate*T:0;}
  for(const type of ['physical','magic','true'] as const)rawDPSByType[type]/=T;
- const axis=enemyAxis(s,data),incoming=statsFor(s.enemy,data),phys=mitigate(1,effectiveResistance(x.armor,incoming.armorPenPercent,incoming.armorPen)),magic=mitigate(1,effectiveResistance(x.mr,incoming.magicPenPercent,incoming.magicPen));
+ const axis=enemyAxis(s,data),incoming=s.matchupUnknown?{armorPenPercent:0,armorPen:0,magicPenPercent:0,magicPen:0}:statsFor(s.enemy,data),phys=mitigate(1,effectiveResistance(x.armor,incoming.armorPenPercent,incoming.armorPen)),magic=mitigate(1,effectiveResistance(x.mr,incoming.magicPenPercent,incoming.magicPen));
  const ehp=x.hp/(axis==='physical'?phys:axis==='magic'?magic:.5*phys+.5*magic),dps=damage/T;
  return {rawDPSByType,dps,ehp,utility:x.move+x.haste,ttk:dps>0?e.hp/dps:Infinity,omitted};
 }

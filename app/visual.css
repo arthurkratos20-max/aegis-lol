@@ -156,3 +156,5 @@ dialog::backdrop{background:#07090dcc;backdrop-filter:blur(8px)}
 .manual-inventory .item-slots{margin-top:16px}
 .build-panel>.two-fields{margin-top:0}
 @media(max-width:420px){.suggested-build-grid{gap:8px}.suggested-build-slot{padding:8px 4px 22px}}
+
+.matchup-mode{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,340px);gap:12px 24px;align-items:center;margin-bottom:24px}.matchup-mode h3{font-size:16px}.matchup-mode p{margin:8px 0 0;font-size:12px}.matchup-mode-note{grid-column:1/-1;color:var(--gold);font-size:11px;letter-spacing:.02em}@media(max-width:700px){.matchup-mode{grid-template-columns:1fr}.matchup-mode select{width:100%}}

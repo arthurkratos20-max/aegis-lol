@@ -8,7 +8,10 @@
     "build": "next build --webpack",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "ingest": "node scripts/ingest.mjs"
+    "ingest": "node scripts/ingest.mjs",
+    "prebuild": "node scripts/prepare-image-assets.mjs",
+    "predev": "node scripts/prepare-image-assets.mjs",
+    "pretest": "node scripts/prepare-image-assets.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",

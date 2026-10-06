@@ -9,7 +9,7 @@ import {SHARD_ROWS,SHARD_LABELS} from './shards';
 import {plain} from './model';
 export interface RuneSelectorProps {page:RunePage;data:Dataset;scenario:Scenario;onChange:(page:RunePage)=>void}
 const colors:Record<number,string>={8000:'#deb65d',8100:'#e36a75',8200:'#88b8ef',8400:'#82c77b',8300:'#8fd9d8'};
-const cdn='https://ddragon.leagueoflegends.com/cdn/img/';
+const cdn='/assets/riot/icons/';
 const shardIcons={adaptive:Swords,as:Zap,haste:Zap,move:Footprints,scalingHP:Heart,hp:Heart,tenacity:Shield};
 export default function RuneSelector({page,data,scenario,onChange}:RuneSelectorProps){
  const [error,setError]=useState('');

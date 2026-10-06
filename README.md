@@ -1,49 +1,31 @@
-# Aegis LoL — abrir no VS Code
+# Aegis Lab — Engine → Otimizador → Interface
 
-1. Extraia este ZIP.
-2. No VS Code, use Arquivo → Abrir Pasta e escolha `aegis-lol` (a pasta com `package.json`).
-3. Instale Node.js 22 ou superior, se ainda não tiver.
-4. Abra Terminal → Novo Terminal e execute:
+Código TypeScript/React/Next.js para análise exploratória de builds de LoL.
 
-```bash
+## Executar
+
+Node compatível com Next 16 e `--experimental-strip-types` (ambiente verificado: Node 22+).
+
+```sh
 npm ci
-npm run dev
-```
-
-Abra http://localhost:3000 no navegador. Para parar, pressione Ctrl+C no terminal.
-
-## Verificações
-
-```bash
 npm test
 npm run typecheck
 npm run build
+npm run dev
 ```
 
-O pacote inclui a versão publicada do projeto: engine, slider contínuo, grupos exclusivos, comparador, seleção/travas de runas, presets FREE e gate PRO. É uma aplicação Next.js/React/TypeScript para VS Code; não é uma solução .sln do Visual Studio.
+`out/` é a exportação estática. Não inclui servidor Node em produção.
 
-## Supabase
+## Ordem dos módulos
 
-O laboratório funciona localmente sem credenciais. O modo local é FREE e salva até três presets no navegador. Para conectar uma conta real, copie `.env.example` para `.env.local`, preencha apenas a URL e a chave pública anon/publishable do seu projeto Supabase e siga `SUPABASE_FREEMIUM.md`. As migrações SQL e funções estão em `supabase/`. Não envie `.env.local` ao GitHub. Nunca use `service_role` em variáveis NEXT_PUBLIC.
+1. `src/contracts.ts`, `src/model.ts`, `src/native.ts`, `src/engine.ts`: contratos, atributos, fórmulas extraídas e combate 1v1 determinístico.
+2. `src/optimizer.ts`, `src/optimizer.worker.ts`: busca de itens, custos, travas, upgrades, vendas autorizadas, score e alternativas.
+3. `src/Laboratory.tsx`, `src/components.tsx`, `app/globals.css`: interface responsiva integrada aos módulos anteriores.
 
-## Enviar ao GitHub
+## Limites reais
 
-Crie um repositório vazio `aegis-lol` na conta `arthurkratos20-max`, sem README/licença/gitignore. Na pasta deste projeto:
+Resultados exploratórios. Modo Estrito permanece bloqueado. Passivas de itens, runas, dragões, grupos únicos e várias exceções de campeões não estão implementados. Nenhuma recomendação representa ótimo global ou meta observado. Fórmulas piloto extraídas não equivalem à validação completa de um campeão. Cast representa lockout; impacto continua instantâneo no tempo da ação, sem projétil/geometria. Valores esperados de crítico/acerto não representam trajetória aleatória. Subpesos são rascunhos e não entram no score.
 
-```bash
-git init
-git branch -M main
-git add .
-git status
-git commit -m "Publica projeto Aegis LoL"
-git remote add origin https://github.com/arthurkratos20-max/aegis-lol.git
-git push -u origin main
-```
+Supabase é opcional para uso local. Copie `.env.example` e configure um projeto próprio para contas/persistência. Migrações e funções estão incluídas, mas conexão, cobrança e publicação não foram verificadas em serviços reais nesta entrega. Nenhum preço ou segredo é incluído. UI PRO não constitui proteção de cálculos enviados ao navegador.
 
-O `.gitignore` incluído evita enviar dependências, builds e arquivos de ambiente. GitHub Desktop também pode publicar esta pasta, caso prefira uma interface gráfica.
-
-## Limites
-
-A engine é exploratória: várias passivas e interações ainda não estão modeladas. Runas usam scores heurísticos onde faltam fórmulas; o otimizador guloso não garante ótimo global. TTK extrapola o DPS médio da janela configurada. O gate PRO protege a interface; os cálculos continuam no cliente. Sem credenciais, não há conexão real ao Supabase nem checkout ativo. Consulte as demais documentações incluídas.
-
-Dependências e arquivos compilados não estão no ZIP; `npm ci` os instala conforme o lockfile.
+Leia `docs/progress.md` para a validação realizada e `docs/formulas/core.md` para as hipóteses.

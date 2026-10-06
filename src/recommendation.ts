@@ -32,6 +32,7 @@ const CORE:Record<Profile,string[]>={
 };
 const SPECIFIC:Record<string,string[]>={Ezreal:['3078','3004','3161','6692'],Shen:['3748','3084','6665','3065','3071','3181','3153'],Yasuo:['3153','3031','3072'],Yone:['3153','3031','3072'],Riven:['6692','3071','3161','3053'],Darius:['3078','3053','3071','3161'],Kaisa:['3124','3115','3031'],KogMaw:['3153','3124','3072'],Vayne:['3153','3124','3072'],Varus:['3153','3124','3072']};
 export function enemyAxis(s:Scenario,data:Dataset):'physical'|'magic'|'mixed' {
+ if(s.matchupUnknown)return 'mixed';
  const f=s.enemy;if(f.actions.length){let physical=0,magic=0;for(const a of f.actions){if(a.type==='physical')physical++;if(a.type==='magic')magic++;}if(physical>magic)return 'physical';if(magic>physical)return 'magic';}
  const gear=f.items.map(id=>data.items[id]?.stats??{}),ap=gear.reduce((n,i)=>n+(i.FlatMagicDamageMod??0),0),ad=gear.reduce((n,i)=>n+(i.FlatPhysicalDamageMod??0),0);if(ap>ad&&ap>0)return 'magic';if(ad>ap&&ad>0)return 'physical';
  const p=profileFor(f.champion,f.lane,data);return ['enchanter','supportDamage','fighterAP','assassinAP','mageControl','mageBurn','mageBurst'].includes(p)?'magic':['marksman','assassinAD','fighterAD'].includes(p)?'physical':'mixed';

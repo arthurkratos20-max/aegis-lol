@@ -33,13 +33,13 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const pool=Object.keys(data.items).filter(completed);
  const mine=championForCounter(s.player.champion,data,s.player),enemy=championForCounter(s.enemy.champion,data,s.enemy);
  const draft=s.counterPreset?.source.includes('Draft')?s.draft?.enemy:undefined;
- const evaluation=draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
+ const evaluation=s.matchupUnknown?{enemyCount:0,priorities:{},reasons:[]}:draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
  const ranks=rankCounterCandidates(mine,counterItemCandidates(s.player,data),evaluation),maxCounter=Math.max(1,...ranks.map(r=>r.score));
  const counters=new Map(ranks.map(r=>[r.candidate.id,r.score/maxCounter]));
  const fixed=[...new Set([...s.player.locked,...(!s.allowSell?s.player.owned:[])])];
  const lockedBoot=fixed.find(id=>isBoot(id,data)&&id!=='1001');
  const bootAllowed=kitFor(s.player,data).boots&&s.player.boots!=='none';
- let boot=bootAllowed?(s.player.boots==='fixed'?s.player.fixedBoot:lockedBoot??((evaluation.priorities['magic-resist']??0)>(evaluation.priorities.armor??0)||enemy.hasHardCC?'3111':base.boots)):null;
+ let boot=bootAllowed?(s.player.boots==='fixed'?s.player.fixedBoot:lockedBoot??((evaluation.priorities['magic-resist']??0)>(evaluation.priorities.armor??0)||(!s.matchupUnknown&&enemy.hasHardCC)?'3111':base.boots)):null;
  if(boot==='1001')boot='3158';
  if(boot&&!compatible(boot))throw Error('Bota fixa incompatível com o campeão ou snapshot.');
  if(s.player.boots==='fixed'&&lockedBoot&&lockedBoot!==boot)throw Error('Bota fixada conflita com o inventário travado.');

@@ -5,7 +5,7 @@ import type {Dataset,Fighter,Rune,RunePage} from './contracts';
 import {parseItemHTML} from './itemTooltip';
 import {SHARD_LABELS,defaultShards} from './shards';
 import {statsFor,plain} from './model';
-const cdn='https://ddragon.leagueoflegends.com/cdn/img/';
+const cdn='/assets/riot/icons/';
 export function RuneCard({r,f,data,keystone=false,onSelect,disabled=false,chosen=false}:{r:Rune;f?:Fighter;data:Dataset;keystone?:boolean;onSelect?:()=>void;disabled?:boolean;chosen?:boolean}){
  const [open,setOpen]=useState(false),[pinned,setPinned]=useState(false);
  const covered=data.version==='16.19.1'&&[9104,9105,9103,8106].includes(r.id);
