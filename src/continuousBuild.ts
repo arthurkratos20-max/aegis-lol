@@ -32,7 +32,7 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const completed=(id:string)=>compatible(id)&&!isBoot(id,data)&&(data.items[id].gold.total>=2000||id==='3041')&&Number(id)<10000;
  const pool=Object.keys(data.items).filter(completed);
  const mine=championForCounter(s.player.champion,data,s.player),enemy=championForCounter(s.enemy.champion,data,s.enemy);
- const draft=s.counterPreset?.source.includes('Draft')?s.draft?.enemy:undefined;
+ const draft=(s.counterPreset?.mode==='draft'||s.counterPreset?.source.includes('Draft'))?s.draft?.enemy:undefined;
  const evaluation=s.matchupUnknown?{enemyCount:0,priorities:{},reasons:[]}:draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
  const ranks=rankCounterCandidates(mine,counterItemCandidates(s.player,data),evaluation),maxCounter=Math.max(1,...ranks.map(r=>r.score));
  const counters=new Map(ranks.map(r=>[r.candidate.id,r.score/maxCounter]));

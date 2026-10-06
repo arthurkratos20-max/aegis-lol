@@ -74,3 +74,9 @@ Smoke de browser local: cartão pronto em 287ms com assets externos bloqueados p
 - Suportes: auto por rota, seletor Utilidade/Dano nas duas interfaces. Utilidade exclui AP egoísta sem aura/cura/proteção; Dano em rota solo libera AP compatível. Tags de utilidade usam metadados do catálogo, não orçamento ou preços inventados.
 - Eligibility e ItemScore marcados estimated; métricas calculadas usam somente efeitos suportados pelo modelo. Permissão de item não gera fórmula de habilidade ausente nem promete ótimo global. Runas de ataque consideram capacidades derivadas da matriz e mantêm requisitos de recurso/CC e travas.
 - Validação: 128 testes, incluindo pools AD/AP dos oito híbridos pedidos, ausência de tanque puro em ADCs, bloqueios de magos/bruisers, dados explícitos sobrepondo classe, Azir/Kayle, suporte por rota e modo, e todos os campeões em três pesos com seis itens distintos elegíveis. TypeScript/build necessários antes da publicação. Sem QA de navegador nesta alteração.
+
+
+## Correções do draft — 2026-10-06
+- Composição inicial respeita a rota do jogador e mantém cinco campeões distintos em cada lado. Drafts antigos com IDs ausentes, duplicados ou índice ativo inválido são normalizados sem perder seleções válidas.
+- Prévia e aplicação usam a rota do slot ativo e o nível atual. Aplicar o draft inicial persiste toda a composição para o otimizador avaliar os cinco adversários. Tipo de counter explícito, com compatibilidade para presets antigos.
+- Validação: 159 testes aprovados, incluindo os 173 campeões nas cinco rotas para inicialização do draft, recuperação de drafts antigos e preservação de inventário/pesos. TypeScript e build de produção aprovados.

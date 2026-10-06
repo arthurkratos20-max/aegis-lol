@@ -1,3 +1,4 @@
+import {normalizeDraft,DRAFT_LANES} from './draft.ts';
 import type {Dataset,Scenario,CounterPreset,RunePage} from './contracts.ts';
 import {fighter,itemEligible,isBoot} from './model.ts';
 import {kitFor,runeCompatible} from './compatibility.ts';
@@ -19,8 +20,9 @@ export function analyzeComposition(ids:readonly string[],data:Dataset):ThreatAna
  if(result.count){result.physical/=result.count;result.magic/=result.count;}return result;
 }
 export interface ContextRecommendation {preset:CounterPreset;items:string[];runes:number[];analysis:ThreatAnalysis;evaluation:CounterEvaluation;explanation:string;warnings:string[]}
-export function contextualRecommendation(s:Scenario,data:Dataset,champion:string,enemies:readonly string[],source:string,mode:'matchup'|'draft'='draft'):ContextRecommendation {
- const active=champion===s.player.champion?s.player:{...fighter(data,champion),level:s.player.level};
+export function contextualRecommendation(s:Scenario,data:Dataset,champion:string,enemies:readonly string[],source:string,mode:'matchup'|'draft'='draft',lane?:string):ContextRecommendation {
+ const current=champion===s.player.champion?s.player:{...fighter(data,champion),level:s.player.level};
+ const active=lane?{...current,lane}:current;
  const selected=[...new Set(enemies)].filter(id=>data.champions[id]).slice(0,mode==='matchup'?1:5);
  const mine=championForCounter(champion,data,active),opponents=selected.map(id=>championForCounter(id,data,id===s.enemy.champion?s.enemy:undefined));
  const evaluation=mode==='matchup'&&opponents[0]?calculateMatchupCounter(mine,opponents[0]):calculateDraftCounter(mine,opponents);
@@ -37,7 +39,12 @@ export function contextualRecommendation(s:Scenario,data:Dataset,champion:string
  const highlights=[...rankedRunes.map(r=>Number(r.candidate.id)).filter(id=>completed.selected.includes(id)),...completed.selected].filter((id,i,arr)=>arr.indexOf(id)===i).slice(0,2);
  const magic=(evaluation.priorities['magic-resist']??0)>(evaluation.priorities.armor??0);
  const boot=kitFor(active,data).boots&&active.boots!=='none'?(t.hardCC>=2||magic?'3111':t.physical>.65?'3047':p==='marksman'?'3006':ap?'3020':'3158'):null;
- const preset:CounterPreset={champion,items,boot:boot&&itemEligible(boot,data,champion)?boot:null,runes:completed,source};
+ const preset:CounterPreset={mode,lane:active.lane,champion,items,boot:boot&&itemEligible(boot,data,champion)?boot:null,runes:completed,source};
  return {preset,items,runes:highlights,analysis:t,evaluation,explanation:evaluation.reasons.join(' ')||'Compre proteção para o tipo de pressão predominante.',warnings:[...(t.airborne?['Tenacidade e purificação não removem nem encurtam arremessos ao ar.']:[]),'Prioridades heurísticas por atributos e tags dos inimigos selecionados; não representam win rate nem DPS medido. Metadados curados quando o snapshot não fornece counterTraits. Passivas sem fórmula: [Cálculo indisponível].']};
 }
-export function applyCounter(s:Scenario,data:Dataset,preset:CounterPreset):Scenario {const player=preset.champion===s.player.champion?s.player:{...fighter(data,preset.champion),level:s.player.level};return {...s,player,counterPreset:preset};}
+export function applyCounter(s:Scenario,data:Dataset,preset:CounterPreset):Scenario {
+ const current=preset.champion===s.player.champion?s.player:{...fighter(data,preset.champion),level:s.player.level};
+ const draft=preset.mode==='draft'||preset.source.includes('Draft')?normalizeDraft(s,data):s.draft;
+ const lane=preset.lane??(draft&&preset.source.includes('Draft')?DRAFT_LANES[draft.active]:current.lane);
+ return {...s,player:{...current,lane},draft,counterPreset:preset};
+}
