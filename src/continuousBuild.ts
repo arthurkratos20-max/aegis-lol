@@ -2,7 +2,7 @@ import type {Dataset,Scenario} from './contracts.ts';
 import {itemEligible,isBoot} from './model.ts';
 import {itemCompatible,kitFor} from './compatibility.ts';
 import {recommend,profileFor,type TacticalMode} from './recommendation.ts';
-import {evaluateBuild,exclusiveGroupsValid,normalizeMetric,type BuildMetrics} from './buildEvaluation.ts';
+import {evaluateBuild,exclusiveGroupsValid,normalizeMetric,offensiveMetric,type BuildMetrics} from './buildEvaluation.ts';
 import {championForCounter,counterItemCandidates} from './counterAdapters.ts';
 import {calculateMatchupCounter,calculateDraftCounter,rankCounterCandidates} from './counterEvaluation.ts';
 
@@ -10,7 +10,7 @@ export function recipeContains(final:string,component:string,data:Dataset,seen=n
  if(final===component)return true;if(seen.has(final))return false;
  return (data.items[final]?.from??[]).some(id=>recipeContains(id,component,data,new Set(seen).add(final)));
 }
-export interface ItemScore {id:string;normalizedDPS:number;normalizedEHP:number;counterBonus:number;score:number;coverage:'modeled'|'estimated'}
+export interface ItemScore {id:string;normalizedOffense:number;normalizedEHP:number;counterBonus:number;score:number;coverage:'modeled'|'estimated'}
 export function continuousWeights(sliderValue:number){
  const value=Math.max(0,Math.min(100,sliderValue));
  return {weightDamage:value/100,weightDefense:(100-value)/100};
@@ -18,12 +18,12 @@ export function continuousWeights(sliderValue:number){
 export function scoreItems(rows:{id:string;metrics:BuildMetrics;counter?:number}[],sliderValue:number):ItemScore[]{
  const {weightDamage,weightDefense}=continuousWeights(sliderValue);
  const bounds=(key:'dps'|'ehp')=>rows.reduce((b,r)=>({min:Math.min(b.min,r.metrics[key]),max:Math.max(b.max,r.metrics[key])}),{min:Infinity,max:-Infinity});
- const d=bounds('dps'),h=bounds('ehp');
+ const values=rows.map(row=>offensiveMetric(row.metrics)),d={min:Math.min(...values),max:Math.max(...values)},h=bounds('ehp');
  return rows.map(row=>{
-  const normalizedDPS=normalizeMetric(row.metrics.dps,d.min,d.max),normalizedEHP=normalizeMetric(row.metrics.ehp,h.min,h.max);
+  const normalizedOffense=normalizeMetric(offensiveMetric(row.metrics),d.min,d.max),normalizedEHP=normalizeMetric(row.metrics.ehp,h.min,h.max);
   // Counter is a bounded contextual preference, with zero influence at both pure endpoints.
   const counterBonus=.05*4*weightDamage*weightDefense*Math.max(0,Math.min(1,row.counter??0));
-  return {id:row.id,normalizedDPS,normalizedEHP,counterBonus,score:weightDamage*normalizedDPS+weightDefense*normalizedEHP+counterBonus,coverage:'estimated' as const};
+  return {id:row.id,normalizedOffense,normalizedEHP,counterBonus,score:weightDamage*normalizedOffense+weightDefense*normalizedEHP+counterBonus,coverage:'estimated' as const};
  }).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
 }
 export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced'){
