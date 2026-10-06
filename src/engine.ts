@@ -1,11 +1,13 @@
 import type {Action,CombatEvent,CombatResult,CombatSummary,Dataset,Scenario,Stats,Formula} from './contracts.ts';
 import {statsFor,attackAction,hasteCooldown,mitigate,validateScenario,effectiveResistance} from './model.ts';
 import {nativeDamage} from './native.ts';
+import {championKitCoverage} from './championKit.ts';
 export function formulaDamage(f:Formula,actor:Stats,baseAD:number,target:Stats,hp:number):number{return Math.max(0,f.base+f.ad*actor.ad+f.bonusAD*(actor.ad-baseAD)+f.ap*actor.ap+f.ownMaxHP*actor.hp+f.targetMaxHP*target.hp+f.targetCurrentHP*hp+f.targetMissingHP*(target.hp-hp));}
 export function coverageWarnings(s:Scenario,data:Dataset):string[]{
  const w=['Modelo exploratório: attack speed ratio usa a velocidade base do Data Dragon; exceções, regeneração e passivas nativas ainda não estão validadas.','Tempos, distância e acertos representam condições configuradas, sem simulação geométrica.'];
  for(const [name,f]of [['Você',s.player],['Adversário',s.enemy]] as const){if(f.items.length)w.push(`${name}: atributos numéricos do snapshot, AH/penetrações da seção de atributos e acúmulos cobertos são aplicados. Outras passivas, grupos únicos e procs continuam omitidos.`);if(f.runes.selected.length)w.push(`${name}: apenas atributos da linha Lenda e Caça Suprema cobertos pelo painel de acúmulos; demais efeitos de runas omitidos.`);if(Object.values(f.dragons).some(Boolean)||f.soul)w.push(`${name}: dragões/alma configurados, mas seus efeitos foram omitidos por falta de validação.`);if(Object.values(f.stacks).some(Boolean))w.push(`${name}: acúmulos são valores iniciais estáticos; geração/consumo durante combate não automatizados.`);if(!f.actions.length)w.push(`${name}: sequência contém somente ataques básicos; habilidades nativas não incluídas.`);}
  if(Object.values(s.enabledConditions).some(Boolean))w.push('Condições de itens/runa selecionadas não implementadas.');
+ for(const [name,f] of [['Você',s.player],['Adversário',s.enemy]] as const){const kit=championKitCoverage(f.champion,data);w.push(`${name}: kit ${kit.status==='partial'?'parcial':'sem fórmulas nativas disponíveis'}; cobertura pendente: ${kit.missing.join(', ')}. A simulação usa apenas as ações configuradas; não inclui automaticamente o kit completo.`);}
  return w;
 }
 export function simulate(s:Scenario,data:Dataset):CombatResult{

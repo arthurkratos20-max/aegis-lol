@@ -5,14 +5,15 @@ import {nativeDamage} from './native.ts';
 import {exclusiveGroupsValid} from './itemGroups.ts';
 import {getChampionScaling} from './championScaling.ts';
 import {kitFor} from './compatibility.ts';
+import {kitImpactPotential} from './championKit.ts';
 export {exclusiveGroupsValid} from './itemGroups.ts';
 export function normalizeMetric(value:number,min:number,max:number):number{return max>min?Math.max(0,Math.min(1,(value-min)/(max-min))):0;}
-export interface BuildMetrics {rawDPSByType?:Record<'physical'|'magic'|'true',number>;dps:number;ehp:number;utility:number;ttk:number;omitted:number;magicPotential?:number;magicPotentialBasis?:'spells'|'attacks'}
+export interface BuildMetrics {rawDPSByType?:Record<'physical'|'magic'|'true',number>;dps:number;ehp:number;utility:number;ttk:number;omitted:number;magicPotential?:number;magicPotentialBasis?:'spells'|'attacks';kitPotential?:number;kitCovered?:string[]}
 /** A comparison index, not spell damage: AP contribution × cooldown throughput × target mitigation. */
 export function magicalPotential(ap:number,haste:number,resistance:number):number {
  return Math.max(0,ap)*(1+Math.max(0,haste)/100)*mitigate(1,resistance);
 }
-export function offensiveMetric(metrics:BuildMetrics):number{return metrics.magicPotential??metrics.dps;}
+export function offensiveMetric(metrics:BuildMetrics):number{return metrics.kitPotential??metrics.magicPotential??metrics.dps;}
 /** Uncapped offensive throughput vs fixed target resistances. No invented combo or proc frequency. */
 export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
  const f={...s.player,items},x=statsFor(f,data),base=statsFor({...f,items:[]},data),e=s.matchupUnknown?{...statsFor(s.enemy,data),hp:2500,armor:100,mr:100,armorPen:0,armorPenPercent:0,magicPen:0,magicPenPercent:0}:statsFor(s.enemy,data),T=Math.max(.1,s.duration);
@@ -41,7 +42,9 @@ export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetri
  const magicPotentialBasis=attackMagic?'attacks' as const:'spells' as const;
  const baseAttackRate=attackMagic?statsFor({...f,items:[],overrides:{}},data).as:1;
  const magicPotential=attackMagic?Math.max(0,x.ap)*Math.min(2.5,Math.max(.01,x.as))/Math.min(2.5,Math.max(.01,baseAttackRate))*mitigate(1,resistance('magic')):magicalPotential(x.ap,x.haste,resistance('magic'));
- return {rawDPSByType,dps,ehp,utility:x.move+x.haste,ttk:dps>0?e.hp/dps:Infinity,omitted,...(estimateMagic?{magicPotential,magicPotentialBasis}:{})};
+ const kit=kitImpactPotential(f,data,x,e,s.distance);
+ const kitPotential=kit&&kit.damage>0?kit.damage+(f.automaticAttacks&&s.distance<=x.range?aa:0):undefined;
+ return {rawDPSByType,dps,ehp,utility:x.move+x.haste,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
 }
 export function calculateOptimalBuild(candidates:string[][],s:Scenario,data:Dataset,previous?:string[]):{items:string[];metrics:BuildMetrics;score:number;count:number} {
  const rows=candidates.filter(items=>exclusiveGroupsValid(items,data)).map(items=>({items,metrics:evaluateBuild(items,s,data)}));if(!rows.length)throw Error('Travas ou grupos exclusivos impedem uma build válida de seis itens.');
