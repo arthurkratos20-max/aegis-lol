@@ -13,7 +13,7 @@ export function kitImpactPotential(f:Fighter,data:Dataset,actor:Stats,target:Sta
  if(f.actions.length||!data.mechanics?.[f.champion])return null;
  let damage=0,shield=0,resource=actor.mana*f.initialResource,omitted=0;const covered:SkillKey[]=[];
  for(const [index,opt] of (nativeOptions[f.champion]??[]).entries()){
-  if(covered.includes(opt.key)||!f.skills.slice(0,f.level).includes(opt.key))continue;
+  if(opt.automatic===false||covered.includes(opt.key)||!f.skills.slice(0,f.level).includes(opt.key))continue;
   // Shen Q is one bonus on a landed attack, not an independent ranged spell.
   if(f.champion==='Shen'&&opt.key==='Q'&&(!f.automaticAttacks||distance>actor.range))continue;
   try{

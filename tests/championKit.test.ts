@@ -26,7 +26,7 @@ test('Shen native index uses the real AP/HP formulas and does not invent magical
 });
 test('isolated Ezreal impacts match independent native spell evaluations, once per skill',()=>{
  const f=fighter(data,'Ezreal'),x=statsFor(f,data),e={...statsFor(fighter(data,'Darius'),data),armor:0,mr:0};
- const expected=nativeOptions.Ezreal.map((_,i)=>nativeDamage(nativeAction(f,data,i),f,data,x,e)).reduce((a,b)=>a+b,0);
+ const expected=nativeOptions.Ezreal.map((opt,i)=>opt.automatic===false?0:nativeDamage(nativeAction(f,data,i),f,data,x,e)).reduce((a,b)=>a+b,0);
  const r=kitImpactPotential(f,data,x,e)!;assert.ok(Math.abs(r.damage-expected)<1e-9);assert.deepEqual(r.covered,['Q','E','R']);
  f.initialResource=0;assert.equal(kitImpactPotential(f,data,x,e),null);
 });
@@ -35,4 +35,22 @@ test('manual actions remain authoritative and simulation discloses unsupported k
  const m=evaluateBuild([],s,data);assert.equal(m.kitPotential,undefined);assert.equal(offensiveMetric(m),m.dps);
  const before=JSON.stringify(s),r=simulate(s,data);assert.equal(JSON.stringify(s),before);
  assert.ok(r.warnings.some(w=>w.includes('kit parcial')&&w.includes('P')));
+});
+
+test('conditional native impacts use current formulas without being assumed in automatic builds',()=>{
+ for(const [champion,key,spellName,value,coefficient] of [
+  ['Ezreal','W','EzrealW','BaseDamage',1],
+  ['Yasuo','R','YasuoR','RBaseDamage',1.5],
+  ['Riven','R','RivenFengShuiEngine','MinBase',.550000011920929],
+ ] as const){
+  const f=fighter(data,champion);f.items=['3072','3089'];
+  const actor=statsFor(f,data),base=statsFor({...f,items:[],runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Lux'),data);
+  const index=nativeOptions[champion].findIndex(o=>o.key===key&&o.automatic===false);
+  const a=nativeAction(f,data,index),rank=f.skills.slice(0,f.level).filter(k=>k===key).length;
+  const spell=data.mechanics![champion].spells[spellName];
+  const expected=spell.values[value][rank]+coefficient*(actor.ad-base.ad)+(champion==='Ezreal'?spell.values.APRatio[rank]*actor.ap:0);
+  assert.ok(Math.abs(nativeDamage(a,f,data,actor,target)-expected)<1e-8);
+  assert.ok(championKitCoverage(champion,data).covered.includes(key));
+  assert.ok(!kitImpactPotential(f,data,actor,target)?.covered.includes(key));
+ }
 });
