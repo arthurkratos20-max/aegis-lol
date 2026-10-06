@@ -16,23 +16,24 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
  const warnings=coverageWarnings(s,data);const sides=['player','enemy'] as const;
  const st={player:statsFor(s.player,data),enemy:statsFor(s.enemy,data)};
  const hp={player:st.player.hp*s.player.initialHP,enemy:st.enemy.hp*s.enemy.initialHP};const resource={player:st.player.mana*s.player.initialResource,enemy:st.enemy.mana*s.enemy.initialResource};
- const summary=():CombatSummary=>({damage:0,raw:0,dps:0,hp:0,death:null,healing:0,shielding:0,composition:{physical:0,magic:0,true:0}});
+ const summary=():CombatSummary=>({damage:0,raw:0,dps:0,hp:0,death:null,healing:0,shielding:0,ccSeconds:0,composition:{physical:0,magic:0,true:0}});
  const results={player:summary(),enemy:summary()};const cooldowns:Record<string,number>={};const locks={player:0,enemy:0};const cc={player:0,enemy:0};const stasis={player:0,enemy:0};const shields:{player:{amount:number;expires:number}[];enemy:{amount:number;expires:number}[]}={player:[],enemy:[]};
  const queue:{side:'player'|'enemy';a:Action;order:number}[]=[];let order=0;
  for(const side of sides){const f=s[side];for(const a of f.actions)queue.push({side,a,order:order++});if(f.automaticAttacks&&f.uptime>0&&s.distance<=st[side].range){const interval=1/(st[side].as*Math.max(.001,f.uptime));for(let t=0;t<s.duration;t+=interval)queue.push({side,a:attackAction(t),order:order++});}else if(f.automaticAttacks&&s.distance>st[side].range)warnings.push(`${side}: ataques fora do alcance inicial; nenhum ataque automático gerado.`);}
  queue.sort((a,b)=>a.a.at-b.a.at||a.order-b.order);const events:CombatEvent[]=[];
  function record(side:'player'|'enemy',a:Action,raw=0,damage=0,absorbed=0,overkill=0,note?:string){events.push({at:a.at,actor:side,source:a.name,kind:a.kind,type:a.type,raw,damage,absorbed,overkill,playerHP:hp.player,enemyHP:hp.enemy,playerResource:resource.player,enemyResource:resource.enemy,note});}
- for(const {side,a}of queue){const other=side==='player'?'enemy':'player';if(a.at>s.duration)continue;
+ for(const {side,a}of queue){const other=side==='player'?'enemy':'player';if(a.at>=s.duration)continue;
   shields.player=shields.player.filter(x=>x.expires>a.at);shields.enemy=shields.enemy.filter(x=>x.expires>a.at);
   if(hp[side]<=0){record(side,a,0,0,0,0,'Ação cancelada: morto');continue;}if(a.at<cc[side]||a.at<stasis[side]||a.at<locks[side]){record(side,a,0,0,0,0,'Ação cancelada: CC, estase ou cast em andamento');continue;}
   const key=`${side}:${a.key}`;if(a.at<(cooldowns[key]??0)){record(side,a,0,0,0,0,'Ação cancelada: cooldown');continue;}if(resource[side]<a.cost){record(side,a,0,0,0,0,'Ação cancelada: recurso insuficiente');continue;}
   resource[side]-=a.cost;cooldowns[key]=a.at+hasteCooldown(a.cooldown,st[side].haste+(a.key==='R'?(st[side].ultimateHaste??0):['Q','W','E'].includes(a.key)?(st[side].basicHaste??0):0));locks[side]=a.at+a.cast;
-  const base=statsFor({...s[side],items:[],overrides:{},runes:{...s[side].runes,shards:[]}},data).ad;let raw=a.native?nativeDamage(a,s[side],data,st[side],st[other]):formulaDamage(a.formula,st[side],base,st[other],hp[other]);
+  const beneficial=a.kind==='heal'||a.kind==='shield';const target=beneficial?side:other;
+  const base=statsFor({...s[side],items:[],overrides:{},runes:{...s[side].runes,shards:[]}},data).ad;let raw=a.native?nativeDamage(a,s[side],data,st[side],st[target]):formulaDamage(a.formula,st[side],base,st[target],hp[target]);
   if(a.kind==='stasis'){stasis[side]=a.at+a.duration;record(side,a);continue;}
-  if(a.kind==='heal'){const amount=Math.min(st[side].hp-hp[side],raw*(1-s.conditions.grievous));hp[side]+=amount;results[side].healing+=amount;record(side,a,raw,0,0,0,`Cura útil ${amount.toFixed(1)}`);continue;}
-  if(a.kind==='shield'){shields[side].push({amount:raw*(1-s.conditions.shieldReduction),expires:a.at+a.duration});record(side,a,raw);continue;}
+  if(a.kind==='heal'){const amount=Math.min(st[side].hp-hp[side],raw*a.hit*(1-s.conditions.grievous));hp[side]+=amount;results[side].healing+=amount;record(side,a,raw,0,0,0,`Cura útil ${amount.toFixed(1)}`);continue;}
+  if(a.kind==='shield'){shields[side].push({amount:raw*a.hit*(1-s.conditions.shieldReduction),expires:a.at+a.duration});record(side,a,raw);continue;}
   if(hp[other]<=0){record(side,a,0,0,0,0,'Alvo morto');continue;}if(a.at<stasis[other]){record(side,a,0,0,0,0,'Alvo em estase');continue;}
-  if(a.kind==='cc'){cc[other]=Math.max(cc[other],a.at+a.duration);record(side,a);continue;}
+  if(a.kind==='cc'){const end=Math.min(s.duration,a.at+a.duration*a.hit);results[side].ccSeconds+=Math.max(0,end-Math.max(a.at,cc[other]));cc[other]=Math.max(cc[other],end);record(side,a,0,0,0,0,a.hit<1?'CC com duração esperada pela chance configurada':undefined);continue;}
   if(a.kind==='attack')raw*=1+st[side].crit*(st[side].critMultiplier-1);raw*=a.hit;
   const resistance=a.type==='physical'?effectiveResistance(st[other].armor,st[side].armorPenPercent,st[side].armorPen):effectiveResistance(st[other].mr,st[side].magicPenPercent,st[side].magicPen);
   const post=a.type==='true'?raw:mitigate(raw,resistance);let remaining=post,absorbed=0;
