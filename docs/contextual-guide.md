@@ -9,3 +9,11 @@ O montador preserva os scores de cada rodada em `decisions`. A UI usa esses valo
 Matchups são um índice de pressão por características (alcance básico, CC, tanque, burst), não taxas de vitória ou um ranking de meta. O catálogo completo é exibido sem filtro de popularidade por rota. Casos sem evidência de vantagem ficam sem lista favorável. Sinergias distinguem possibilidade de complementaridade de um combo comprovado; fontes de cura/escudo podem ser próprias.
 
 Validação: 197 testes, incluindo cobertura de todo o elenco e recomposição das decisões para 173 campeões × 5 rotas (865 cenários); TypeScript e build de produção. Essa bateria não reexecuta a auditoria histórica de 451.530 matchups, pois o score não foi alterado.
+
+## Layout compacto
+
+As listas de matchups e sinergias usam retratos com detalhe sob seleção. Não são exibidas taxas de vitória inventadas. As habilidades usam abas com uma descrição aberta por vez e navegação por setas; artes de skins do catálogo são ilustrativas, com fallback à splash local base quando a imagem externa falha. A arte não representa mudança de efeito da habilidade.
+
+`GuideText` resolve nomes exatos conhecidos e tokens explícitos de item, runa, campeão e habilidade. Habilidades de outros campeões mostram retrato, ícone, tecla e nome. Tokens desconhecidos permanecem como texto literal; não há interpretação de HTML. As comparações são editoriais ou por descrição, não equivalência de mecânicas.
+
+Regressão do layout: 201 testes aprovados, com referências de Q/W/E/R de todo o elenco e proteção contra correspondência em partes de palavras; TypeScript e build de produção.

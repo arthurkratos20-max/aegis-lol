@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import type {Dataset} from '../src/contracts.ts';
+import {parseGuideReferences} from '../src/guideReferences.ts';
+const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+test('explicit cross-champion ability includes champion portrait, key and skill name',()=>{const parts=parseGuideReferences('Compare [[skill:Jax:E]] com [[skill:Shen:W]].',data);const refs=parts.filter(p=>p.reference).map(p=>p.reference!);assert.equal(refs.length,2);assert.equal(refs[0].key,'E');assert.ok(refs[0].championIcon);assert.match(refs[0].label,/Jax/);assert.ok(refs[0].icon.endsWith(data.champions.Jax.spells[2].image.full));});
+test('rune and item names resolve to circular reference data without substring corruption',()=>{const name=data.items['3084'].name,rune=data.runes.flatMap(t=>t.slots.flatMap(s=>s.runes)).find(r=>r.id===8437)!;const parts=parseGuideReferences(`${name} e ${rune.name}.`,data);assert.equal(parts.filter(p=>p.reference).length,2);assert.ok(!parseGuideReferences('Jaxxx é um texto sem referência.',data).some(p=>p.reference));});
+test('invalid references stay readable and ordinary text stays literal',()=>{const text='[[skill:missing:Q]] <script> nunca é HTML executável';assert.equal(parseGuideReferences(text,data).map(p=>p.text).join(''),text);});
+test('skill references resolve for every champion',()=>{for(const c of Object.values(data.champions))for(const key of ['Q','W','E','R']){const parts=parseGuideReferences(`[[skill:${c.id}:${key}]]`,data);assert.equal(parts.length,1);assert.equal(parts[0].reference?.key,key);}});
