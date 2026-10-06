@@ -17,3 +17,7 @@ As listas de matchups e sinergias usam retratos com detalhe sob seleção. Não 
 `GuideText` resolve nomes exatos conhecidos e tokens explícitos de item, runa, campeão e habilidade. Habilidades de outros campeões mostram retrato, ícone, tecla e nome. Tokens desconhecidos permanecem como texto literal; não há interpretação de HTML. As comparações são editoriais ou por descrição, não equivalência de mecânicas.
 
 Regressão do layout: 201 testes aprovados, com referências de Q/W/E/R de todo o elenco e proteção contra correspondência em partes de palavras; TypeScript e build de produção.
+
+## Preferências finais de leitura
+
+Cards de runas e itens mantêm padding e tamanho de texto legíveis. As referências inline exibem somente ícones, com nome e descrição do catálogo em tooltip por mouse, foco ou toque e Escape para fechar. A habilidade referenciada inclui retrato, ícone e tecla; o nome completo fica no tooltip e no rótulo acessível. As orientações de cenário das runas usam condições editoriais explícitas (exposição a burst, engage dos suportes, custo de abandonar a lane); não classificam volatilidade por dados de partidas inexistentes. Validação final: 202 testes, TypeScript e build de produção.
