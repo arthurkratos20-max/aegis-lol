@@ -79,4 +79,6 @@ Smoke de browser local: cartão pronto em 287ms com assets externos bloqueados p
 ## Correções do draft — 2026-10-06
 - Composição inicial respeita a rota do jogador e mantém cinco campeões distintos em cada lado. Drafts antigos com IDs ausentes, duplicados ou índice ativo inválido são normalizados sem perder seleções válidas.
 - Prévia e aplicação usam a rota do slot ativo e o nível atual. Aplicar o draft inicial persiste toda a composição para o otimizador avaliar os cinco adversários. Tipo de counter explícito, com compatibilidade para presets antigos.
-- Validação: 159 testes aprovados, incluindo os 173 campeões nas cinco rotas para inicialização do draft, recuperação de drafts antigos e preservação de inventário/pesos. TypeScript e build de produção aprovados.
+- Validação: 160 testes aprovados, incluindo os 173 campeões nas cinco rotas para inicialização do draft, recuperação de drafts antigos e preservação de inventário/pesos. TypeScript e build de produção aprovados.
+
+- Runas e fragmento de tenacidade consideram todos os inimigos do draft aplicado; adversário desconhecido e extremos do slider preservam bônus zero.

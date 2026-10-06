@@ -20,3 +20,13 @@ test('applying a default draft persists all enemies and slot lane, preserving cu
 test('different active draft champion uses slot lane and leaves current scenario untouched until applied',()=>{
  const s=initialScenario(data);s.draft=normalizeDraft(s,data);s.draft.own[4]='Lux';s.draft.active=4;const before=JSON.stringify(s);const r=contextualRecommendation(s,data,'Lux',s.draft.enemy,'Draft 5v5','draft','Support');assert.equal(r.preset.lane,'Support');assert.equal(JSON.stringify(s),before);const next=applyCounter(s,data,r.preset);assert.equal(next.player.champion,'Lux');assert.equal(next.player.lane,'Support');assert.equal(next.player.level,s.player.level);
 });
+
+import {heuristicRuneScore} from '../src/runeOptimizer.ts';
+test('rune counter bonuses use all applied draft enemies and remain zero for unknown matchup and slider extremes',()=>{
+ const s=initialScenario(data);s.enemy=fighter(data,'MasterYi');s.draft=normalizeDraft(s,data);s.draft.enemy=['MasterYi','Leona','Shen','Ahri','Lulu'];
+ const rec=contextualRecommendation(s,data,s.player.champion,s.draft.enemy,'Draft 5v5','draft');const next=applyCounter(s,data,rec.preset);
+ const rune=data.runes.flatMap(t=>t.slots.flatMap(row=>row.runes)).find(r=>r.id===8242)!;
+ assert.equal(heuristicRuneScore(rune,s,data,50).counterBonus,0);assert.ok(heuristicRuneScore(rune,next,data,50).counterBonus>0);
+ for(const slider of [0,100])assert.equal(heuristicRuneScore(rune,next,data,slider).counterBonus,0);
+ next.matchupUnknown=true;assert.equal(heuristicRuneScore(rune,next,data,50).counterBonus,0);
+});
