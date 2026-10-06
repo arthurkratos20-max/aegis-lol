@@ -2,6 +2,7 @@ import type {Dataset,Scenario,RunePage,RuneTree,Rune} from './contracts.ts';
 import {kitFor,runeCompatible} from './compatibility.ts';
 import {continuousWeights} from './continuousBuild.ts';
 import {SHARD_ROWS} from './shards.ts';
+import {kitRuneEstimate,runeAffinity} from './runeAffinity.ts';
 import {championForCounter} from './counterAdapters.ts';
 export interface HeuristicRuneScore {
  id:number; normalizedDPS:number; normalizedEHP:number; counterBonus:number; score:number;
@@ -20,10 +21,10 @@ function runeThreats(s:Scenario,data:Dataset){
 }
 export function heuristicRuneScore(rune:Rune,s:Scenario,data:Dataset,sliderValue:number):HeuristicRuneScore {
  const k=kitFor(s.player,data),enemies=runeThreats(s,data),w=continuousWeights(sliderValue);
- let [normalizedDPS,normalizedEHP]=estimates[rune.id]??[.1,.1];
+ let [normalizedDPS,normalizedEHP]=kitRuneEstimate(rune.id,s.player,data)??estimates[rune.id]??[.1,.1];
  if([8008,9923,9104].includes(rune.id)&&!k.autoAttack)normalizedDPS*=.15;
  if(rune.id===8437&&k.healthScaling)normalizedDPS+=.1;
- if([8214,8465,8453].includes(rune.id)&&!k.healShield)normalizedEHP*=.2;
+ if([8214,8465,8453].includes(rune.id)&&!k.healShield&&!(rune.id===8465&&['engage','warden'].includes(runeAffinity(s.player,data))))normalizedEHP*=.2;
  const counter=!s.matchupUnknown&&enemies.some(enemy=>rune.id===8473&&enemy.isBurst||rune.id===8242&&enemy.hasHardCC||rune.id===8017&&enemy.isTank||rune.id===8444&&enemy.hasHealing)?1:0;
  const counterBonus=.05*4*w.weightDamage*w.weightDefense*counter;
  return {id:rune.id,normalizedDPS,normalizedEHP,counterBonus,score:w.weightDamage*normalizedDPS+w.weightDefense*normalizedEHP+counterBonus,coverage:'heuristic'};
@@ -31,7 +32,7 @@ export function heuristicRuneScore(rune:Rune,s:Scenario,data:Dataset,sliderValue
 export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense)):RunePage {
  const page=s.player.runes;if(page.locked)return structuredClone(page);
  const locks=page.locks??{},locked=new Set(locks.runes??[]),k=kitFor(s.player,data);
- const viable=(r:Rune)=>runeCompatible(r.id,s.player,data).allowed&&(r.id!==8465||k.healShield)&&(r.id!==8401||k.healShield);
+ const viable=(r:Rune)=>runeCompatible(r.id,s.player,data).allowed&&(r.id!==8465||k.healShield||['engage','warden'].includes(runeAffinity(s.player,data)))&&(r.id!==8401||k.healShield);
  const locate=(id:number)=>{for(const tree of data.runes)for(let row=0;row<tree.slots.length;row++)if(tree.slots[row].runes.some(r=>r.id===id))return {tree,row};return undefined;};
  for(const id of locked){const slot=locate(id);if(!slot||!page.selected.includes(id)||![page.primary,page.secondary].includes(slot.tree.id)||slot.tree.id===page.secondary&&slot.row===0)throw Error('Trava de runa ausente ou incompatível com as árvores atuais.');}
  const primaryLocked=locks.primaryTree||[...locked].some(id=>locate(id)?.tree.id===page.primary);

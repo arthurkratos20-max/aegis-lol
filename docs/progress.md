@@ -82,3 +82,16 @@ Smoke de browser local: cartão pronto em 287ms com assets externos bloqueados p
 - Validação: 160 testes aprovados, incluindo os 173 campeões nas cinco rotas para inicialização do draft, recuperação de drafts antigos e preservação de inventário/pesos. TypeScript e build de produção aprovados.
 
 - Runas e fragmento de tenacidade consideram todos os inimigos do draft aplicado; adversário desconhecido e extremos do slider preservam bônus zero.
+
+
+## Afinidade de runas para magos — 2026-10-06
+- Scores de runas por kit: burst, poke, dano contínuo de habilidades, encantador e ataques AP. São estimativas curadas de afinidade, sem alegação de ótimo global ou meta observado.
+- Magos de habilidades não recebem automaticamente Ritmo Fatal, Chuva de Lâminas ou runas de AS/roubo de vida. Classificação Fighter secundária não comprova sinergia com ataques contínuos. Azir/Kayle/Teemo preservam acesso; Twisted Fate/Neeko podem mudar afinidade com inventário AD/AS explícito.
+- Runas de mana, aceleração e defesa seguem requisitos/kit. Travas individuais, páginas travadas, edição manual e estrutura legal de seis runas/três fragmentos preservadas.
+- Validação: 164 testes aprovados; varredura de todos os 101 percentuais em 15 magos, expectativas de arquétipos, exceções de ataques AP e travas. TypeScript e build de produção aprovados.
+
+
+## Afinidade de runas para suportes e tanques — 2026-10-06
+- Suportes separados em encantadores, engage, proteção e dano por ataques. Aery valoriza encantadores, Pós-Choque valoriza engage com imobilização, Guardião valoriza proteção de aliados e Aperto valoriza tanques de rota. Suportes de dano preservam afinidade de habilidades; Senna/Pyke possuem perfis próprios.
+- Runas menores priorizam cura/escudo, proteção e durabilidade conforme kit. Guardião não exige que o próprio campeão tenha uma habilidade de cura/escudo. Pós-Choque continua condicionado a CC; runas de mana respeitam recurso; travas preservadas.
+- Validação: 168 testes aprovados, incluindo magos, suportes/tanques nos extremos e intermediário do slider, oito tanques em 101 percentuais, exceções ofensivas e travas. Scores são heurísticas curadas, não dados de meta nem demonstração de ótimo global.
