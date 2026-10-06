@@ -56,18 +56,18 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
  const rank=(ids:string[])=>scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...chosen,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
  const legal=(id:string)=>!chosen.includes(id)&&exclusiveGroupsValid([...chosen,id],data);
- let evaluated=0;const scores:ItemScore[]=[];
+ let evaluated=0;const scores:ItemScore[]=[];const decisions:{selected:string;candidates:ItemScore[]}[]=[];
  // Keep each owned/locked component represented by a legal final upgrade.
  for(const component of fixed.filter(id=>!isBoot(id,data)&&!required.includes(id))){
   if(chosen.some(id=>!required.includes(id)&&recipeContains(id,component,data)))continue;
   const upgrades=pool.filter(id=>legal(id)&&recipeContains(id,component,data));evaluated+=upgrades.length;
-  const best=rank(upgrades)[0];if(!best||chosen.length===6)throw Error('Não há espaço para um upgrade compatível do componente travado.');
-  chosen.push(best.id);scores.push(best);
+  const ranked=rank(upgrades),best=ranked[0];if(!best||chosen.length===6)throw Error('Não há espaço para um upgrade compatível do componente travado.');
+  decisions.push({selected:best.id,candidates:ranked});chosen.push(best.id);scores.push(best);
  }
  while(chosen.length<6){
   const candidates=pool.filter(legal);evaluated+=candidates.length;
-  const best=rank(candidates)[0];if(!best)throw Error('Grupos únicos impedem completar os seis slots.');
-  chosen.push(best.id);scores.push(best);
+  const ranked=rank(candidates),best=ranked[0];if(!best)throw Error('Grupos únicos impedem completar os seis slots.');
+  decisions.push({selected:best.id,candidates:ranked});chosen.push(best.id);scores.push(best);
  }
- return {base,boot,core,target:chosen,scores,evaluated,metrics:evaluateBuild(chosen,s,data),sliderValue};
+ return {base,boot,core,target:chosen,scores,decisions,evaluated,metrics:evaluateBuild(chosen,s,data),sliderValue};
 }

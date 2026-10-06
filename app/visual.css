@@ -158,3 +158,17 @@ dialog::backdrop{background:#07090dcc;backdrop-filter:blur(8px)}
 @media(max-width:420px){.suggested-build-grid{gap:8px}.suggested-build-slot{padding:8px 4px 22px}}
 
 .matchup-mode{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,340px);gap:12px 24px;align-items:center;margin-bottom:24px}.matchup-mode h3{font-size:16px}.matchup-mode p{margin:8px 0 0;font-size:12px}.matchup-mode-note{grid-column:1/-1;color:var(--gold);font-size:11px;letter-spacing:.02em}@media(max-width:700px){.matchup-mode{grid-template-columns:1fr}.matchup-mode select{width:100%}}
+
+/* Contextual learning: independent selection and explanation focus. */
+.educational-runes{display:grid;grid-template-columns:minmax(320px,1fr) minmax(280px,1fr);gap:20px;align-items:start}
+.rune-lessons{max-height:700px;overflow:auto;padding:4px 10px 4px 4px;scrollbar-width:thin}
+.guide-card{background:#111923;border:1px solid #293748;border-radius:12px;padding:16px;margin:10px 0;transition:border-color .15s,box-shadow .15s}
+.guide-card h4,.guide-card summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:0}
+.guide-card img{width:38px;height:38px;object-fit:contain;border-radius:6px}
+.guide-card p{line-height:1.65;color:#bac9d9;font-size:14px}
+.guide-card.is-active,.guide-card:focus-visible{border-color:#d8b66a;box-shadow:0 0 0 2px #d8b66a33;outline:none}
+.rs-icon.guide-highlight{opacity:1!important;border-color:var(--rune-color)!important;box-shadow:0 0 0 3px var(--rune-color),0 0 24px var(--rune-color);filter:brightness(1.3)}
+.contextual-guide{margin:24px 0;min-width:0}.contextual-guide>section{scroll-margin-top:100px;margin:26px 0}.guide-item-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.guide-nav{display:flex;gap:12px;flex-wrap:wrap}.guide-nav a{padding:8px 14px;border:1px solid #344354;border-radius:8px;color:#ddbd7d;text-decoration:none}.guide-nav a:hover,.guide-nav a:focus-visible{background:#27313e}.guide-advanced{border-top:1px solid #344354;margin-top:14px;padding-top:14px}.contextual-guide .skill-table td{min-width:28px;text-align:center}
+.quick-bottom-grid:has(.educational-runes){grid-template-columns:1fr}.contextual-guide .notice{padding:10px}.contextual-guide .testing-tag{white-space:normal}
+@media(max-width:850px){.educational-runes,.guide-item-grid{grid-template-columns:1fr}.rune-lessons{max-height:460px}.contextual-guide{padding:14px}.educational-runes{min-width:0}.rune-selector{min-width:0}}
+@media(prefers-reduced-motion:reduce){.guide-card{transition:none}}

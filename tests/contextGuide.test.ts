@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import type {Dataset} from '../src/contracts.ts';
+import {initialScenario,fighter} from '../src/model.ts';
+import {runeGuide,guideMatchups,guideAllies,skillUsage} from '../src/contextGuide.ts';
+import {fullBuild} from '../src/fullBuild.ts';
+const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+test('guide functions cover every champion without invented match statistics',()=>{for(const id of Object.keys(data.champions)){const s=initialScenario(data);s.player=fighter(data,id);const before=JSON.stringify(s);const rows=guideMatchups(s,data);for(const row of [...rows.hard,...rows.best]){assert.notEqual(row.id,id);assert.ok(Number.isFinite(row.pressure));assert.ok(row.reasons.length);}assert.ok(rows.hard.every(r=>r.pressure>0));assert.ok(rows.best.every(r=>r.pressure<0));assert.ok(guideAllies(s,data).every(r=>r.id!==id&&r.reasons.length));for(const sp of data.champions[id].spells){const g=skillUsage(sp.description);assert.ok(g.moment&&g.position&&g.mistake);}for(const tree of data.runes)for(const r of tree.slots[0].runes){const g=runeGuide(r,s,data);assert.ok(g.synergy&&g.condition&&Number.isFinite(g.score.score));}assert.equal(JSON.stringify(s),before);}});
+test('item explanations use exact scoring traces for every champion and route',()=>{for(const id of Object.keys(data.champions))for(const lane of ['Top','Jungle','Mid','Bot','Support']){const s=initialScenario(data);s.player=fighter(data,id);s.player.lane=lane;s.matchupUnknown=true;const r=fullBuild(s,data);for(const d of r.decisions??[]){assert.equal(d.selected,d.candidates[0].id);assert.ok(r.target.includes(d.selected));for(const row of d.candidates){const recomputed=s.weights.offense/100*row.normalizedOffense+s.weights.defense/100*row.normalizedEHP+s.weights.utility/100*row.normalizedUtility+row.counterBonus;assert.ok(Math.abs(row.score-recomputed)<1e-9);}}}});
+test('Aftershock teaching requires landing immobilization rather than treating ranged as trigger',()=>{const s=initialScenario(data);s.player=fighter(data,'Shen');const r=data.runes.flatMap(t=>t.slots.flatMap(row=>row.runes)).find(r=>r.id===8439)!;assert.match(runeGuide(r,s,data).condition,/acertar a imobilização/);});

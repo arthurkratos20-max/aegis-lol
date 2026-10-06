@@ -14,7 +14,7 @@ export function itemReason(id:string,data:Dataset):string{
 export function fullBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced',_previous?:string[]):QuickRecommendation{
  const result=greedyContinuousBuild(s,data,mode),target=result.target,weights=preferenceWeights(s.weights),kit=championKitCoverage(s.player.champion,data);
  
- return {...result.base,cores:target.filter(id=>!isBoot(id,data)),boots:result.boot,target,
+ return {...result.base,decisions:result.decisions,cores:target.filter(id=>!isBoot(id,data)),boots:result.boot,target,
   runes:calculateOptimalRunes(s,data,s.weights),
   total:target.reduce((n,id)=>n+data.items[id].gold.total,0),
   reasons:Object.fromEntries(target.map(id=>[id,id===result.boot?'Bota contextual fixa durante o slider.':id===result.core?'Item-chave fixo para preservar o perfil do campeão.':itemReason(id,data)])),

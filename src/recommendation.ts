@@ -53,7 +53,7 @@ export function runeSuggestion(profile:Profile,s:Scenario,data:Dataset,mode:Tact
  if(extra.length<2){for(const slot of second.slots.slice(1)){if(extra.some(id=>slot.runes.some(r=>r.id===id)))continue;const valid=slot.runes.find(r=>runeCompatible(r.id,s.player,data).allowed);if(valid)extra.push(valid.id);if(extra.length===2)break;}}
  return {primary,secondary,selected:[...main,...extra],shards:[],locked:false};
 }
-export interface QuickRecommendation {profile:Profile;cores:string[];boots:string|null;target:string[];runes:RunePage;verdict:string;reasons:Record<string,string>;warnings:string[];total:number}
+export interface QuickRecommendation {decisions?:{selected:string;candidates:import('./continuousBuild.ts').ItemScore[]}[];profile:Profile;cores:string[];boots:string|null;target:string[];runes:RunePage;verdict:string;reasons:Record<string,string>;warnings:string[];total:number}
 export function recommend(s:Scenario,data:Dataset,mode:TacticalMode='balanced'):QuickRecommendation {
  const profile=supportIntent(s.player,data)==='utility'?profileFor(s.player.champion,'Support',data):profileFor(s.player.champion,s.player.lane==='Support'&&s.player.supportMode==='damage'?'Mid':s.player.lane,data),axis=enemyAxis(s,data),isAP=['enchanter','supportDamage','fighterAP','assassinAP','mageControl','mageBurn','mageBurst'].includes(profile),isTank=['tank','supportTank'].includes(profile);
  const pool=[...(SPECIFIC[s.player.champion]??CORE[profile])];
