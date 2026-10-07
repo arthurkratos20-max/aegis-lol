@@ -212,3 +212,21 @@
 .compact-laboratory .champion-details .back-link{justify-self:start}
 .compact-laboratory .champion-details h2{display:flex;align-items:center;gap:8px}
 .compact-laboratory .champion-details h2 img{width:30px;height:30px;border:1px solid #46566b;border-radius:4px;object-fit:cover}
+
+/* Stage 1: one compact, reactive preferences area. */
+.compact-laboratory .tactical-preference{display:grid;gap:8px}
+.compact-laboratory .preferences .panel-head{margin-bottom:8px}
+.compact-laboratory .preferences .objective-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.compact-laboratory .preferences .field{gap:4px;margin:0}
+.compact-laboratory .preferences select{min-height:32px;padding:5px 8px;font-size:12px}
+.compact-laboratory .preferences .hint{margin:6px 0;font-size:11px;line-height:1.4}
+.compact-laboratory .preferences .preset-row{gap:6px;margin:6px 0 0;flex-wrap:wrap}
+.compact-laboratory .preferences .preset-row button{padding:4px 10px;font-size:11px;min-height:28px}
+.compact-laboratory .preferences .advanced{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid #253143}
+.compact-laboratory .preferences .advanced>.slider-field{grid-column:span 4;margin:0;font-size:12px}
+.compact-laboratory .preferences .advanced>.hint{grid-column:1/-1}
+.compact-laboratory .preferences .advanced input[type=number]{min-height:30px;padding:4px 8px}
+@media(max-width:600px){.compact-laboratory .preferences .advanced{grid-template-columns:repeat(2,minmax(0,1fr))}.compact-laboratory .preferences .objective-fields{grid-template-columns:1fr}.compact-laboratory .preferences .advanced>.slider-field{grid-column:1/-1}}
+
+.compact-laboratory .preferences .advanced>.field{grid-column:span 3}
+@media(max-width:600px){.compact-laboratory .preferences .advanced>.field{grid-column:span 1}}

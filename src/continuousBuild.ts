@@ -47,14 +47,14 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const ranks=rankCounterCandidates(mine,counterItemCandidates(s.player,data),evaluation),maxCounter=Math.max(1,...ranks.map(r=>r.score));
  const counters=new Map(ranks.map(r=>[r.candidate.id,r.score/maxCounter]));
  const fixed=[...new Set([...s.player.locked,...(!s.allowSell?s.player.owned:[])])];
- const lockedBoot=fixed.find(id=>isBoot(id,data)&&id!=='1001');
+ const lockedBoot=fixed.find(id=>isBoot(id,data)&&(id!=='1001'||s.player.locked.includes(id)));
  const bootAllowed=kitFor(s.player,data).boots&&s.player.boots!=='none';
  let boot=bootAllowed?(s.player.boots==='fixed'?s.player.fixedBoot:lockedBoot??((evaluation.priorities['magic-resist']??0)>(evaluation.priorities.armor??0)||(!s.matchupUnknown&&enemy.hasHardCC)?'3111':base.boots)):null;
- if(boot==='1001')boot='3158';
+ if(boot==='1001'&&!s.player.locked.includes(boot))boot='3158';
  if(boot&&!compatible(boot))throw Error('Bota fixa incompatível com o campeão ou snapshot.');
  if(s.player.boots==='fixed'&&lockedBoot&&lockedBoot!==boot)throw Error('Bota fixada conflita com o inventário travado.');
  if(!bootAllowed&&fixed.some(id=>isBoot(id,data)))throw Error('A regra Sem Botas conflita com uma bota travada ou possuída.');
- const required=fixed.filter(id=>!isBoot(id,data)&&data.items[id]&&(data.items[id].gold.total>=2000||id==='3041'));
+ const required=fixed.filter(id=>!isBoot(id,data)&&data.items[id]&&(s.player.locked.includes(id)||data.items[id].gold.total>=2000||id==='3041'));
  if(!exclusiveGroupsValid(fixed,data))throw Error('Itens travados ou possuídos conflitam em grupos exclusivos.');
  const coreEligible=(id:string)=>completed(id)&&exclusiveGroupsValid([...required,...(required.includes(id)?[]:[id])],data);
  const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
@@ -87,7 +87,7 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const rank=(ids:string[])=>rankWith(ids,chosen);
  const legal=(id:string)=>!chosen.includes(id)&&exclusiveGroupsValid([...chosen,id],data);
 
- // Keep each owned/locked component represented by a legal final upgrade.
+ // Explicit locks keep the exact item; only unlocked owned components may upgrade.
  for(const component of fixed.filter(id=>!isBoot(id,data)&&!required.includes(id))){
   if(chosen.some(id=>!required.includes(id)&&recipeContains(id,component,data)))continue;
   const upgrades=pool.filter(id=>legal(id)&&recipeContains(id,component,data));evaluated+=upgrades.length;
@@ -99,5 +99,9 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
   const ranked=rank(candidates),best=ranked[0];if(!best)throw Error('Grupos únicos impedem completar os seis slots.');
   decisions.push({selected:best.id,candidates:ranked});chosen.push(best.id);scores.push(best);
  }
- return {base,boot,core,target:chosen,scores,decisions,evaluated,metrics:evaluateBuild(chosen,s,data),sliderValue};
+ // Keep manually locked inventory slots in place; fill the remaining slots with ranked choices.
+ const target=Array<string>(chosen.length),free=chosen.filter(id=>!s.player.locked.includes(id));
+ for(const id of s.player.locked){const slot=s.player.items.indexOf(id),index=slot>=0?slot:chosen.indexOf(id);if(index<0||index>=target.length)throw Error('Item travado não pertence a um slot válido do inventário.');target[index]=id;}
+ for(let index=0;index<target.length;index++)if(!target[index])target[index]=free.shift()!;
+ return {base,boot,core,target,scores,decisions,evaluated,metrics:evaluateBuild(target,s,data),sliderValue};
 }
