@@ -150,3 +150,65 @@
 .tactical-preference{grid-column:1/-1;min-width:0}
 @media(min-width:1024px){.compact-laboratory .tactical-preference .build-controls{grid-template-columns:minmax(290px,2.4fr) repeat(4,minmax(0,1fr));gap:16px;align-items:center}.compact-laboratory .tactical-preference .build-control-preference{grid-column:auto}.compact-laboratory .tactical-preference .build-control-metric:last-child{grid-column:auto}}
 @media(max-width:1023px){.tactical-context{grid-column:auto;grid-template-columns:minmax(0,1fr)}.tactical-preference{grid-column:auto}}
+/* Refined compact surfaces and champion portrait selectors. */
+.champion-picker{min-width:0;margin:0}
+.champion-picker-trigger{display:flex!important;align-items:center;gap:8px;width:100%;text-align:left;min-height:42px;padding:6px 9px!important;background:#0c131d!important;border:1px solid #334052!important;border-radius:7px!important}
+.champion-picker-trigger img,.champion-picker-menu img{width:28px;height:28px;object-fit:cover;border:1px solid #46566b;border-radius:4px;flex-shrink:0}
+.champion-picker-trigger strong{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.champion-picker-trigger>svg{flex-shrink:0;color:#91a4bd}
+.champion-picker-unknown{width:28px;height:28px;display:grid;place-items:center;background:#172234;border:1px solid #334a60;border-radius:4px;color:#b4c4d7;flex-shrink:0}
+.champion-picker-menu{position:fixed;z-index:11000;display:flex;flex-direction:column;background:#0f1723;border:1px solid #45566d;border-radius:8px;box-shadow:0 14px 40px #0009;overflow:hidden;font-size:13px}
+.champion-picker-search{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid #28384d;color:#92a6bf;flex:none}
+.champion-picker-search input{width:100%;min-width:0;min-height:32px;border:0;border-radius:4px;padding:6px;background:#0a111b;font-size:12px}
+.champion-picker-list{overflow-y:auto;overscroll-behavior:contain;padding:4px;min-height:0}
+.champion-picker-list button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;border-radius:4px;padding:5px 7px;min-height:40px;text-align:left;font-size:13px}
+.champion-picker-list button>span:not(.champion-picker-unknown){flex:1}
+.champion-picker-list button.is-active{background:#243449}
+.champion-picker-list button[aria-selected=true]{color:#ebc985;background:#c7a25414}
+.champion-picker-list button>svg{color:#e2bb69;flex:none}
+.champion-picker-empty{font-size:12px;color:#a0afc2;padding:10px}
+.compact-laboratory .tactical-context .champion-hero{background-color:#111a26;background-position:right 30%;min-height:0}
+.compact-laboratory .champion-details{padding:12px;display:grid;grid-template-columns:1fr auto;gap:6px 12px}
+.compact-laboratory .champion-details .back-link{grid-column:1;font-size:11px;padding:0}
+.compact-laboratory .hero-tags{grid-column:2;grid-row:1;margin:0;justify-content:flex-end}
+.compact-laboratory .champion-details h2{grid-column:1/-1;font-size:19px;margin:0}
+.compact-laboratory .champion-details>p{display:none}
+.compact-laboratory .hero-fields{grid-column:1/-1;margin:0;gap:8px}
+.compact-laboratory .hero-fields label{margin-bottom:0}
+.compact-laboratory .tactical-context .matchup-mode{padding:12px;gap:6px;align-content:start}
+.compact-laboratory .matchup-mode h3{font-size:13px}
+.compact-laboratory .matchup-mode p{display:none}
+.compact-laboratory .matchup-mode .champion-picker>span{display:none}
+.compact-laboratory .matchup-mode-note{font-size:10px}
+.compact-laboratory .tactical-context{gap:12px}
+.compact-laboratory .tactical-dashboard,.compact-laboratory .tactical-config,.compact-laboratory .tactical-analysis{gap:12px}
+.compact-laboratory .panel{padding:12px;background:linear-gradient(150deg,#121c29,#101720);border-color:#2b3a4d;border-radius:8px;box-shadow:0 3px 12px #0001}
+.compact-laboratory .panel-head{margin-bottom:8px}
+.compact-laboratory .tactical-preference .build-controls{padding:10px 12px;border-radius:8px;background:#111b28;gap:12px}
+.compact-laboratory .build-control-preference>small{font-size:10px;line-height:1.3;margin:0}
+.compact-laboratory .build-control-preference>label{font-size:10px}
+.compact-laboratory .build-control-labels{margin:3px 0}
+.compact-laboratory .build-control-preference input[type=range]{margin:0;height:20px;min-height:20px}
+.compact-laboratory .build-control-metric strong{font-size:16px}
+.compact-laboratory .rune-selector{padding:4px 0}
+.compact-laboratory .rs-tabs{padding-bottom:6px;margin-bottom:6px}
+.compact-laboratory .rs-row{padding:6px 0}
+.compact-laboratory .rs-caption{margin:6px 0 0}
+.compact-laboratory .rs-columns header{margin-bottom:3px}
+.compact-laboratory #manual-runes>.hint{font-size:11px;margin:5px 0}
+.compact-laboratory #manual-runes>details{margin:6px 0;padding-top:6px}
+.compact-laboratory .rune-lessons{margin-top:7px}
+.compact-laboratory .duel-analysis-title{margin:10px 0 6px}
+.compact-laboratory .tactical-table th,.compact-laboratory .tactical-table td{padding:5px 7px}
+.compact-laboratory .page-heading{margin-bottom:12px}
+@media(max-width:600px){.compact-laboratory .hero-tags{max-width:160px;flex-wrap:wrap}.compact-laboratory .champion-details{grid-template-columns:1fr auto}.champion-picker-trigger{min-height:42px!important}.champion-picker-menu{font-size:14px}.champion-picker-list button{min-height:44px}}
+.fast-main{padding-top:18px;padding-bottom:32px}
+.fast-layout{gap:12px}
+.fast-panel{padding:14px;border-radius:9px}
+.quick-header{padding-top:16px;padding-bottom:16px}
+.fast-summary{margin-bottom:16px}
+.fast-shards>span{font-size:10px}
+
+.compact-laboratory .champion-details .back-link{justify-self:start}
+.compact-laboratory .champion-details h2{display:flex;align-items:center;gap:8px}
+.compact-laboratory .champion-details h2 img{width:30px;height:30px;border:1px solid #46566b;border-radius:4px;object-fit:cover}
