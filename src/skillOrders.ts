@@ -14,7 +14,7 @@ export function pathPriority(sequence:SkillKey[],data:Dataset,id:string):SkillKe
 }
 export function baseSkillPlan(data:Dataset,id:string,lane:string):SkillPlan{
  const record=records[id],local=record?.lanes[lane],dominant=Object.entries(record?.lanes??{}).sort((a,b)=>b[1].games-a[1].games)[0];
- const enough=local&&local.games>=100,entry=enough?[lane,local] as const:dominant;
+ const enough=local&&local.games>=100,entry=local?[lane,local] as const:dominant;
  const row=entry?.[1],sourceLane=entry?.[0]??lane,samePatch=skillOrderSnapshot.patch===data.version;
  const priority=id==='Udyr'?['R','W','E','Q'] as SkillKey[]:row?keys(row.priority):['Q','E','W'] as SkillKey[];
  const observed=row?keys(row.sequence):[];
@@ -33,6 +33,7 @@ export function skillPlan(s:Scenario,data:Dataset,side:'player'|'enemy'='player'
  const alternatives:SkillPlan['alternatives']=[];
  const variant=(label:string,priority:SkillKey[],opening:SkillKey[],reason:string,points:Record<number,SkillKey>={})=>{const sequence=buildSkillPath(data,f.champion,priority,opening,points);if(sequence.length)alternatives.push({label,reason,sequence});return sequence;};
  let sequence=plan.sequence,reason=plan.reason,changed=false;
+ if(f.champion==='Shen'&&f.lane==='Jungle'){sequence=buildSkillPath(data,f.champion,plan.priority,['Q','W','E']);reason='Selva: abertura Q → W → E estimada para fortalecer ataques e bloquear ataques dos monstros antes de liberar E. Mantém a prioridade de maximização da referência; não estima tempo de clear. O adversário selecionado representa encontros/invasões, não uma lane de farm.';changed=true;}
  if(f.champion==='Urgot'&&f.lane==='Top'){
   const ranged=variant('Pressão com segundo Q',['W','Q','E'],['E','Q','W'],'Guia editorial de GoliathGames: segundo ponto em Q no nível 4 para pressão/slow, mantendo W no nível 9. Escolha estimada; acertar Q e gerenciar mana continuam necessários.',{4:'Q'});
   if(known&&range>300){sequence=ranged;reason=`Contra ${c.name}, há alcance à distância: testar pressão de Q antes de prolongar ataques. ${alternatives[0].reason}`;changed=true;}

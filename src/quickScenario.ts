@@ -11,5 +11,8 @@ const weights:Record<Profile,Scenario['weights']>={
 /** Independent automatic recommendation: manual sliders, inventories and presets stay in the manual workspace. */
 export function quickScenario(s:Scenario,data:Dataset):Scenario {
  const profile=profileFor(s.player.champion,s.player.lane,data),base=initialScenario(data);
- return withSkillPlans({...base,player:{...fighter(data,s.player.champion),lane:s.player.lane},enemy:{...fighter(data,s.enemy.champion),lane:s.player.lane},matchupUnknown:s.matchupUnknown,weights:{...weights[profile]},teamPriority:0},data);
+ const automatic={...weights[profile]};
+ if(s.player.lane==='Jungle'&&['tank','fighterAD','fighterAP'].includes(profile)){automatic.offense+=20;automatic.defense-=20;}
+ if(s.player.lane==='Mid'&&profile==='tank'){automatic.offense+=10;automatic.defense-=10;}
+ return withSkillPlans({...base,player:{...fighter(data,s.player.champion),lane:s.player.lane},enemy:{...fighter(data,s.enemy.champion),lane:s.player.lane},matchupUnknown:s.matchupUnknown,weights:automatic,teamPriority:0},data);
 }
