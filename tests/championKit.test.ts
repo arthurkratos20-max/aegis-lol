@@ -7,7 +7,7 @@ import {championKitCoverage,kitImpactPotential} from '../src/championKit.ts';
 import {evaluateBuild,offensiveMetric} from '../src/buildEvaluation.ts';
 import {nativeAction,nativeDamage,nativeOptions} from '../src/native.ts';
 import {simulate} from '../src/engine.ts';
-const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 data.mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8')).champions;
 test('every champion has explicit coverage and none is misreported as a complete kit',()=>{
  const rows=Object.keys(data.champions).map(id=>championKitCoverage(id,data));

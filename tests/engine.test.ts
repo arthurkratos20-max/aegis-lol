@@ -7,7 +7,7 @@ import {growth,hasteCooldown,mitigate,initialScenario,statsFor,skillValid,conser
 import {simulate,formulaDamage} from '../src/engine.ts';
 import {legalBuild,purchaseCost,optimize,pareto,purchasePlan} from '../src/optimizer.ts';
 import {nativeAction,nativeDamage} from '../src/native.ts';
-const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 data.mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8')).champions;
 function scene():Scenario{const s=initialScenario(data);s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;s.player.overrides={hp:1000,ad:100,armor:100,mr:100,mana:100};s.enemy.overrides={hp:1000,ad:100,armor:100,mr:100,mana:100};return s;}
 function action(p:Partial<Action>={}):Action{return {id:'a',at:0,kind:'spell',key:'Q',name:'Test spell',type:'physical',formula:{...EMPTY_FORMULA,base:100},cooldown:0,cost:0,cast:0,duration:1,hit:1,onHit:false,custom:true,coverage:'testing',...p};}

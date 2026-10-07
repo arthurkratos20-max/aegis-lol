@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+execFileSync(process.execPath, ["--experimental-strip-types", path.join(root, "scripts/prepare-catalog.mjs")], { stdio: "inherit" });
 const archive = path.join(root, "assets/riot-images.tar.gz");
 const assets = path.join(root, "assets");
 const parts = readdirSync(assets).filter(name => /^riot-images\.part-\d{3}$/.test(name)).sort();

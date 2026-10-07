@@ -5,7 +5,7 @@ import {recommend,goldCheck,runeSuggestion,profileFor,itemSetJSON} from '../src/
 import {runeCompatible} from '../src/compatibility.ts';
 import {tooltipFor} from '../src/abilityTooltip.ts';
 import {splashURL} from '../src/skins.ts';
-const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));data.mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8')).champions;
+const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));data.mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8')).champions;
 test('both default levels are 18',()=>{const s=initialScenario(data);assert.equal(s.player.level,18);assert.equal(s.enemy.level,18);});
 test('chroma always resolves splash of base skin',()=>{assert.equal(splashURL('Shen',{num:999,baseSkinNum:2,chromaId:12345}),'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Shen_2.jpg');});
 test('Data Dragon parentSkin resolves actual chroma splash',()=>{const chroma=data.champions.Shen.skins.find(sk=>sk.parentSkin!==undefined)!;assert.equal(splashURL('Shen',chroma),`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Shen_${chroma.parentSkin}.jpg`);});

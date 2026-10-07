@@ -11,7 +11,7 @@ export interface RuneTree {id:number;name:string;icon:string;slots:{runes:Rune[]
 export interface NativeSpell {values:Record<string,number[]>;calculations:Record<string,CalcNode>;cooldown:number[];cost:number[];path:string}
 export interface CalcNode {__type:string;[key:string]:unknown}
 export interface ChampionMechanics {ratio:number;critMultiplier:number;spells:Record<string,NativeSpell>;source:string}
-export interface Dataset {version:string;locale:string;generatedAt:string;source:string;champions:Record<string,Champion>;items:Record<string,Item>;runes:RuneTree[];mechanics?:Record<string,ChampionMechanics>}
+export interface Dataset {catalogWarnings?:string[];statCorrections?:{champion:string;stat:string;value:number;source:string}[];version:string;locale:string;generatedAt:string;source:string;champions:Record<string,Champion>;items:Record<string,Item>;runes:RuneTree[];mechanics?:Record<string,ChampionMechanics>}
 export interface RuneLocks {primaryTree?:boolean;secondaryTree?:boolean;runes?:number[];shards?:number[]}
 export interface RunePage {locks?:RuneLocks;primary:number;secondary:number;selected:number[];shards:string[];locked:boolean}
 export interface Stats {basicHaste?:number;ultimateHaste?:number;hp:number;ad:number;ap:number;armor:number;mr:number;mana:number;as:number;baseAS:number;ratio:number;bonusAS:number;crit:number;critMultiplier:number;haste:number;move:number;range:number;hpRegen:number;manaRegen:number;lifesteal:number;armorPen:number;magicPen:number;armorPenPercent:number;magicPenPercent:number}
