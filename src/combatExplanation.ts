@@ -1,0 +1,3 @@
+import type {CombatEvent,CombatResult} from './contracts.ts';
+export function explainCombatEvent(e:CombatEvent){const damaging=['attack','spell'].includes(e.kind)&&!e.note?.startsWith('Ação cancelada')&&!['Alvo morto','Alvo em estase'].includes(e.note??'');const afterResistance=e.damage+e.absorbed+e.overkill;return {damaging,afterResistance,resistanceDifference:damaging?e.raw-afterResistance:0,cancelled:!!e.note?.startsWith('Ação cancelada')};}
+export function combatSequenceSummary(r:CombatResult){return {events:r.events.length,cancelled:r.events.filter(e=>explainCombatEvent(e).cancelled).length,damage:r.events.reduce((n,e)=>n+e.damage,0),absorbed:r.events.reduce((n,e)=>n+e.absorbed,0)};}
