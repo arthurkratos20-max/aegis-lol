@@ -16,7 +16,7 @@ const shardIcons={adaptive:Swords,as:Zap,haste:Zap,move:Footprints,scalingHP:Hea
 export default function RuneSelector({page,data,scenario,onChange}:RuneSelectorProps){
  const [error,setError]=useState(''),[highlight,setHighlight]=useState<number|null>(null);
  const primary=data.runes.find(t=>t.id===page.primary),secondary=data.runes.find(t=>t.id===page.secondary);
- function commit(next:RunePage){try{const resolved=calculateOptimalRunes({...scenario,player:{...scenario.player,runes:next}},data);onChange(resolved);setError('');}catch(e){setError(e instanceof Error?e.message:String(e));}}
+ function commit(next:RunePage){try{const resolved=calculateOptimalRunes({...scenario,player:{...scenario.player,runes:next}},data,scenario.weights,true);onChange(resolved);setError('');}catch(e){setError(e instanceof Error?e.message:String(e));}}
  function runeButton(r:Rune,tree:number,keystone=false){
   const selected=page.selected.includes(r.id),locked=page.locked||!!page.locks?.runes?.includes(r.id),compatibility=runeCompatible(r.id,scenario.player,data);
   return <span className="rs-slot" key={r.id}><button type="button" className={`rs-icon ${keystone?'rs-keystone':''} ${selected?'is-selected':''} ${highlight===r.id?'guide-highlight':''}`} data-rune-id={r.id} style={{'--rune-color':colors[tree]??'#b5c5dc'} as CSSProperties} disabled={!compatibility.allowed&&!selected} aria-label={`${r.name}${locked?' · escolha travada':''}`} aria-pressed={selected} title={`${r.name}\n${plain(r.longDesc||r.shortDesc)}${!compatibility.allowed?'\nIncompatível com o kit deste campeão.':''}`} onClick={()=>{if(!selected||!locked)commit(selectManualRune(page,data,r.id));}}>
