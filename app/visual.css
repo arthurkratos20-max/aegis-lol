@@ -195,3 +195,5 @@ dialog::backdrop{background:#07090dcc;backdrop-filter:blur(8px)}
 .guide-matchup-group.allies .guide-champion-label{text-align:left;min-width:0}.guide-matchup-group.allies .guide-champion-label strong{font-size:14px;text-align:left}
 @media(max-width:850px){.guide-matchup-group.allies .guide-champion-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.guide-matchup-group.allies .guide-champion-strip{grid-template-columns:1fr}}
+
+.team-portrait-button{padding:0;border:0;background:transparent;flex-shrink:0}.team-portrait-button:disabled{opacity:1}.team-portrait-button .team-champion-splash{display:block}.active-team-champion{outline:1px solid var(--accent,#c7aa70);outline-offset:-1px;border-radius:8px}.team-workspace>.results-grid{margin:16px 0}.team-workspace .context-assistant{border:0;padding:12px 0}.team-workspace>details{margin-top:16px}
