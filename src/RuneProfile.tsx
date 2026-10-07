@@ -1,8 +1,9 @@
 'use client';
 import {useState} from 'react';
-import {Swords,Zap,Shield,X} from 'lucide-react';
+import {X} from 'lucide-react';
 import type {Dataset,Fighter,Rune,RunePage} from './contracts';
 import {parseItemHTML} from './itemTooltip';
+import {ShardIcon} from './AttributeLabel';
 import {SHARD_LABELS,defaultShards} from './shards';
 import {statsFor,plain} from './model';
 const cdn='/assets/riot/icons/';
@@ -18,5 +19,5 @@ export default function RuneProfile({page,f,data}:{page:RunePage;f?:Fighter;data
  const selected=(tree:typeof primary)=>tree?.slots.flatMap(slot=>slot.runes.filter(r=>page.selected.includes(r.id)))??[];
  const main=selected(primary),extra=selected(secondary),keystone=primary?.slots[0].runes.find(r=>page.selected.includes(r.id));
  const shards=page.shards.length===3?page.shards:f?defaultShards(f,data):['haste','adaptive','hp'];
- return <div className="rune-profile-grid"><section><header>{primary&&<img src={cdn+primary.icon} alt=""/>}<span><small>Principal</small><b>{primary?.name??'Não definida'}</b></span></header>{keystone?<RuneCard r={keystone} f={f} data={data} keystone/>:<p className="hint">Runachave não selecionada.</p>}{main.filter(r=>r.id!==keystone?.id).map(r=><RuneCard key={r.id} r={r} f={f} data={data}/>)}</section><section><header>{secondary&&<img src={cdn+secondary.icon} alt=""/>}<span><small>Secundária</small><b>{secondary?.name??'Não definida'}</b></span></header>{extra.map(r=><RuneCard key={r.id} r={r} f={f} data={data}/>)}<div className="rune-shards"><h4>Fragmentos de atributo</h4>{[Swords,Zap,Shield].map((Icon,i)=><div key={i}><Icon size={17}/><span><small>{['Ofensivo','Flexível','Defensivo'][i]}</small><b>{SHARD_LABELS[shards[i]]??SHARD_LABELS.hp}</b></span></div>)}<p>Tabela de fragmentos · 16.19.1{data.version!=='16.19.1'?' · revisão do novo patch pendente':''}</p></div></section></div>;
+ return <div className="rune-profile-grid"><section><header>{primary&&<img src={cdn+primary.icon} alt=""/>}<span><small>Principal</small><b>{primary?.name??'Não definida'}</b></span></header>{keystone?<RuneCard r={keystone} f={f} data={data} keystone/>:<p className="hint">Runachave não selecionada.</p>}{main.filter(r=>r.id!==keystone?.id).map(r=><RuneCard key={r.id} r={r} f={f} data={data}/>)}</section><section><header>{secondary&&<img src={cdn+secondary.icon} alt=""/>}<span><small>Secundária</small><b>{secondary?.name??'Não definida'}</b></span></header>{extra.map(r=><RuneCard key={r.id} r={r} f={f} data={data}/>)}<div className="rune-shards"><h4>Fragmentos de atributo</h4>{shards.map((shard,i)=><div key={i}><ShardIcon shard={shard}/><span><small>{['Ofensivo','Flexível','Defensivo'][i]}</small><b>{SHARD_LABELS[shards[i]]??SHARD_LABELS.hp}</b></span></div>)}<p>Tabela de fragmentos · 16.19.1{data.version!=='16.19.1'?' · revisão do novo patch pendente':''}</p></div></section></div>;
 }
