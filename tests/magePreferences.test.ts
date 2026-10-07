@@ -25,12 +25,12 @@ test('empty mage actions disclose estimated rotation DPS and respond to AP',()=>
   assert.ok(offensiveMetric(ap)>offensiveMetric(empty),champion);
  }
 });
-test('configured actions and marksmen retain modeled DPS as the offensive criterion',()=>{
+test('configured actions retain their criterion; incomplete marksmen use a separate attribute index',()=>{
  const s={...initialScenario(data),matchupUnknown:true,player:fighter(data,'Lux')};
  s.player.actions=[{id:'q',at:0,kind:'spell',key:'Q',name:'AP test',type:'magic',formula:{...EMPTY_FORMULA,base:100,ap:1},cooldown:4,cost:0,cast:0,duration:0,hit:1,onHit:false,custom:true,coverage:'testing'}];
  const base=evaluateBuild([],s,data),ap=evaluateBuild(['3089'],s,data);
  assert.equal(ap.magicPotential,undefined);assert.ok(ap.dps>base.dps);assert.equal(offensiveMetric(ap),ap.dps);
- s.player=fighter(data,'Jinx');const adc=evaluateBuild(['3031'],s,data);assert.equal(adc.magicPotential,undefined);assert.equal(offensiveMetric(adc),adc.dps);
+ s.player=fighter(data,'Jinx');const adc=evaluateBuild(['3031'],s,data);assert.equal(adc.magicPotential,undefined);assert.equal(adc.offenseBasis,'attribute-index');assert.equal(adc.exactDPS,null);assert.equal(offensiveMetric(adc),adc.offenseValue);
 });
 test('weighted item score uses the magic index and crosses before 100 percent',()=>{
  const rows=[{id:'ap',metrics:{dps:20,magicPotential:200,ehp:100,utility:0,ttk:1,omitted:0}},{id:'tank',metrics:{dps:20,magicPotential:100,ehp:200,utility:0,ttk:1,omitted:0}}];

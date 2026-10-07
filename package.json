@@ -11,7 +11,9 @@
     "ingest": "node scripts/ingest.mjs",
     "prebuild": "node scripts/prepare-image-assets.mjs",
     "predev": "node scripts/prepare-image-assets.mjs",
-    "pretest": "node scripts/prepare-image-assets.mjs"
+    "pretest": "node scripts/prepare-image-assets.mjs",
+    "sync:kits": "node --experimental-strip-types scripts/sync-kits.mjs",
+    "audit:kits": "node --experimental-strip-types scripts/audit-kits.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",

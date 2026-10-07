@@ -12,7 +12,7 @@ import {kitFor} from './compatibility.ts';
 import {kitImpactPotential} from './championKit.ts';
 export {exclusiveGroupsValid} from './itemGroups.ts';
 export function normalizeMetric(value:number,min:number,max:number):number{return max>min?Math.max(0,Math.min(1,(value-min)/(max-min))):0;}
-export interface BuildMetrics {rawDPSByType?:Record<'physical'|'magic'|'true',number>;isExactFormula?:boolean;estimatedRotationDPS?:number;offenseValue?:number;dps:number;ehp:number;utility:number;ttk:number;omitted:number;magicPotential?:number;magicPotentialBasis?:'spells'|'attacks';kitPotential?:number;kitCovered?:string[]}
+export interface BuildMetrics {exactDPS?:number|null;offenseBasis?:'attribute-index'|'configured-actions';rawDPSByType?:Record<'physical'|'magic'|'true',number>;isExactFormula?:boolean;estimatedRotationDPS?:number;offenseValue?:number;dps:number;ehp:number;utility:number;ttk:number;omitted:number;magicPotential?:number;magicPotentialBasis?:'spells'|'attacks';kitPotential?:number;kitCovered?:string[]}
 /** A comparison index, not spell damage: AP contribution × cooldown throughput × target mitigation. */
 export function magicalPotential(ap:number,haste:number,resistance:number):number {
  return Math.max(0,ap)*(1+Math.max(0,haste)/100)*mitigate(1,resistance);
@@ -87,7 +87,8 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
  }
  const k=kitFor(f,data),utility=Math.max(0,x.haste)/100*(1+(k.hardCC?.25:0)+(k.healShield?.5:0))+Math.max(0,x.move-base.move)/100+(k.mana?Math.max(0,x.mana-base.mana)/Math.max(1,base.mana)+Math.max(0,x.manaRegen-base.manaRegen)/Math.max(1,base.manaRegen):0);
  const offenseValue=s.objective==='single'?(f.actions.length?singleDamage:peak):s.objective==='burst'?(f.actions.length?burstDamage:damage/T*Math.min(T,3)+burst):dps;
- return {isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
+ const attributeIndex=classAbilityPower(champion,x,base,1,1,{...getChampionScaling(champion,data),damageType:championForCounter(f.champion,data,f).damageType}).raw*(1+Math.max(0,x.haste)/100)+(getChampionScaling(champion,data).hasAttackSpeedScaling?rawAA*rate:0);
+ return {exactDPS:null,offenseBasis:f.actions.length?'configured-actions':'attribute-index',isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue:f.actions.length?offenseValue:attributeIndex,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
 }
 /** Weighted target comparison, not simultaneous 5v5 combat. Harmonic EHP mixes damage taken. */
 export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {

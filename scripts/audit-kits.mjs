@@ -1,0 +1,7 @@
+import fs from 'node:fs';import {championKitCoverage} from '../src/championKit.ts';
+const data=JSON.parse(fs.readFileSync('public/data/pt_BR.json'));const mechanics=JSON.parse(fs.readFileSync('public/data/mechanics.json'));
+if(mechanics.version===data.version)data.mechanics=mechanics.champions;
+let imported;try{imported=JSON.parse(fs.readFileSync('public/data/kit-import.json'));}catch{}
+const kits=Object.keys(data.champions).map(id=>{const coverage=championKitCoverage(id,data),candidate=imported?.version===data.version?imported.champions?.[id]:undefined;return {id,isExactFormula:coverage.isExactFormula,missing:coverage.missing,unresolvedPlaceholders:Object.fromEntries(data.champions[id].spells.map((spell,index)=>[['Q','W','E','R'][index],[...new Set((spell.tooltip??'').match(/\{\{[^}]+\}\}/g)??[])]])),importedImpacts:candidate?.impacts?.length??0,unvalidatedImpacts:candidate?.impacts?.filter(i=>!i.reviewed||i.missing.length).length??0,importedConditions:candidate?.impacts?.map(i=>({key:i.key,condition:i.condition,kind:i.kind,terms:i.terms,missing:i.missing,reviewed:i.reviewed}))??[],importGaps:candidate?.missing??['Dataset alternativo correspondente ao patch ainda não importado.']};});
+const report={patch:data.version,champions:kits.length,fullyValidated:kits.filter(k=>k.isExactFormula).length,kitImportPatchRejected:!!imported&&imported.version!==data.version,kits};
+fs.writeFileSync('docs/kit-pipeline-audit.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
