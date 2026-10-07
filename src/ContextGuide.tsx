@@ -1,4 +1,5 @@
 'use client';
+import KitReview from './KitReview';
 import BuildStages from './BuildStages';
 import LanePlan from './LanePlan';
 import GuideMatchups from './GuideMatchups';
@@ -17,6 +18,7 @@ export default function ContextGuide({scenario:s,data,recommendation:rec,onChang
  const excluded=round?.candidates.filter(row=>!rec.target.includes(row.id)&&row.score<round.candidates[0].score-1e-9).slice(0,3)??[];
  return <section className="panel contextual-guide" aria-label="Guia contextual do campeão"><div className="panel-head"><div><span className="quick-eyebrow">GUIA CONTEXTUAL · {s.player.lane}</span><h2>Entenda {c.name}</h2></div><span className="testing-tag">{coverage.isExactFormula?'Guia Refinado & Validado':'Estimativa de Kit'}</span></div><p className="hint">Análise de Sinergia de Kit (Calculador Aegis). {coverage.status==='partial'?'Há fórmulas parciais disponíveis; isso não valida o kit completo nem este guia.':'Textos dinâmicos por perfil e catálogo; interações específicas ainda exigem revisão.'} Estatísticas de builds/matchups: não integradas; a ordem de habilidades indica sua fonte separadamente.</p>
  <nav className="guide-nav" aria-label="Seções do guia">{[['skills','Habilidades'],['items','Itens'],['matchups','Matchups'],['synergies','Sinergias']].map(([id,label])=><a key={id} href={`#guide-${id}`}>{label}</a>)}</nav>
+ <KitReview key={`kit:${c.id}`} scenario={s} data={data} onChange={onChange}/>
  <LanePlan scenario={s} data={data}/>
  <GuideSkills key={`skills:${c.id}`} scenario={s} data={data} onChange={onChange}/>
  <BuildStages scenario={s} data={data} recommendation={rec}/>
