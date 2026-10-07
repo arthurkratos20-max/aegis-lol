@@ -1,3 +1,4 @@
+import {attributePreferences,preferenceScore} from './advancedPreferences.ts';
 import {championForCounter} from './counterAdapters.ts';
 import {teamContext} from './teamContext.ts';
 import {classAbilityPower,normalizeSpell,hasDocumentedNonDamageImpact} from './abilityModel.ts';
@@ -12,7 +13,7 @@ import {kitFor} from './compatibility.ts';
 import {kitImpactPotential} from './championKit.ts';
 export {exclusiveGroupsValid} from './itemGroups.ts';
 export function normalizeMetric(value:number,min:number,max:number):number{return max>min?Math.max(0,Math.min(1,(value-min)/(max-min))):0;}
-export interface BuildMetrics {exactDPS?:number|null;offenseBasis?:'attribute-index'|'configured-actions';rawDPSByType?:Record<'physical'|'magic'|'true',number>;isExactFormula?:boolean;estimatedRotationDPS?:number;offenseValue?:number;dps:number;ehp:number;utility:number;ttk:number;omitted:number;magicPotential?:number;magicPotentialBasis?:'spells'|'attacks';kitPotential?:number;kitCovered?:string[]}
+export interface BuildMetrics {attributes?:Record<string,number>;exactDPS?:number|null;offenseBasis?:'attribute-index'|'configured-actions';rawDPSByType?:Record<'physical'|'magic'|'true',number>;isExactFormula?:boolean;estimatedRotationDPS?:number;offenseValue?:number;dps:number;ehp:number;utility:number;ttk:number;omitted:number;magicPotential?:number;magicPotentialBasis?:'spells'|'attacks';kitPotential?:number;kitCovered?:string[]}
 /** A comparison index, not spell damage: AP contribution × cooldown throughput × target mitigation. */
 export function magicalPotential(ap:number,haste:number,resistance:number):number {
  return Math.max(0,ap)*(1+Math.max(0,haste)/100)*mitigate(1,resistance);
@@ -87,8 +88,11 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
  }
  const k=kitFor(f,data),utility=Math.max(0,x.haste)/100*(1+(k.hardCC?.25:0)+(k.healShield?.5:0))+Math.max(0,x.move-base.move)/100+(k.mana?Math.max(0,x.mana-base.mana)/Math.max(1,base.mana)+Math.max(0,x.manaRegen-base.manaRegen)/Math.max(1,base.manaRegen):0);
  const offenseValue=s.objective==='single'?(f.actions.length?singleDamage:peak):s.objective==='burst'?(f.actions.length?burstDamage:damage/T*Math.min(T,3)+burst):dps;
- const attributeIndex=classAbilityPower(champion,x,base,1,1,{...getChampionScaling(champion,data),damageType:championForCounter(f.champion,data,f).damageType}).raw*(1+Math.max(0,x.haste)/100)+(getChampionScaling(champion,data).hasAttackSpeedScaling?rawAA*rate:0);
- return {exactDPS:null,offenseBasis:f.actions.length?'configured-actions':'attribute-index',isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue:f.actions.length?offenseValue:attributeIndex,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
+ const impactIndex=classAbilityPower(champion,x,base,1,1,{...getChampionScaling(champion,data),damageType:championForCounter(f.champion,data,f).damageType}).raw;
+ const attackIndex=getChampionScaling(champion,data).hasAttackSpeedScaling?rawAA*rate:0;
+ const attributeIndex=s.objective==='single'?Math.max(impactIndex,f.automaticAttacks&&s.distance<=x.range?rawAA:0):s.objective==='burst'?impactIndex*(1+Math.max(0,x.haste)/100*Math.min(T,3)/T)+attackIndex*Math.min(T,3):impactIndex*(1+Math.max(0,x.haste)/100)+attackIndex;
+ const attributes={AD:x.ad,AP:x.ap,HP:x.hp,Armadura:x.armor,RM:x.mr,AS:x.as,Haste:x.haste,Movimento:x.move};
+ return {attributes,exactDPS:null,offenseBasis:f.actions.length?'configured-actions':'attribute-index',isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue:f.actions.length?offenseValue:attributeIndex,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
 }
 /** Weighted target comparison, not simultaneous 5v5 combat. Harmonic EHP mixes damage taken. */
 export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
@@ -104,6 +108,7 @@ export function calculateOptimalBuild(candidates:string[][],s:Scenario,data:Data
  const rows=candidates.filter(items=>exclusiveGroupsValid(items,data)).map(items=>({items,metrics:evaluateBuild(items,s,data)}));if(!rows.length)throw Error('Travas ou grupos exclusivos impedem uma build válida de seis itens.');
  const bounds=(key:'dps'|'ehp'|'utility')=>{let min=Infinity,max=-Infinity;for(const row of rows){min=Math.min(min,row.metrics[key]);max=Math.max(max,row.metrics[key]);}return {min,max};};
  const d=rows.reduce((b,row)=>({min:Math.min(b.min,offensiveMetric(row.metrics)),max:Math.max(b.max,offensiveMetric(row.metrics))}),{min:Infinity,max:-Infinity}),h=bounds('ehp'),u=bounds('utility'),w=preferenceWeights(s.weights);let best=rows[0],score=-Infinity;
- for(const row of rows){const value=w.weightDamage*normalizeMetric(offensiveMetric(row.metrics),d.min,d.max)+w.weightDefense*normalizeMetric(row.metrics.ehp,h.min,h.max)+w.weightUtility*normalizeMetric(row.metrics.utility,u.min,u.max);const same=previous&&row.items.length===previous.length&&row.items.every(id=>previous.includes(id));if(value>score+1e-9||Math.abs(value-score)<=1e-9&&same){best=row;score=value;}}
+ const preferences=attributePreferences(rows.map(row=>row.metrics),s.subweights);
+ for(const [index,row] of rows.entries()){const baseScore=w.weightDamage*normalizeMetric(offensiveMetric(row.metrics),d.min,d.max)+w.weightDefense*normalizeMetric(row.metrics.ehp,h.min,h.max)+w.weightUtility*normalizeMetric(row.metrics.utility,u.min,u.max);const value=preferenceScore(baseScore,preferences.scores[index],preferences.active);const same=previous&&row.items.length===previous.length&&row.items.every(id=>previous.includes(id));if(value>score+1e-9||Math.abs(value-score)<=1e-9&&same){best=row;score=value;}}
  return {...best,score,count:rows.length};
 }

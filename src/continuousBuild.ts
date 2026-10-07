@@ -1,3 +1,4 @@
+import {attributePreferences,preferenceScore} from './advancedPreferences.ts';
 import {teamContext} from './teamContext.ts';
 import {withSkillPlans} from './skillOrders.ts';
 import {preferenceWeights} from './preferenceWeights.ts';
@@ -17,15 +18,16 @@ export interface ItemScore {id:string;normalizedOffense:number;normalizedEHP:num
 export function continuousWeights(sliderValue:number){
  return preferenceWeights(Math.max(0,Math.min(100,sliderValue)));
 }
-export function scoreItems(rows:{id:string;metrics:BuildMetrics;counter?:number}[],sliderValue:number|Scenario['weights']):ItemScore[]{
+export function scoreItems(rows:{id:string;metrics:BuildMetrics;counter?:number}[],sliderValue:number|Scenario['weights'],subweights:Record<string,number>={}):ItemScore[]{
  const {weightDamage,weightDefense,weightUtility}=preferenceWeights(sliderValue);
  const bounds=(key:'dps'|'ehp'|'utility')=>rows.reduce((b,r)=>({min:Math.min(b.min,r.metrics[key]),max:Math.max(b.max,r.metrics[key])}),{min:Infinity,max:-Infinity});
  const values=rows.map(row=>offensiveMetric(row.metrics)),d={min:Math.min(...values),max:Math.max(...values)},h=bounds('ehp'),u=bounds('utility');
- return rows.map(row=>{
+ const preferences=attributePreferences(rows.map(row=>row.metrics),subweights);
+ return rows.map((row,index)=>{
   const normalizedOffense=normalizeMetric(offensiveMetric(row.metrics),d.min,d.max),normalizedEHP=normalizeMetric(row.metrics.ehp,h.min,h.max),normalizedUtility=normalizeMetric(row.metrics.utility,u.min,u.max);
   // Counter is a bounded contextual preference, with zero influence at both pure endpoints.
   const counterBonus=.05*4*weightDamage*weightDefense*Math.max(0,Math.min(1,row.counter??0));
-  return {id:row.id,normalizedOffense,normalizedEHP,normalizedUtility,counterBonus,score:weightDamage*normalizedOffense+weightDefense*normalizedEHP+weightUtility*normalizedUtility+counterBonus,coverage:'estimated' as const};
+  return {id:row.id,normalizedOffense,normalizedEHP,normalizedUtility,counterBonus,score:preferenceScore(weightDamage*normalizedOffense+weightDefense*normalizedEHP+weightUtility*normalizedUtility+counterBonus,preferences.scores[index],preferences.active),coverage:'estimated' as const};
  }).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
 }
 export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced',contextual=false){
@@ -58,7 +60,7 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
  let evaluated=0;const scores:ItemScore[]=[];const decisions:{selected:string;candidates:ItemScore[]}[]=[];
  const rankWith=(ids:string[],prefix:string[])=>{
-  const ranked=scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...prefix,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
+  const ranked=scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...prefix,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights,s.subweights);
   if(!contextual)return ranked;
   return ranked.map(row=>{const attributeScore=.8*(row.score-row.counterBonus),affinityBonus=.15*(affinity.has(row.id)?1:0),contextualBonus=.05*(counters.get(row.id)??0);return {...row,attributeScore,affinityBonus,contextualBonus,score:attributeScore+affinityBonus+contextualBonus};}).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
  };
