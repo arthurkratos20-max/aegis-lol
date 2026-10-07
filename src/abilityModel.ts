@@ -24,3 +24,11 @@ export function classAbilityPower(champion:Champion,actor:Stats,base:Stats,rank:
  const health=(scaling?scaling.hasHealthScaling:type==='tank')?Math.max(0,actor.hp-base.hp)/Math.max(1,base.hp)*base.ad:0;
  return {raw:(power+health)*rank/Math.max(1,maxrank),type:magic?'magic' as const:'physical' as const,isExactFormula:false as const,model:type};
 }
+
+/** Conservative direct-impact classification from official tooltip semantics; does not model buffs or passives. */
+export function hasDocumentedNonDamageImpact(spell:Spell):boolean {
+ const text=spell.tooltip??spell.description;
+ if(/<(physicalDamage|magicDamage|trueDamage|damage)>/i.test(text))return false;
+ if(/\b(dano|damage)\b/i.test(text))return false;
+ return /<(shield|healing|heal)>/i.test(text)||/\b(visão|vision|revela|reveals)\b/i.test(text);
+}

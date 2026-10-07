@@ -1,0 +1,2449 @@
+{
+  "patch": "16.19.1",
+  "champions": 173,
+  "partialKits": 6,
+  "fullyValidatedKits": 0,
+  "unmodeledKits": 167,
+  "sourceChecks": {
+    "officialDDragon": "HTTP 200; Ashe/Lux/Ahri vars empty; unresolved calculation placeholders",
+    "nativeAshe": "HTTP 403; patch-pinned CommunityDragon source unavailable"
+  },
+  "resolved": [
+    "Vision and shield-only skills no longer receive fabricated direct class damage."
+  ],
+  "remainingScope": [
+    "Champion passives, recasts, stacks, marks, attack modifiers and complete per-skill formulas",
+    "Item/rune passives and temporal interactions",
+    "Full kit gameplay optimality cannot be proved from static class proxies"
+  ],
+  "kits": [
+    {
+      "champion": "Akshan",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ambessa",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Alistar",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ahri",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Akali",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Aatrox",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Anivia",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Amumu",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Annie",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "AurelionSol",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ashe",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Belveth",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Aphelios",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Azir",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Bard",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Aurora",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Blitzcrank",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Brand",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Camille",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Briar",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Caitlyn",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Cassiopeia",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Braum",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Chogath",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Darius",
+      "isExactFormula": false,
+      "status": "partial",
+      "covered": [
+        "Q",
+        "R"
+      ],
+      "missing": [
+        "P",
+        "W",
+        "E"
+      ],
+      "source": "https://raw.communitydragon.org/16.19/game/data/characters/darius/darius.bin.json"
+    },
+    {
+      "champion": "Corki",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "DrMundo",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ekko",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Diana",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Draven",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Elise",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ezreal",
+      "isExactFormula": false,
+      "status": "partial",
+      "covered": [
+        "Q",
+        "E",
+        "R",
+        "W"
+      ],
+      "missing": [
+        "P"
+      ],
+      "source": "https://raw.communitydragon.org/16.19/game/data/characters/ezreal/ezreal.bin.json"
+    },
+    {
+      "champion": "Evelynn",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Fiddlesticks",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Fiora",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Fizz",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Galio",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Gangplank",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Garen",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Gragas",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Gnar",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Graves",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Gwen",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Heimerdinger",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Hecarim",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Hwei",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Janna",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Jayce",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Irelia",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ivern",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Illaoi",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "JarvanIV",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Jax",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Jhin",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Karma",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Jinx",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kaisa",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kalista",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Katarina",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Karthus",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kassadin",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kayle",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kayn",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Khazix",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "KogMaw",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kennen",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kled",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Kindred",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "KSante",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "LeeSin",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Leblanc",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Lillia",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Lissandra",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Leona",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Lux",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Locke",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Lucian",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Lulu",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "MasterYi",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Malzahar",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Malphite",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Maokai",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Mel",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Milio",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "MissFortune",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Mordekaiser",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "MonkeyKing",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Naafiri",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Morgana",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nami",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nasus",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nautilus",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Neeko",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nidalee",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nilah",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Olaf",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nocturne",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Nunu",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Orianna",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ornn",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Poppy",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Pantheon",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Pyke",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Qiyana",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Quinn",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Rammus",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Rakan",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "RekSai",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Rell",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Renata",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Riven",
+      "isExactFormula": false,
+      "status": "partial",
+      "covered": [
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "missing": [
+        "P"
+      ],
+      "source": "https://raw.communitydragon.org/16.19/game/data/characters/riven/riven.bin.json"
+    },
+    {
+      "champion": "Renekton",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Rengar",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Samira",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Rumble",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ryze",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Sett",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Shen",
+      "isExactFormula": false,
+      "status": "partial",
+      "covered": [
+        "Q",
+        "E"
+      ],
+      "missing": [
+        "P",
+        "W",
+        "R"
+      ],
+      "source": "https://raw.communitydragon.org/16.19/game/data/characters/shen/shen.bin.json"
+    },
+    {
+      "champion": "Senna",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Shaco",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Shyvana",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Seraphine",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Singed",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Sejuani",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Sion",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Sivir",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Swain",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Skarner",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Smolder",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Syndra",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Sona",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Soraka",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Sylas",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "TahmKench",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Talon",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Taliyah",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Taric",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Teemo",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Thresh",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Tryndamere",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Trundle",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Tristana",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "TwistedFate",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Twitch",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Urgot",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Udyr",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Vayne",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Velkoz",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Veigar",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Varus",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Vex",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Viego",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Vi",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Viktor",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Volibear",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Vladimir",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Xayah",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Warwick",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Xerath",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "XinZhao",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Yunara",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Yasuo",
+      "isExactFormula": false,
+      "status": "partial",
+      "covered": [
+        "Q",
+        "E",
+        "R"
+      ],
+      "missing": [
+        "P",
+        "W"
+      ],
+      "source": "https://raw.communitydragon.org/16.19/game/data/characters/yasuo/yasuo.bin.json"
+    },
+    {
+      "champion": "Yone",
+      "isExactFormula": false,
+      "status": "partial",
+      "covered": [
+        "Q"
+      ],
+      "missing": [
+        "P",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": "https://raw.communitydragon.org/16.19/game/data/characters/yone/yone.bin.json"
+    },
+    {
+      "champion": "Yorick",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zaahen",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zac",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Yuumi",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zeri",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Ziggs",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zed",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zilean",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zoe",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    },
+    {
+      "champion": "Zyra",
+      "isExactFormula": false,
+      "status": "missing",
+      "covered": [],
+      "missing": [
+        "P",
+        "Q",
+        "W",
+        "E",
+        "R"
+      ],
+      "source": null
+    }
+  ]
+}

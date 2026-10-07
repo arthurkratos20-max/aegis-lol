@@ -1,6 +1,6 @@
 import {championForCounter} from './counterAdapters.ts';
 import {teamContext} from './teamContext.ts';
-import {classAbilityPower,normalizeSpell} from './abilityModel.ts';
+import {classAbilityPower,normalizeSpell,hasDocumentedNonDamageImpact} from './abilityModel.ts';
 import {preferenceWeights} from './preferenceWeights.ts';
 import type {Dataset,Scenario} from './contracts.ts';
 import {fighter,statsFor,mitigate,effectiveResistance} from './model.ts';
@@ -61,7 +61,9 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
    const options=(nativeOptions[f.champion]??[]).filter(o=>o.key===key);
    if(options.length&&options.every(o=>o.kind==='shield'||o.automatic===false))continue;
    if(f.champion==='Shen'&&key==='Q'&&(!f.automaticAttacks||s.distance>x.range))continue;
-   const spell=champion.spells[i],normalized=normalizeSpell(spell,rank),cd=normalized.cooldown/(1+Math.max(0,x.haste)/100);
+   const spell=champion.spells[i];
+   if(hasDocumentedNonDamageImpact(spell))continue;
+   const normalized=normalizeSpell(spell,rank),cd=normalized.cooldown/(1+Math.max(0,x.haste)/100);
    const power=classAbilityPower(champion,x,base,rank,spell.maxrank,{...getChampionScaling(champion,data),damageType:championForCounter(f.champion,data,f).damageType});
    const coefficients=normalized.coefficients;
    if(coefficients.length)power.raw=base.ad*rank/Math.max(1,spell.maxrank)+coefficients.reduce((sum,c)=>sum+c.value*(c.stat==='bonusAD'?x.ad-base.ad:x[c.stat]),0);
