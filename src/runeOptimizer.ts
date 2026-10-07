@@ -37,7 +37,7 @@ export function heuristicRuneScore(rune:Rune,s:Scenario,data:Dataset,sliderValue
  const normalizedUtility=({8210:1,8106:1,8347:1,8234:1,8232:1,8275:1,8230:1,8226:k.mana?1:0,8009:k.mana||k.energy?1:0,8214:k.healShield?1:.2,8453:k.healShield?1:0,8465:k.healShield?1:.5} as Record<number,number>)[rune.id]??0;
  return {id:rune.id,normalizedUtility,normalizedDPS,normalizedEHP,counterBonus,score:w.weightDamage*normalizedDPS+w.weightDefense*normalizedEHP+w.weightUtility*normalizedUtility+counterBonus,coverage:'heuristic'};
 }
-export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number|Scenario['weights']=s.weights):RunePage {
+export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number|Scenario['weights']=s.weights,contextual=false):RunePage {
  const page=s.player.runes;if(page.locked)return structuredClone(page);
  const locks=page.locks??{},locked=new Set(locks.runes??[]),k=kitFor(s.player,data);
  const viable=(r:Rune)=>runeCompatible(r.id,s.player,data).allowed&&(r.id!==8465||k.healShield||['engage','warden'].includes(runeAffinity(s.player,data)))&&(r.id!==8401||k.healShield);
@@ -45,20 +45,21 @@ export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number
  for(const id of locked){const slot=locate(id);if(!slot||!page.selected.includes(id)||![page.primary,page.secondary].includes(slot.tree.id)||slot.tree.id===page.secondary&&slot.row===0)throw Error('Trava de runa ausente ou incompatível com as árvores atuais.');}
  const primaryLocked=locks.primaryTree||[...locked].some(id=>locate(id)?.tree.id===page.primary);
  const secondaryLocked=locks.secondaryTree||[...locked].some(id=>locate(id)?.tree.id===page.secondary);
- const ranked=(runes:Rune[])=>runes.filter(r=>viable(r)||locked.has(r.id)).map(r=>({r,...heuristicRuneScore(r,s,data,sliderValue)})).sort((a,b)=>b.score-a.score||a.id-b.id);
+ const score=(r:Rune)=>heuristicRuneScore(r,s,data,sliderValue).score+(contextual?matchupRuneAdjustment(r.id,s,data).bonus:0);
+ const ranked=(runes:Rune[])=>runes.filter(r=>viable(r)||locked.has(r.id)).map(r=>({r,score:score(r)})).sort((a,b)=>b.score-a.score||a.r.id-b.r.id);
  const choose=(tree:RuneTree,row:number)=>{
   const fixed=tree.slots[row].runes.filter(r=>locked.has(r.id));if(fixed.length>1)throw Error('Duas runas travadas na mesma linha.');
   return fixed[0]??ranked(tree.slots[row].runes)[0]?.r;
  };
- const keystones=data.runes.filter(tree=>(!primaryLocked||tree.id===page.primary)&&(!secondaryLocked||tree.id!==page.secondary)).flatMap(tree=>{const key=choose(tree,0);return key?[{tree,key,score:heuristicRuneScore(key,s,data,sliderValue).score}]:[];}).sort((a,b)=>b.score-a.score||a.key.id-b.key.id);
+ const keystones=data.runes.filter(tree=>(!primaryLocked||tree.id===page.primary)&&(!secondaryLocked||tree.id!==page.secondary)).flatMap(tree=>{const key=choose(tree,0);return key?[{tree,key,score:score(key)}]:[];}).sort((a,b)=>b.score-a.score||a.key.id-b.key.id);
  const primary=keystones[0];if(!primary)throw Error('Nenhuma árvore primária compatível com as travas.');
  const main=primary.tree.slots.map((_,row)=>choose(primary.tree,row));if(main.length!==4||main.some(r=>!r))throw Error('Árvore primária incompleta no snapshot.');
  const alternatives=data.runes.filter(t=>t.id!==primary.tree.id&&(!secondaryLocked||t.id===page.secondary)).flatMap(tree=>{
   const rows=tree.slots.slice(1).map((_,i)=>({r:choose(tree,i+1),row:i+1})).filter((v):v is {r:Rune;row:number}=>!!v.r);
   const fixed=rows.filter(v=>locked.has(v.r.id));if(fixed.length>2)return [];
-  const free=rows.filter(v=>!fixed.includes(v)).sort((a,b)=>heuristicRuneScore(b.r,s,data,sliderValue).score-heuristicRuneScore(a.r,s,data,sliderValue).score||a.row-b.row);
+  const free=rows.filter(v=>!fixed.includes(v)).sort((a,b)=>score(b.r)-score(a.r)||a.row-b.row);
   const selected=[...fixed,...free.slice(0,2-fixed.length)].sort((a,b)=>a.row-b.row);if(selected.length!==2)return [];
-  return [{tree,selected,score:selected.reduce((sum,v)=>sum+heuristicRuneScore(v.r,s,data,sliderValue).score,0)}];
+  return [{tree,selected,score:selected.reduce((sum,v)=>sum+score(v.r),0)}];
  }).sort((a,b)=>b.score-a.score||a.tree.id-b.tree.id);
  const secondary=alternatives[0];if(!secondary)throw Error('Nenhuma árvore secundária legal com as travas atuais.');
  const w=preferenceWeights(sliderValue);
@@ -71,4 +72,24 @@ export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number
   return [...row].sort((a,b)=>shardScore(b)-shardScore(a)||a.localeCompare(b))[0];
  });
  return {...page,primary:primary.tree.id,secondary:secondary.tree.id,selected:[...main.map(r=>r!.id),...secondary.selected.map(v=>v.r.id)],shards};
+}
+
+/** Bounded editorial lane-response scores, never simulated rune damage or win rates. */
+export function matchupRuneAdjustment(id:number,s:Scenario,data:Dataset):{bonus:number;reason:string}{
+ if(s.matchupUnknown)return {bonus:0,reason:'Adversário indefinido: afinidade com kit e rota, sem resposta de confronto.'};
+ const enemy=championForCounter(s.enemy.champion,data,s.enemy),ranged=data.champions[enemy.id].stats.attackrange>300;
+ const close=data.champions[s.player.champion].stats.attackrange<=300,k=kitFor(s.player,data);
+ const response=(bonus:number,reason:string)=>({bonus,reason:`Contra ${enemy.name}: ${reason} Orientação estimada de kit, sem vantagem estatística comprovada.`});
+ if(id===8473&&enemy.isBurst)return response(.22,'Osso Revestido favorece resistência a uma sequência de impactos; pode ser retirado antes do combo.');
+ if(id===8444&&ranged&&!enemy.isBurst)return response(.22,'Ventos Revigorantes favorece recuperação após pressão de alcance; alcance sozinho não comprova poke constante.');
+ if(id===8242&&enemy.hasHardCC)return response(.16,'Inabalável considera a presença de controle; não presume proteção contra todo tipo de controle.');
+ if(id===8017&&enemy.isTank)return response(.16,'Dilacerar favorece pressão contra alvos resistentes; a condição real da runa ainda precisa ser atendida.');
+ if(id===8437&&close&&!ranged)return response(.12,'Aperto ganha afinidade com trocas corpo a corpo quando é possível aplicar o ataque carregado.');
+ if(id===8439&&k.hardCC&&enemy.isBurst)return response(.16,'Pós-Choque depende de acertar sua imobilização antes de receber a resposta de burst.');
+ if(id===8021&&k.autoAttack&&ranged&&!enemy.isTank)return response(.12,'Agilidade nos Pés oferece uma alternativa de sustentação e reposicionamento sob pressão de alcance.');
+ return {bonus:0,reason:`Contra ${enemy.name}: preserva a afinidade da runa com o kit; sem resposta específica modelada para este gatilho.`};
+}
+export function matchupRuneReason(s:Scenario,data:Dataset,page:RunePage):string{
+ const responses=page.selected.map(id=>matchupRuneAdjustment(id,s,data)).filter(x=>x.bonus>0);
+ return responses.length?responses.map(x=>x.reason).join(' '):matchupRuneAdjustment(0,s,data).reason;
 }

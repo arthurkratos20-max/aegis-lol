@@ -1,3 +1,4 @@
+import {calculateOptimalRunes} from './runeOptimizer.ts';
 import type {Dataset,Scenario} from './contracts.ts';
 import {profileFor,type QuickRecommendation} from './recommendation.ts';
 import {fullBuild} from './fullBuild.ts';
@@ -21,8 +22,10 @@ export function quickRecommendation(s:Scenario,data:Dataset):QuickRecommendation
  const core=scoreItems(eligible.map(id=>({id,metrics:evaluateBuild([id],s,data)})),s.weights)[0]?.id;
  const policy=contextualResponse(s,data,core?[core]:[]),response=policy.id,responseReason=policy.reason;
  const required=[core,response].filter((id):id is string=>!!id);
- const projected={...s,player:{...s.player,locked:required}};
+ const runes=calculateOptimalRunes(s,data,s.weights,true);
+ const projected={...s,player:{...s.player,runes,locked:required}};
  const rec=fullBuild(projected,data,'balanced',undefined,true);
+ rec.runes=runes;
  if(response){rec.target=[...rec.target.filter(id=>id!==response),response];rec.reasons[response]=responseReason;rec.warnings.unshift(`${data.champions[s.enemy.champion].name}: ${responseReason} Resposta situacional, não primeiro item obrigatório.`);} 
  rec.warnings.unshift('Cartão rápido: ranking estratégico estimado combina 80% da pontuação de atributos, 15% de afinidade com kit/função e 5% de resposta contextual. Todas as classes priorizam o pool de afinidade; um slot de resposta contextual compatível é reservado quando houver regra disponível. Não quantifica passivas sem fórmula.');
  if(core){rec.target=[core,...rec.target.filter(id=>id!==core)];rec.cores=[core,...rec.cores.filter(id=>id!==core)];rec.reasons[core]=reason;rec.warnings.unshift(reason);}
