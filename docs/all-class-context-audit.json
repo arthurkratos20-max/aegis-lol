@@ -1,0 +1,25 @@
+{
+  "scope": "Automatic quick card; contextual rules across all profiles; mathematical consistency, not proof of gameplay optimality",
+  "champions": 173,
+  "lanes": 5,
+  "policyAndLegalSkillPaths": 150510,
+  "completeBuildAndIndependentMitigationScenarios": 2595,
+  "automatedTests": 249,
+  "failures": 0,
+  "typescript": "passed",
+  "productionBuild": "passed",
+  "limitations": [
+    "Class rotations, item passives and contextual rules remain estimated where champion formulas are absent.",
+    "All pair policies were checked computationally; they were not individually manually reviewed.",
+    "Exhaustive full-build optimizer audit of 451530 combinations was not rerun in this change.",
+    "Greedy ranking is not a proof of global optimality.",
+    "Support builds may legitimately match against enemies with the same removable-CC need."
+  ],
+  "changes": [
+    "Contextual response policy for all class profiles",
+    "Affinity pools across all automatic profiles with legal sparse-pool expansion",
+    "One shared incoming-damage classification for counters and EHP",
+    "AP/AD/HP eligibility-aware class rotation proxy",
+    "Strategic scores exclude double counting of counter bonus and are bounded in [0,1]"
+  ]
+}

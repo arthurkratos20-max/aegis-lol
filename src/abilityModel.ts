@@ -18,9 +18,9 @@ export function classModel(champion:Champion){
  return 'fighter';
 }
 /** Unit-scaled stat proxy, not invented spell coefficients: all ratios are relative to the champion's base stats. */
-export function classAbilityPower(champion:Champion,actor:Stats,base:Stats,rank:number,maxrank:number){
- const type=classModel(champion),magic=type==='mage'||type==='support';
- const power=magic?base.ad+Math.max(0,actor.ap):actor.ad;
- const health=type==='tank'?Math.max(0,actor.hp-base.hp)/Math.max(1,base.hp)*base.ad:0;
+export function classAbilityPower(champion:Champion,actor:Stats,base:Stats,rank:number,maxrank:number,scaling?:{hasADScaling:boolean;hasAPScaling:boolean;hasHealthScaling:boolean;damageType?:string}){
+ const type=classModel(champion),magic=scaling?scaling.damageType==='magic':type==='mage'||type==='support';
+ const power=scaling?base.ad+(scaling.hasADScaling?Math.max(0,actor.ad-base.ad):0)+(scaling.hasAPScaling?Math.max(0,actor.ap):0):magic?base.ad+Math.max(0,actor.ap):actor.ad;
+ const health=(scaling?scaling.hasHealthScaling:type==='tank')?Math.max(0,actor.hp-base.hp)/Math.max(1,base.hp)*base.ad:0;
  return {raw:(power+health)*rank/Math.max(1,maxrank),type:magic?'magic' as const:'physical' as const,isExactFormula:false as const,model:type};
 }

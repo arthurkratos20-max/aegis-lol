@@ -1,3 +1,4 @@
+import {championForCounter} from './counterAdapters.ts';
 import {supportIntent} from './championScaling.ts';
 import type {Dataset,Fighter,RunePage,Scenario,CombatResult} from './contracts.ts';
 import {itemEligible,isBoot,statsFor} from './model.ts';
@@ -35,7 +36,7 @@ export function enemyAxis(s:Scenario,data:Dataset):'physical'|'magic'|'mixed' {
  if(s.matchupUnknown)return 'mixed';
  const f=s.enemy;if(f.actions.length){let physical=0,magic=0;for(const a of f.actions){if(a.type==='physical')physical++;if(a.type==='magic')magic++;}if(physical>magic)return 'physical';if(magic>physical)return 'magic';}
  const gear=f.items.map(id=>data.items[id]?.stats??{}),ap=gear.reduce((n,i)=>n+(i.FlatMagicDamageMod??0),0),ad=gear.reduce((n,i)=>n+(i.FlatPhysicalDamageMod??0),0);if(ap>ad&&ap>0)return 'magic';if(ad>ap&&ad>0)return 'physical';
- const p=profileFor(f.champion,f.lane,data);return ['enchanter','supportDamage','fighterAP','assassinAP','mageControl','mageBurn','mageBurst'].includes(p)?'magic':['marksman','assassinAD','fighterAD'].includes(p)?'physical':'mixed';
+ const type=championForCounter(f.champion,data,f).damageType;return type==='true'?'mixed':type;
 }
 export function runeSuggestion(profile:Profile,s:Scenario,data:Dataset,mode:TacticalMode):RunePage {
  let primary=8000,secondary=8400,selected=[8010,9111,9105,8299,8473,8451];

@@ -35,6 +35,9 @@ test('all automatic champion/lane recommendations are complete, compatible and l
   const s=initialScenario(data);s.player.champion=id;s.player.lane=lane;s.matchupUnknown=enemy==='unknown';if(enemy!=='unknown')s.enemy.champion=enemy;
   const a=quickScenario(s,data),r=quickRecommendation(a,data);assert.equal(r.target.length,6,`${id} ${lane} ${enemy}`);assert.equal(new Set(r.target).size,6);assert.ok(Number.isFinite(r.total));assert.ok(r.total>0);
   for(const item of r.target)assert.ok(itemEligible(item,data,id)&&itemCompatible(item,a.player,data).allowed,`${id} ${item}`);
+  const m=evaluateBuild(r.target,a,data),actor=statsFor({...a.player,items:r.target},data),target=enemy==='unknown'?{armor:100,mr:100}:statsFor(a.enemy,data);
+  const raw=m.rawDPSByType!;const independent=raw.physical*mitigate(1,effectiveResistance(target.armor,actor.armorPenPercent,actor.armorPen))+raw.magic*mitigate(1,effectiveResistance(target.mr,actor.magicPenPercent,actor.magicPen))+raw.true;
+  assert.ok(Math.abs(m.dps-independent)<1e-7,`${id} ${lane} ${enemy}: mitigation reconciliation`);
   assert.ok(exclusiveGroupsValid(r.target,data));if(id==='Cassiopeia')assert.equal(r.boots,null);if(id!=='Aphelios')assert.ok(skillValid(a.player.skills,data,id),`${id} ${lane}: skill path`);
   checked++;
  }
@@ -50,3 +53,5 @@ import {itemEligible} from '../src/model.ts';import {itemCompatible} from '../sr
  for(const r of builds){assert.ok(!r.target.some(id=>['6694','6696','6697'].includes(id)));assert.ok(r.target.includes('3031'));}
  s.matchupUnknown=true;const unknown=quickRecommendation(quickScenario(s,data),data);s.enemy.champion='Lux';assert.deepEqual(unknown.target,quickRecommendation(quickScenario(s,data),data).target);
  });
+
+import {evaluateBuild} from '../src/buildEvaluation.ts';import {statsFor,mitigate,effectiveResistance} from '../src/model.ts';

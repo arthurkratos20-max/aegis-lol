@@ -13,7 +13,7 @@ export function recipeContains(final:string,component:string,data:Dataset,seen=n
  if(final===component)return true;if(seen.has(final))return false;
  return (data.items[final]?.from??[]).some(id=>recipeContains(id,component,data,new Set(seen).add(final)));
 }
-export interface ItemScore {id:string;normalizedOffense:number;normalizedEHP:number;normalizedUtility:number;counterBonus:number;score:number;coverage:'modeled'|'estimated'}
+export interface ItemScore {id:string;normalizedOffense:number;normalizedEHP:number;normalizedUtility:number;counterBonus:number;score:number;coverage:'modeled'|'estimated';attributeScore?:number;affinityBonus?:number;contextualBonus?:number}
 export function continuousWeights(sliderValue:number){
  return preferenceWeights(Math.max(0,Math.min(100,sliderValue)));
 }
@@ -35,8 +35,8 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const completed=(id:string)=>compatible(id)&&!isBoot(id,data)&&(data.items[id].gold.total>=2000||id==='3041')&&Number(id)<10000;
  const affinity=new Set(affinityCandidates(s,data));
  const allPool=Object.keys(data.items).filter(completed);
- // Automatic ADC advice stays in the kit pool; raw AD/AH alone cannot justify assassin items.
- const pool=contextual&&base.profile==='marksman'&&allPool.filter(id=>affinity.has(id)).length>=8?allPool.filter(id=>affinity.has(id)):allPool;
+ // Automatic advice prioritizes kit/role affinity across every class; sparse off-meta pools may expand only when necessary to finish six legal slots.
+ const pool=contextual?allPool.filter(id=>affinity.has(id)):allPool;
  const mine=championForCounter(s.player.champion,data,s.player),enemy=championForCounter(s.enemy.champion,data,s.enemy);
  const draft=(s.counterPreset?.mode==='draft'||s.counterPreset?.source.includes('Draft'))?s.draft?.enemy:undefined;
  let evaluation=s.matchupUnknown?{enemyCount:0,priorities:{},reasons:[]}:draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
@@ -60,7 +60,7 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const rankWith=(ids:string[],prefix:string[])=>{
   const ranked=scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...prefix,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
   if(!contextual)return ranked;
-  return ranked.map(row=>({...row,score:.8*row.score+.15*(affinity.has(row.id)?1:0)+.05*(counters.get(row.id)??0)})).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+  return ranked.map(row=>{const attributeScore=.8*(row.score-row.counterBonus),affinityBonus=.15*(affinity.has(row.id)?1:0),contextualBonus=.05*(counters.get(row.id)??0);return {...row,attributeScore,affinityBonus,contextualBonus,score:attributeScore+affinityBonus+contextualBonus};}).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
  };
  // Explicit inventory/boot locks stay authoritative. Automatic boots are scored anew.
  if(bootAllowed&&s.player.boots!=='fixed'&&!lockedBoot){
@@ -74,7 +74,8 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const corePool=[...new Set([...base.cores,...affinityCandidates(s,data)])].filter(id=>coreEligible(id)&&!required.includes(id)&&(!responseNeeded||requestedResponse.includes(id)));
  let core=required[0];
  if(prefix.length<6){
-  const candidates=corePool.length?corePool:pool.filter(id=>coreEligible(id)&&!required.includes(id));
+  const preferredCore=pool.filter(id=>coreEligible(id)&&!required.includes(id));
+  const candidates=corePool.length?corePool:preferredCore.length?preferredCore:allPool.filter(id=>coreEligible(id)&&!required.includes(id));
   const ranked=rankWith(candidates,prefix);evaluated+=candidates.length;
   if(ranked[0]){core=ranked[0].id;decisions.push({selected:core,candidates:ranked});scores.push(ranked[0]);}
  }
@@ -92,7 +93,7 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
   decisions.push({selected:best.id,candidates:ranked});chosen.push(best.id);scores.push(best);
  }
  while(chosen.length<6){
-  const candidates=pool.filter(legal);evaluated+=candidates.length;
+  const preferred=pool.filter(legal),candidates=preferred.length?preferred:allPool.filter(legal);evaluated+=candidates.length;
   const ranked=rank(candidates),best=ranked[0];if(!best)throw Error('Grupos únicos impedem completar os seis slots.');
   decisions.push({selected:best.id,candidates:ranked});chosen.push(best.id);scores.push(best);
  }
