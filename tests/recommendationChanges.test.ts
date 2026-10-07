@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import type {Dataset} from '../src/contracts.ts';
+import {initialScenario} from '../src/model.ts';
+import {fullBuild} from '../src/fullBuild.ts';
+import {recommendationSnapshot,recommendationChanges} from '../src/recommendationChanges.ts';
+const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+test('comparison snapshots survive later mutation and unchanged recalculations remain unchanged',()=>{const s=initialScenario(data),r=fullBuild(s,data),a=recommendationSnapshot(s,r);s.weights.offense=99;r.target.reverse();assert.notEqual(a.weights.offense,99);assert.notDeepEqual(a.items,r.target);const d=recommendationChanges(a,a,r,data);assert.equal(d.unchanged,true);});
+test('slider changes identify actual item/rune/skill differences without pairing unrelated slots',()=>{const s=initialScenario(data),r=fullBuild(s,data),a=recommendationSnapshot(s,r),b={...a,items:['3157'],runes:[99999],skills:['E'],weights:{offense:0,defense:100,utility:0}};const d=recommendationChanges(a,b,{...r,target:['3157'],decisions:[{selected:'3157',candidates:[{id:'3157',normalizedOffense:.2,normalizedEHP:.8,normalizedUtility:.3,counterBonus:0,score:.8,coverage:'estimated'}]}]},data);assert.deepEqual(d.added,['3157']);assert.ok(d.triggers.some(x=>x.includes('defesa 100%')));assert.ok(d.itemReasons[0].text.includes('defesa 0.800'));assert.ok(!d.itemReasons[0].text.includes('Neste mesmo pool'));assert.equal(d.unchanged,false);});
+test('reordering does not falsely report items added or removed',()=>{const s=initialScenario(data),r=fullBuild(s,data),a=recommendationSnapshot(s,r),b={...a,items:[...a.items].reverse()};const d=recommendationChanges(a,b,r,data);assert.equal(d.reordered,true);assert.deepEqual(d.added,[]);assert.deepEqual(d.removed,[]);});
