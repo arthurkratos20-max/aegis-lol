@@ -180,3 +180,18 @@ dialog::backdrop{background:#07090dcc;backdrop-filter:blur(8px)}
 @media(max-width:650px){.guide-matchup-groups{grid-template-columns:1fr}.guide-matchup-group.allies{grid-column:auto}.guide-champion-tile{flex-basis:66px;max-width:90px}}
 /* Keep educational card dimensions, with concise icon-only inline references. */
 .rune-lessons .guide-card,.contextual-guide .guide-card{padding:16px}.rune-lessons .guide-card p,.contextual-guide .guide-card p{font-size:14px;line-height:1.65}.rune-lessons .guide-card h4,.contextual-guide .guide-card h4{font-size:15px}.rune-card-summary{display:block;overflow:visible;-webkit-line-clamp:unset}.guide-reference-trigger{display:inline-flex!important;padding:0 2px!important;margin:0 2px!important;min-width:0!important;min-height:0!important;border:0!important;border-radius:20px!important;background:transparent!important;color:#e6cc86;vertical-align:middle;cursor:help;line-height:1}.guide-reference-trigger:hover,.guide-reference-trigger:focus-visible{box-shadow:0 0 0 2px #d8b66a;outline:none}.guide-reference-tooltip{position:fixed;z-index:10000;width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:13px 15px;background:#162130;border:1px solid #82704b;border-radius:10px;box-shadow:0 8px 30px #0009;color:#d6e0ec;font-size:13px;pointer-events:none;box-sizing:border-box}.guide-reference-tooltip strong{display:block;color:#efcf86;font-size:14px}.guide-reference-tooltip p{margin:8px 0 0;line-height:1.55}.rune-draft-advice{background:#182130;border:1px solid #344457;border-radius:8px;padding:10px 12px;margin:10px 0}.rune-draft-advice summary{font-size:13px;color:#dcc486;cursor:pointer}.rune-draft-advice p{font-size:14px;line-height:1.65}
+.team-champion-row{display:flex;align-items:center;gap:16px;padding:10px 0;border-bottom:1px solid var(--line,#283441)}
+.team-champion-splash,.team-champion-empty{width:112px;height:72px;flex:0 0 112px;border-radius:8px;object-fit:cover;object-position:65% 30%;border:1px solid #344453}
+.team-champion-empty{display:grid;place-items:center;color:#738094;background:#111923}
+.team-champion-name{min-width:0;flex:1;display:grid;gap:6px}.team-champion-name strong{font-size:16px}.team-champion-name .field{margin:0}.team-champion-name small{color:#929eab}
+@media(max-width:520px){.team-champion-splash,.team-champion-empty{width:88px;flex-basis:88px;height:66px}.team-champion-row{gap:10px}}
+.guide-sequence-option{display:flex;align-items:flex-start;gap:12px;padding:10px 0}.guide-sequence-option button{flex-shrink:0}.guide-sequence-option small{max-width:580px;line-height:1.5}
+@media(max-width:600px){.guide-sequence-option{flex-direction:column;gap:6px}}
+.guide-champion-label{display:grid;gap:6px;text-align:center}
+.guide-matchup-group.allies{display:block}
+.guide-matchup-group.allies .guide-champion-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}
+.guide-matchup-group.allies .guide-champion-tile{width:100%;max-width:none;min-height:76px;flex-direction:row;justify-content:flex-start;gap:12px;padding:8px!important}
+.guide-matchup-group.allies .guide-champion-tile img{width:90px;height:56px;border-radius:6px;object-position:65% 30%;border-width:1px;flex-shrink:0}
+.guide-matchup-group.allies .guide-champion-label{text-align:left;min-width:0}.guide-matchup-group.allies .guide-champion-label strong{font-size:14px;text-align:left}
+@media(max-width:850px){.guide-matchup-group.allies .guide-champion-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.guide-matchup-group.allies .guide-champion-strip{grid-template-columns:1fr}}

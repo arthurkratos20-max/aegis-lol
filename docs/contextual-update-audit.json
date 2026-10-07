@@ -1,0 +1,17 @@
+{
+  "champions": 173,
+  "matchups": 29929,
+  "lanes": 5,
+  "weights": [
+    0,
+    50,
+    100
+  ],
+  "baseScenarios": 451530,
+  "pureUtilityScenarios": 865,
+  "seconds": 826.988,
+  "checked": 452395,
+  "errors": [],
+  "mathErrors": [],
+  "unchangedExtremes": 0
+}

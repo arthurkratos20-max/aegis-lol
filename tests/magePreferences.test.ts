@@ -50,13 +50,13 @@ test('AP attack mage index responds to AS rather than inventing haste-driven aut
  s.player.overrides={as:99};const capped=evaluateBuild(['3089'],s,data);
  s.player.overrides={as:2.5};assert.equal(evaluateBuild(['3089'],s,data).magicPotential,capped.magicPotential);
 });
-test('mage builds change inside the slider while boots, core and owned items remain fixed',()=>{
+test('mage builds rescore automatic boots/core inside the slider and preserve owned items',()=>{
  for(const champion of ['Lux','Ahri','Syndra','Cassiopeia','Annie','Veigar','Karthus','Ryze']){
   const s={...initialScenario(data),matchupUnknown:true,player:fighter(data,champion)};
   s.weights={offense:20,defense:80,utility:0};const low=greedyContinuousBuild(s,data);
   s.weights={offense:80,defense:20,utility:0};const high=greedyContinuousBuild(s,data);
   assert.notDeepEqual([...low.target].sort(),[...high.target].sort(),champion);
-  assert.equal(high.boot,low.boot);assert.equal(high.core,low.core);assert.equal(high.target.length,6);
+  assert.ok(high.core);assert.ok(champion==='Cassiopeia'?high.boot===null:high.boot);assert.equal(high.target.length,6);
   assert.ok(offensiveMetric(high.metrics)>offensiveMetric(low.metrics),champion);
   s.player.owned=['3157'];s.player.locked=['3157'];assert.ok(greedyContinuousBuild(s,data).target.includes('3157'));
  }

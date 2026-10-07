@@ -1,8 +1,9 @@
+import {withSkillPlans} from './skillOrders.ts';
 import {preferenceWeights} from './preferenceWeights.ts';
 import type {Dataset,Scenario} from './contracts.ts';
 import {itemEligible,isBoot} from './model.ts';
 import {itemCompatible,kitFor} from './compatibility.ts';
-import {recommend,profileFor,type TacticalMode} from './recommendation.ts';
+import {recommend,affinityCandidates,type TacticalMode} from './recommendation.ts';
 import {evaluateBuild,exclusiveGroupsValid,normalizeMetric,offensiveMetric,type BuildMetrics} from './buildEvaluation.ts';
 import {championForCounter,counterItemCandidates} from './counterAdapters.ts';
 import {calculateMatchupCounter,calculateDraftCounter,rankCounterCandidates} from './counterEvaluation.ts';
@@ -27,6 +28,7 @@ export function scoreItems(rows:{id:string;metrics:BuildMetrics;counter?:number}
  }).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
 }
 export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced'){
+ s=withSkillPlans(s,data);
  const neutral={...s,player:{...s.player,locked:[],owned:[]},weights:{offense:50,defense:50,utility:0}},base=recommend(neutral,data,mode);
   const compatible=(id:string)=>itemEligible(id,data,s.player.champion)&&itemCompatible(id,s.player,data).allowed;
  const completed=(id:string)=>compatible(id)&&!isBoot(id,data)&&(data.items[id].gold.total>=2000||id==='3041')&&Number(id)<10000;
@@ -47,16 +49,31 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const required=fixed.filter(id=>!isBoot(id,data)&&data.items[id]&&(data.items[id].gold.total>=2000||id==='3041'));
  if(!exclusiveGroupsValid(fixed,data))throw Error('Itens travados ou possuídos conflitam em grupos exclusivos.');
  const coreEligible=(id:string)=>completed(id)&&exclusiveGroupsValid([...required,...(required.includes(id)?[]:[id])],data);
- const preferredCore=base.cores.find(coreEligible)??pool.find(coreEligible);
- if(!preferredCore)throw Error('Nenhum item-chave compatível com os grupos travados.');
- const core=required.length+(boot?1:0)>=6&&!required.includes(preferredCore)?required[0]:preferredCore;
+ const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
+ let evaluated=0;const scores:ItemScore[]=[];const decisions:{selected:string;candidates:ItemScore[]}[]=[];
+ const rankWith=(ids:string[],prefix:string[])=>scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...prefix,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
+ // Explicit inventory/boot locks stay authoritative. Automatic boots are scored anew.
+ if(bootAllowed&&s.player.boots!=='fixed'&&!lockedBoot){
+  const candidates=Object.keys(data.items).filter(id=>compatible(id)&&isBoot(id,data)&&data.items[id].from?.includes('1001')&&(id!=='3006'||kitFor(s.player,data).autoAttack)&&Number(id)<10000&&data.items[id].gold.total>=800&&exclusiveGroupsValid([...required,id],data));
+  const ranked=rankWith(candidates,required);evaluated+=candidates.length;
+  if(ranked[0]){boot=ranked[0].id;decisions.push({selected:boot,candidates:ranked});scores.push(ranked[0]);}
+ }
+ const prefix=[...(boot?[boot]:[]),...required];
+ const requestedResponse=mode==='antiheal'?['3033','3165','3075']:mode==='antishield'&&base.profile==='assassinAD'?['6695']:[];
+ const responseNeeded=requestedResponse.length>0&&!required.some(id=>requestedResponse.includes(id));
+ const corePool=[...new Set([...base.cores,...affinityCandidates(s,data)])].filter(id=>coreEligible(id)&&!required.includes(id)&&(!responseNeeded||requestedResponse.includes(id)));
+ let core=required[0];
+ if(prefix.length<6){
+  const candidates=corePool.length?corePool:pool.filter(id=>coreEligible(id)&&!required.includes(id));
+  const ranked=rankWith(candidates,prefix);evaluated+=candidates.length;
+  if(ranked[0]){core=ranked[0].id;decisions.push({selected:core,candidates:ranked});scores.push(ranked[0]);}
+ }
  if(!core)throw Error('Nenhum item-chave elegível no catálogo.');
  const chosen=[...(boot?[boot]:[]),core,...required.filter(id=>id!==core)];
  if(chosen.length>6||!exclusiveGroupsValid(chosen,data))throw Error('O core e os itens travados não cabem em seis slots ou conflitam em grupos únicos.');
- const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
- const rank=(ids:string[])=>scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...chosen,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
+ const rank=(ids:string[])=>rankWith(ids,chosen);
  const legal=(id:string)=>!chosen.includes(id)&&exclusiveGroupsValid([...chosen,id],data);
- let evaluated=0;const scores:ItemScore[]=[];const decisions:{selected:string;candidates:ItemScore[]}[]=[];
+
  // Keep each owned/locked component represented by a legal final upgrade.
  for(const component of fixed.filter(id=>!isBoot(id,data)&&!required.includes(id))){
   if(chosen.some(id=>!required.includes(id)&&recipeContains(id,component,data)))continue;
