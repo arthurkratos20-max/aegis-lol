@@ -43,6 +43,8 @@ export function validateScenario(s:Scenario,data:Dataset):string[]{
  const errors:string[]=[];if(s.schema!==1||s.patch!==data.version)errors.push('Snapshot incompatível');if(!Number.isFinite(s.duration)||s.duration<=0||s.duration>120)errors.push('Janela deve ser de 0.1 a 120 segundos');if(!Number.isFinite(s.budget)||s.budget<0)errors.push('Orçamento inválido');if(!Number.isInteger(s.slots)||s.slots<0||s.slots>6)errors.push('Slots inválidos');
  if(!Number.isFinite(s.distance)||s.distance<0)errors.push('Distância inválida');
  for(const value of Object.values(s.conditions))if(!Number.isFinite(value)||value<0||value>1)errors.push('Condição inválida');
+ if(s.enemyTeam!==undefined&&(!Array.isArray(s.enemyTeam)||s.enemyTeam.length>5||s.enemyTeam.some(id=>typeof id!=='string'||id!==''&&!Object.hasOwn(data.champions,id))))errors.push('Time inimigo inválido');
+ if(s.teamPriority!==undefined&&(!Number.isFinite(s.teamPriority)||s.teamPriority<0||s.teamPriority>100))errors.push('Prioridade de time deve estar entre 0 e 100%');
  const weights=Object.values(s.weights);if(weights.some(v=>!Number.isFinite(v)||v<0)||Math.abs(weights.reduce((a,b)=>a+b,0)-100)>1e-6)errors.push('Pesos devem somar 100%');
  for(const f of [s.player,s.enemy]){
   if(!Number.isFinite(f.initialHP)||f.initialHP<0||f.initialHP>1||!Number.isFinite(f.initialResource)||f.initialResource<0||f.initialResource>1)errors.push('HP/recurso inicial inválido');

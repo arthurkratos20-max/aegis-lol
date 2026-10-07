@@ -4,11 +4,11 @@ import {fighter,initialScenario,isBoot,validateScenario} from './model.ts';
 import {SHARD_ROWS} from './shards.ts';
 const MAX_LINK=2400,MAX_JSON=14000;
 type SharedFighter=[string,number,string,string[],[number,number,number[],string[]],Partial<Stats>,Record<string,number>];
-interface SharedBuild {unknown?:boolean;v:1;patch:string;p:SharedFighter;e:SharedFighter;w:Scenario['weights'];duration:number}
+interface SharedBuild {teamPriority?:number;enemyTeam?:string[];unknown?:boolean;v:1;patch:string;p:SharedFighter;e:SharedFighter;w:Scenario['weights'];duration:number}
 const pack=(f:Fighter):SharedFighter=>[f.champion,f.level,f.lane,[...f.items],[f.runes.primary,f.runes.secondary,[...f.runes.selected],[...f.runes.shards]],{...f.overrides},{...f.stacks}];
 export function buildShareLink(s:Scenario,origin:string):string {
  const url=new URL('/',origin);if(!['http:','https:'].includes(url.protocol))throw Error('Endereço do site inválido.');
- const payload:SharedBuild={unknown:s.matchupUnknown===true,v:1,patch:s.patch,p:pack(s.player),e:pack(s.enemy),w:{...s.weights},duration:s.duration};
+ const payload:SharedBuild={teamPriority:s.teamPriority,enemyTeam:s.enemyTeam,unknown:s.matchupUnknown===true,v:1,patch:s.patch,p:pack(s.player),e:pack(s.enemy),w:{...s.weights},duration:s.duration};
  const json=JSON.stringify(payload);if(json.length>MAX_JSON)throw Error('Build muito extensa para compartilhar por QR Code.');
  url.hash=`build=${LZString.compressToEncodedURIComponent(json)}`;
  if(url.href.length>MAX_LINK)throw Error('Build muito extensa para compartilhar por QR Code. Reduza os atributos personalizados.');
@@ -42,8 +42,10 @@ export function readBuildShare(hash:string,data:Dataset):Scenario|null {
  if(!record(raw.w)||Object.keys(raw.w).sort().join(',')!=='defense,offense,utility')throw Error('Preferência inválida.');
  const weights=numbers(raw.w);if(Object.keys(weights).length!==3||Math.abs(Object.values(weights).reduce((a,b)=>a+b,0)-100)>1e-6)throw Error('Preferência inválida.');
  if(raw.unknown!==undefined&&typeof raw.unknown!=='boolean')throw Error('Modo de confronto inválido.');
+ if(raw.teamPriority!==undefined&&(typeof raw.teamPriority!=='number'||!Number.isFinite(raw.teamPriority)||raw.teamPriority<0||raw.teamPriority>100))throw Error('Prioridade de time inválida.');
+ if(raw.enemyTeam!==undefined&&(!Array.isArray(raw.enemyTeam)||raw.enemyTeam.length>5||raw.enemyTeam.some(id=>typeof id!=='string'||id!==''&&!Object.hasOwn(data.champions,id))))throw Error('Time inimigo inválido.');
  if(typeof raw.duration!=='number')throw Error('Janela inválida.');
- const s:Scenario={...initialScenario(data),matchupUnknown:raw.unknown===true,player:unpack(raw.p,data),enemy:unpack(raw.e,data),weights:weights as Scenario['weights'],duration:raw.duration};
+ const s:Scenario={...initialScenario(data),teamPriority:raw.teamPriority as number|undefined,enemyTeam:raw.enemyTeam as string[]|undefined,matchupUnknown:raw.unknown===true,player:unpack(raw.p,data),enemy:unpack(raw.e,data),weights:weights as Scenario['weights'],duration:raw.duration};
  const errors=validateScenario(s,data);if(errors.length)throw Error(errors.join('; '));
  for(const f of [s.player,s.enemy]){const groups=new Set<string>();for(const id of f.items){const group=data.items[id].exclusiveGroup;if(group&&groups.has(group))throw Error('Itens de grupos exclusivos em conflito.');if(group)groups.add(group);}}
  return s;

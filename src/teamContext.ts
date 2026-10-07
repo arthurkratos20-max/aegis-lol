@@ -1,0 +1,2 @@
+import type {Dataset,Scenario} from './contracts.ts';
+export function teamContext(s:Scenario,data:Dataset){const ids=[...new Set((s.enemyTeam??(!s.matchupUnknown?[s.enemy.champion]:[])).filter(id=>typeof id==='string'&&Object.hasOwn(data.champions,id)))].slice(0,5);const value=Number.isFinite(s.teamPriority)?Math.max(0,Math.min(100,s.teamPriority??0)):0;return {ids,weight:ids.length?value/100:0};}

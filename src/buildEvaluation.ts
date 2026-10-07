@@ -1,7 +1,8 @@
+import {teamContext} from './teamContext.ts';
 import {classAbilityPower,normalizeSpell} from './abilityModel.ts';
 import {preferenceWeights} from './preferenceWeights.ts';
 import type {Dataset,Scenario} from './contracts.ts';
-import {statsFor,mitigate,effectiveResistance} from './model.ts';
+import {fighter,statsFor,mitigate,effectiveResistance} from './model.ts';
 import {enemyAxis} from './recommendation.ts';
 import {nativeDamage,nativeOptions,nativeAction} from './native.ts';
 import {exclusiveGroupsValid} from './itemGroups.ts';
@@ -17,7 +18,7 @@ export function magicalPotential(ap:number,haste:number,resistance:number):numbe
 }
 export function offensiveMetric(metrics:BuildMetrics):number{return metrics.offenseValue??metrics.kitPotential??metrics.magicPotential??metrics.dps;}
 /** Manual actions or explicitly estimated class throughput against fixed target resistances. */
-export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
+function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
  const f={...s.player,items},x=statsFor(f,data),base=statsFor({...f,items:[],overrides:{}},data),e=s.matchupUnknown?{...statsFor(s.enemy,data),hp:2500,armor:100,mr:100,armorPen:0,armorPenPercent:0,magicPen:0,magicPenPercent:0}:statsFor(s.enemy,data),T=Math.max(.1,s.duration);
  const resistance=(type:string)=>type==='physical'?effectiveResistance(e.armor,x.armorPenPercent,x.armorPen):effectiveResistance(e.mr,x.magicPenPercent,x.magicPen);
  const rawDPSByType={physical:0,magic:0,true:0};
@@ -84,6 +85,16 @@ export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetri
  const k=kitFor(f,data),utility=Math.max(0,x.haste)/100*(1+(k.hardCC?.25:0)+(k.healShield?.5:0))+Math.max(0,x.move-base.move)/100+(k.mana?Math.max(0,x.mana-base.mana)/Math.max(1,base.mana)+Math.max(0,x.manaRegen-base.manaRegen)/Math.max(1,base.manaRegen):0);
  const offenseValue=s.objective==='single'?(f.actions.length?singleDamage:peak):s.objective==='burst'?(f.actions.length?burstDamage:damage/T*Math.min(T,3)+burst):dps;
  return {isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
+}
+/** Weighted target comparison, not simultaneous 5v5 combat. Harmonic EHP mixes damage taken. */
+export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
+ const base=evaluateSingleBuild(items,s,data),context=teamContext(s,data);
+ if(!context.weight)return base;
+ const rows=context.ids.map(id=>evaluateSingleBuild(items,{...s,teamPriority:0,matchupUnknown:false,enemy:id===s.enemy.champion?s.enemy:{...fighter(data,id),level:s.enemy.level}},data));
+ const weighted=[{m:base,w:1-context.weight},...rows.map(m=>({m,w:context.weight/rows.length}))].filter(x=>x.w>0);
+ if(weighted.length===1)return weighted[0].m;
+ const average=(key:'dps'|'ttk'|'offenseValue'|'magicPotential'|'kitPotential'|'estimatedRotationDPS')=>weighted.reduce((n,x)=>n+x.w*(x.m[key]??0),0);
+ return {...base,dps:average('dps'),offenseValue:average('offenseValue'),ttk:average('ttk'),ehp:1/weighted.reduce((n,x)=>n+x.w/Math.max(1e-9,x.m.ehp),0),omitted:Math.max(...weighted.map(x=>x.m.omitted)),rawDPSByType:{physical:weighted.reduce((n,x)=>n+x.w*(x.m.rawDPSByType?.physical??0),0),magic:weighted.reduce((n,x)=>n+x.w*(x.m.rawDPSByType?.magic??0),0),true:weighted.reduce((n,x)=>n+x.w*(x.m.rawDPSByType?.true??0),0)},...(base.magicPotential!==undefined?{magicPotential:average('magicPotential')}:{}),...(base.kitPotential!==undefined?{kitPotential:average('kitPotential')}:{}),...(base.estimatedRotationDPS!==undefined?{estimatedRotationDPS:average('estimatedRotationDPS')}:{})};
 }
 export function calculateOptimalBuild(candidates:string[][],s:Scenario,data:Dataset,previous?:string[]):{items:string[];metrics:BuildMetrics;score:number;count:number} {
  const rows=candidates.filter(items=>exclusiveGroupsValid(items,data)).map(items=>({items,metrics:evaluateBuild(items,s,data)}));if(!rows.length)throw Error('Travas ou grupos exclusivos impedem uma build válida de seis itens.');

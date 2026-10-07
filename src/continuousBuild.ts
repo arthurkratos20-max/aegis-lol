@@ -1,3 +1,4 @@
+import {teamContext} from './teamContext.ts';
 import {withSkillPlans} from './skillOrders.ts';
 import {preferenceWeights} from './preferenceWeights.ts';
 import type {Dataset,Scenario} from './contracts.ts';
@@ -35,7 +36,9 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const pool=Object.keys(data.items).filter(completed);
  const mine=championForCounter(s.player.champion,data,s.player),enemy=championForCounter(s.enemy.champion,data,s.enemy);
  const draft=(s.counterPreset?.mode==='draft'||s.counterPreset?.source.includes('Draft'))?s.draft?.enemy:undefined;
- const evaluation=s.matchupUnknown?{enemyCount:0,priorities:{},reasons:[]}:draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
+ let evaluation=s.matchupUnknown?{enemyCount:0,priorities:{},reasons:[]}:draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
+ const team=teamContext(s,data);
+ if(team.weight){const teamEvaluation=calculateDraftCounter(mine,team.ids.map(id=>championForCounter(id,data,id===s.enemy.champion?s.enemy:undefined)));const keys=new Set([...Object.keys(evaluation.priorities),...Object.keys(teamEvaluation.priorities)]);evaluation={enemyCount:team.ids.length,priorities:Object.fromEntries([...keys].map(key=>[key,(1-team.weight)*(evaluation.priorities[key]??0)+team.weight*(teamEvaluation.priorities[key]??0)/team.ids.length])),reasons:[...evaluation.reasons,...teamEvaluation.reasons]};}
  const ranks=rankCounterCandidates(mine,counterItemCandidates(s.player,data),evaluation),maxCounter=Math.max(1,...ranks.map(r=>r.score));
  const counters=new Map(ranks.map(r=>[r.candidate.id,r.score/maxCounter]));
  const fixed=[...new Set([...s.player.locked,...(!s.allowSell?s.player.owned:[])])];
