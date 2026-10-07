@@ -41,3 +41,12 @@ test('all automatic champion/lane recommendations are complete, compatible and l
  console.log(`Automatic context audit: ${checked} champion/lane/enemy scenarios validated.`);
 });
 import {itemEligible} from '../src/model.ts';import {itemCompatible} from '../src/compatibility.ts';import {exclusiveGroupsValid} from '../src/buildEvaluation.ts';
+
+ test('Ashe automatic card responds to Cassiopeia versus Caitlyn/Jhin without assassin utility items',()=>{
+ const s=initialScenario(data);s.player.champion='Ashe';s.player.lane='Bot';s.matchupUnknown=false;
+ const builds=['Cassiopeia','Caitlyn','Jhin'].map(enemy=>{s.enemy.champion=enemy;return quickRecommendation(quickScenario(s,data),data);});
+ assert.ok(builds[0].target.includes('3091'));assert.ok(builds[1].target.includes('3026'));assert.ok(builds[2].target.includes('3026'));
+ assert.notDeepEqual(builds[0].target,builds[1].target);
+ for(const r of builds){assert.ok(!r.target.some(id=>['6694','6696','6697'].includes(id)));assert.ok(r.target.includes('3031'));}
+ s.matchupUnknown=true;const unknown=quickRecommendation(quickScenario(s,data),data);s.enemy.champion='Lux';assert.deepEqual(unknown.target,quickRecommendation(quickScenario(s,data),data).target);
+ });

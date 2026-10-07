@@ -28,12 +28,15 @@ export function scoreItems(rows:{id:string;metrics:BuildMetrics;counter?:number}
   return {id:row.id,normalizedOffense,normalizedEHP,normalizedUtility,counterBonus,score:weightDamage*normalizedOffense+weightDefense*normalizedEHP+weightUtility*normalizedUtility+counterBonus,coverage:'estimated' as const};
  }).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
 }
-export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced'){
+export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode='balanced',contextual=false){
  s=withSkillPlans(s,data);
  const neutral={...s,player:{...s.player,locked:[],owned:[]},weights:{offense:50,defense:50,utility:0}},base=recommend(neutral,data,mode);
   const compatible=(id:string)=>itemEligible(id,data,s.player.champion)&&itemCompatible(id,s.player,data).allowed;
  const completed=(id:string)=>compatible(id)&&!isBoot(id,data)&&(data.items[id].gold.total>=2000||id==='3041')&&Number(id)<10000;
- const pool=Object.keys(data.items).filter(completed);
+ const affinity=new Set(affinityCandidates(s,data));
+ const allPool=Object.keys(data.items).filter(completed);
+ // Automatic ADC advice stays in the kit pool; raw AD/AH alone cannot justify assassin items.
+ const pool=contextual&&base.profile==='marksman'&&allPool.filter(id=>affinity.has(id)).length>=8?allPool.filter(id=>affinity.has(id)):allPool;
  const mine=championForCounter(s.player.champion,data,s.player),enemy=championForCounter(s.enemy.champion,data,s.enemy);
  const draft=(s.counterPreset?.mode==='draft'||s.counterPreset?.source.includes('Draft'))?s.draft?.enemy:undefined;
  let evaluation=s.matchupUnknown?{enemyCount:0,priorities:{},reasons:[]}:draft?calculateDraftCounter(mine,draft.filter(id=>data.champions[id]).map(id=>championForCounter(id,data))):calculateMatchupCounter(mine,enemy);
@@ -54,7 +57,11 @@ export function greedyContinuousBuild(s:Scenario,data:Dataset,mode:TacticalMode=
  const coreEligible=(id:string)=>completed(id)&&exclusiveGroupsValid([...required,...(required.includes(id)?[]:[id])],data);
  const sliderValue=100*s.weights.offense/Math.max(1,s.weights.offense+s.weights.defense);
  let evaluated=0;const scores:ItemScore[]=[];const decisions:{selected:string;candidates:ItemScore[]}[]=[];
- const rankWith=(ids:string[],prefix:string[])=>scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...prefix,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
+ const rankWith=(ids:string[],prefix:string[])=>{
+  const ranked=scoreItems(ids.map(id=>({id,metrics:evaluateBuild([...prefix,id],s,data),counter:Math.max(counters.get(id)??0,mode==='antiheal'&&['3033','3165','3075'].includes(id)||mode==='antishield'&&id==='6695'?1:0)})),s.weights);
+  if(!contextual)return ranked;
+  return ranked.map(row=>({...row,score:.8*row.score+.15*(affinity.has(row.id)?1:0)+.05*(counters.get(row.id)??0)})).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+ };
  // Explicit inventory/boot locks stay authoritative. Automatic boots are scored anew.
  if(bootAllowed&&s.player.boots!=='fixed'&&!lockedBoot){
   const candidates=Object.keys(data.items).filter(id=>compatible(id)&&isBoot(id,data)&&data.items[id].from?.includes('1001')&&(id!=='3006'||kitFor(s.player,data).autoAttack)&&Number(id)<10000&&data.items[id].gold.total>=800&&exclusiveGroupsValid([...required,id],data));
