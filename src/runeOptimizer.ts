@@ -1,3 +1,4 @@
+import {tradingKeystoneAllowed,tradingKeystoneBonus,tradingKeystoneReason} from './tradingPatterns.ts';
 import {teamContext} from './teamContext.ts';
 import {preferenceWeights} from './preferenceWeights.ts';
 import type {Dataset,Scenario,RunePage,RuneTree,Rune} from './contracts.ts';
@@ -40,12 +41,12 @@ export function heuristicRuneScore(rune:Rune,s:Scenario,data:Dataset,sliderValue
 export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number|Scenario['weights']=s.weights,contextual=false):RunePage {
  const page=s.player.runes;if(page.locked)return structuredClone(page);
  const locks=page.locks??{},locked=new Set(locks.runes??[]),k=kitFor(s.player,data);
- const viable=(r:Rune)=>runeCompatible(r.id,s.player,data).allowed&&(r.id!==8465||k.healShield||['engage','warden'].includes(runeAffinity(s.player,data)))&&(r.id!==8401||k.healShield);
+ const viable=(r:Rune)=>(!contextual||tradingKeystoneAllowed(r.id,s,data))&&runeCompatible(r.id,s.player,data).allowed&&(r.id!==8465||k.healShield||['engage','warden'].includes(runeAffinity(s.player,data)))&&(r.id!==8401||k.healShield);
  const locate=(id:number)=>{for(const tree of data.runes)for(let row=0;row<tree.slots.length;row++)if(tree.slots[row].runes.some(r=>r.id===id))return {tree,row};return undefined;};
  for(const id of locked){const slot=locate(id);if(!slot||!page.selected.includes(id)||![page.primary,page.secondary].includes(slot.tree.id)||slot.tree.id===page.secondary&&slot.row===0)throw Error('Trava de runa ausente ou incompatível com as árvores atuais.');}
  const primaryLocked=locks.primaryTree||[...locked].some(id=>locate(id)?.tree.id===page.primary);
  const secondaryLocked=locks.secondaryTree||[...locked].some(id=>locate(id)?.tree.id===page.secondary);
- const score=(r:Rune)=>heuristicRuneScore(r,s,data,sliderValue).score+(contextual?matchupRuneAdjustment(r.id,s,data).bonus:0);
+ const score=(r:Rune)=>heuristicRuneScore(r,s,data,sliderValue).score+(contextual?matchupRuneAdjustment(r.id,s,data).bonus+tradingKeystoneBonus(r.id,s,data):0);
  const ranked=(runes:Rune[])=>runes.filter(r=>viable(r)||locked.has(r.id)).map(r=>({r,score:score(r)})).sort((a,b)=>b.score-a.score||a.r.id-b.r.id);
  const choose=(tree:RuneTree,row:number)=>{
   const fixed=tree.slots[row].runes.filter(r=>locked.has(r.id));if(fixed.length>1)throw Error('Duas runas travadas na mesma linha.');
@@ -95,5 +96,10 @@ export function matchupRuneAdjustment(id:number,s:Scenario,data:Dataset):{bonus:
 }
 export function matchupRuneReason(s:Scenario,data:Dataset,page:RunePage):string{
  const responses=page.selected.map(id=>matchupRuneAdjustment(id,s,data)).filter(x=>x.bonus>0);
- return responses.length?responses.map(x=>x.reason).join(' '):matchupRuneAdjustment(0,s,data).reason;
+ const key=data.runes.find(t=>t.id===page.primary)?.slots[0].runes.find(r=>page.selected.includes(r.id));
+ const baseline=calculateOptimalRunes({...s,matchupUnknown:true},data,s.weights,true);
+ const previous=data.runes.find(t=>t.id===baseline.primary)?.slots[0].runes.find(r=>baseline.selected.includes(r.id));
+ const changed=key&&previous&&key.id!==previous.id?`Mudança de ${previous.name} para ${key.name}: `:'';
+ const locked=page.locked||key&&page.locks?.runes?.includes(key.id)?'Runa principal travada: escolha manual preservada. ':'';
+ return locked+changed+(key?tradingKeystoneReason(key.id,s,data)+' ':'')+(responses.length?responses.map(x=>x.reason).join(' '):matchupRuneAdjustment(0,s,data).reason);
 }

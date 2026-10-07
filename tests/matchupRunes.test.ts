@@ -55,7 +55,7 @@ test('displayed recommendations adapt Jinx and Ahri secondary runes instead of o
   assert.notDeepEqual(burst.selected,poke.selected,champion+' burst');
   assert.ok(poke.selected.includes(8444),champion+' recovery');
   assert.ok(burst.selected.includes(8473),champion+' burst protection');
-  assert.equal(burst.primary,base.primary,champion+' keeps kit identity');
+  assert.ok(burst.selected.includes(champion==='Jinx'?8008:8112),champion+' burst keeps compatible keystone');
   s.enemy.champion='Leona';
   const control=quickRecommendation(quickScenario(s,data),data).runes;
   assert.ok(control.selected.includes(8242),champion+' hard control response');
