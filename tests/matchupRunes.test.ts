@@ -7,6 +7,8 @@ import {quickScenario} from '../src/quickScenario.ts';
 import {calculateOptimalRunes,matchupRuneReason} from '../src/runeOptimizer.ts';
 import {runeCompatible} from '../src/compatibility.ts';
 import {skillPlan} from '../src/skillOrders.ts';
+import {quickRecommendation} from '../src/quickRecommendation.ts';
+import {fullBuild} from '../src/fullBuild.ts';
 import {skillValid} from '../src/skillRules.ts';
 const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
 test('automatic runes change for melee, ranged pressure and burst without changing tank identity',()=>{
@@ -39,4 +41,27 @@ test('every champion and lane resolves legal contextual runes and skill paths ac
   checked++;
  }
  assert.equal(checked,3460);
+});
+
+test('displayed recommendations adapt Jinx and Ahri secondary runes instead of only testing the scoring helper',()=>{
+ for(const champion of ['Jinx','Ahri']){
+  const s=initialScenario(data);s.player.champion=champion;s.matchupUnknown=true;
+  const base=quickRecommendation(quickScenario(s,data),data).runes;
+  s.matchupUnknown=false;s.enemy.champion='Caitlyn';
+  const poke=quickRecommendation(quickScenario(s,data),data).runes;
+  s.enemy.champion='Zed';
+  const burst=quickRecommendation(quickScenario(s,data),data).runes;
+  assert.notDeepEqual(poke.selected,base.selected,champion+' ranged pressure');
+  assert.notDeepEqual(burst.selected,poke.selected,champion+' burst');
+  assert.ok(poke.selected.includes(8444),champion+' recovery');
+  assert.ok(burst.selected.includes(8473),champion+' burst protection');
+  assert.equal(burst.primary,base.primary,champion+' keeps kit identity');
+  s.enemy.champion='Leona';
+  const control=quickRecommendation(quickScenario(s,data),data).runes;
+  assert.ok(control.selected.includes(8242),champion+' hard control response');
+  const manual=quickScenario(s,data);
+  assert.deepEqual(fullBuild(manual,data).runes,calculateOptimalRunes(manual,data,manual.weights,true));
+  manual.player.runes={...base,locked:true};
+  assert.deepEqual(fullBuild(manual,data).runes,manual.player.runes);
+ }
 });

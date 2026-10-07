@@ -25,5 +25,5 @@ test('individual runes, either tree and shard locks survive reoptimization witho
  s.player.runes.locked=true;assert.deepEqual(calculateOptimalRunes(s,data,0),s.player.runes);
 });
 test('illegal duplicate row locks fail explicitly; fullBuild synchronizes both modules',()=>{const s=initialScenario(data);s.player.runes=calculateOptimalRunes(s,data,100);s.player.runes.selected.push(8005);s.player.runes.locks={runes:[8005,8008]};assert.throws(()=>calculateOptimalRunes(s,data,50),/mesma linha/);
- s.player=fighter(data,'Jinx');s.weights={offense:0,defense:100,utility:0};assert.deepEqual(fullBuild(s,data).runes,calculateOptimalRunes(s,data));s.weights={offense:100,defense:0,utility:0};assert.equal(fullBuild(s,data).runes.primary,8000);
+ s.player=fighter(data,'Jinx');s.weights={offense:0,defense:100,utility:0};assert.deepEqual(fullBuild(s,data).runes,calculateOptimalRunes(s,data,s.weights,!s.matchupUnknown));s.weights={offense:100,defense:0,utility:0};assert.equal(fullBuild(s,data).runes.primary,8000);
 });

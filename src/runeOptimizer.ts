@@ -74,15 +74,19 @@ export function calculateOptimalRunes(s:Scenario,data:Dataset,sliderValue:number
  return {...page,primary:primary.tree.id,secondary:secondary.tree.id,selected:[...main.map(r=>r!.id),...secondary.selected.map(v=>v.r.id)],shards};
 }
 
-/** Bounded editorial lane-response scores, never simulated rune damage or win rates. */
+/** Editorial lane-response scores on the same affinity scale as kit scores.
+ * Survival responses must compete with offensive secondary trees, even for ADCs/mages.
+ * These are strategic priorities, never measured damage, win rates or guaranteed counters. */
 export function matchupRuneAdjustment(id:number,s:Scenario,data:Dataset):{bonus:number;reason:string}{
  if(s.matchupUnknown)return {bonus:0,reason:'Adversário indefinido: afinidade com kit e rota, sem resposta de confronto.'};
  const enemy=championForCounter(s.enemy.champion,data,s.enemy),ranged=data.champions[enemy.id].stats.attackrange>300;
  const close=data.champions[s.player.champion].stats.attackrange<=300,k=kitFor(s.player,data);
  const response=(bonus:number,reason:string)=>({bonus,reason:`Contra ${enemy.name}: ${reason} Orientação estimada de kit, sem vantagem estatística comprovada.`});
- if(id===8473&&enemy.isBurst)return response(.22,'Osso Revestido favorece resistência a uma sequência de impactos; pode ser retirado antes do combo.');
- if(id===8444&&ranged&&!enemy.isBurst)return response(.22,'Ventos Revigorantes favorece recuperação após pressão de alcance; alcance sozinho não comprova poke constante.');
- if(id===8242&&enemy.hasHardCC)return response(.16,'Inabalável considera a presença de controle; não presume proteção contra todo tipo de controle.');
+ if(id===8473&&enemy.isBurst)return response(.8,'Osso Revestido favorece resistência a uma sequência de impactos; pode ser retirado antes do combo.');
+ if(id===8473&&enemy.hasHardCC&&!ranged)return response(.65,'Osso Revestido considera impactos sucessivos após uma iniciação corpo a corpo; sua recarga e a possibilidade de removê-lo antes da troca limitam a proteção.');
+ if(id===8444&&ranged&&!enemy.isBurst)return response(.8,'Ventos Revigorantes favorece recuperação após pressão de alcance; alcance sozinho não comprova poke constante.');
+ if(id===8242&&enemy.hasHardCC)return response(.8,'Inabalável considera a presença de controle; não presume proteção contra todo tipo de controle.');
+ if(id===8451&&(enemy.isBurst||ranged||enemy.hasHardCC))return response(.45,'Crescimento Excessivo oferece vida ao longo da partida; não substitui resistência imediata e depende da acumulação.');
  if(id===8017&&enemy.isTank)return response(.16,'Dilacerar favorece pressão contra alvos resistentes; a condição real da runa ainda precisa ser atendida.');
  if(id===8437&&close&&!ranged)return response(.12,'Aperto ganha afinidade com trocas corpo a corpo quando é possível aplicar o ataque carregado.');
  if(id===8439&&k.hardCC&&enemy.isBurst)return response(.16,'Pós-Choque depende de acertar sua imobilização antes de receber a resposta de burst.');
