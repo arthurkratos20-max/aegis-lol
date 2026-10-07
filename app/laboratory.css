@@ -230,3 +230,47 @@
 
 .compact-laboratory .preferences .advanced>.field{grid-column:span 3}
 @media(max-width:600px){.compact-laboratory .preferences .advanced>.field{grid-column:span 1}}
+
+/* Stage 2: consolidated configuration and matchup columns. */
+.compact-laboratory .tactical-dashboard{gap:12px 16px}
+.compact-laboratory .tactical-config,.compact-laboratory .tactical-analysis{gap:12px}
+.compact-laboratory .tactical-config .tactical-context{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;grid-column:auto}
+.compact-laboratory .tactical-context .champion-details{padding:10px 12px;gap:6px}
+.compact-laboratory .tactical-context .matchup-mode{padding:10px 12px;gap:6px}
+.compact-laboratory .tactical-context .matchup-mode p{margin:0;font-size:10px}
+.compact-laboratory .panel{padding:12px}
+.compact-laboratory .panel-head{margin-bottom:8px}
+.compact-laboratory .tactical-preference .build-controls{padding:8px 12px}
+.compact-laboratory .build-control-preference>small{max-width:440px;line-height:1.3}
+.compact-laboratory .build-control-preference input[type=range]{min-height:18px}
+.compact-laboratory .compact-build-item .item-tooltip-anchor{margin-bottom:4px}
+.compact-laboratory .build-panel .build-live-status{margin-top:6px}
+.compact-laboratory .build-panel>details{margin-top:6px;padding-top:6px}
+.compact-laboratory .duel-fighters{padding:8px 10px;margin-bottom:8px}
+.compact-laboratory .duel-analysis{gap:8px;margin:8px 0}
+.compact-laboratory .duel-metrics{padding:8px 10px}
+.compact-laboratory .duel-metrics h4{margin:0 0 6px}
+.compact-laboratory .duel-metrics dl{margin:0}
+.compact-laboratory .duel-metrics dl>div{padding:4px 0;font-size:11px}
+.compact-laboratory .duel-analysis-title{margin:8px 0 6px}
+.compact-laboratory .duel-basis{font-size:10px;line-height:1.4;margin:6px 0}
+.compact-laboratory .selected-shards{gap:5px;margin-top:8px}
+.compact-laboratory .selected-shards>span{gap:6px;padding:4px 6px;font-size:10px}
+@media(min-width:1200px){.compact-laboratory .tactical-config{grid-column:span 5}.compact-laboratory .tactical-analysis{grid-column:span 7}}
+@media(max-width:1023px){.compact-laboratory .tactical-config,.compact-laboratory .tactical-analysis{grid-column:auto}.compact-laboratory .main-shell{width:100%}}
+@media(max-width:600px){.compact-laboratory .compact-build-item .item-tooltip-anchor{width:40px;height:40px}.compact-laboratory .selected-shards>span{font-size:11px;padding:6px}.compact-laboratory .duel-metrics dl>div{font-size:12px}}
+@media(min-width:1024px){
+ .compact-laboratory .tactical-preference{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;gap:16px}
+ .compact-laboratory .tactical-preference .build-controls{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-content:start;align-items:center}
+ .compact-laboratory .tactical-preference .build-control-preference{grid-column:1/-1}
+ .compact-laboratory .tactical-preference .build-control-preference>small{max-width:none}
+ .compact-laboratory .tactical-preference .build-control-metric strong{font-size:14px}
+ .compact-laboratory .preferences .hint{font-size:10px;line-height:1.35}
+ .compact-laboratory .preferences .panel-head h3{font-size:14px}
+}
+@media(min-width:1024px){
+ .compact-laboratory .tactical-preference{align-items:start}
+ .compact-laboratory .tactical-preference:has(.advanced){grid-template-columns:minmax(0,1fr)}
+ .compact-laboratory .tactical-preference:has(.advanced) .build-controls{grid-template-columns:minmax(290px,2.4fr) repeat(4,minmax(0,1fr))}
+ .compact-laboratory .tactical-preference:has(.advanced) .build-control-preference{grid-column:auto}
+}
