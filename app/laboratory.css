@@ -274,3 +274,35 @@
  .compact-laboratory .tactical-preference:has(.advanced) .build-controls{grid-template-columns:minmax(290px,2.4fr) repeat(4,minmax(0,1fr))}
  .compact-laboratory .tactical-preference:has(.advanced) .build-control-preference{grid-column:auto}
 }
+/* Stage 3: consistent quick-card density and recoverable catalog state. */
+.catalog-status{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:8px 12px;margin:0 0 12px;border:1px solid #344157;border-radius:7px;background:#111b28;color:#c6d2e3;font-size:11px}
+.catalog-status button{font-size:11px;padding:6px 10px;min-height:32px}
+.model-badge{display:inline-flex;align-items:center;white-space:normal;font-size:10px;line-height:1.4;background:#d8b66b0d;color:#e4c989;border:1px solid #79674460;padding:4px 7px;border-radius:5px}
+.fast-shell .fast-main{padding-top:12px}
+.fast-shell .fast-panel{padding:12px;border-radius:8px}
+.fast-shell .fast-panel h2{font-size:16px;margin:0 0 8px}
+.fast-shell .fast-layout{gap:12px}
+.fast-shell .fast-summary{margin:12px 0;padding:12px;gap:12px}
+.fast-shell .fast-summary h1{font-size:22px;margin:2px 0}
+.fast-shell .fast-summary p{font-size:12px;margin:5px 0}
+.fast-shell .fast-panel .hint{margin-top:8px;font-size:11px}
+.fast-shell .fast-priority{margin:10px 0 14px}
+.fast-shell .fast-items{gap:6px}
+.fast-shell .fast-item{padding:8px 5px;min-height:96px;gap:5px}
+.fast-shell .fast-item strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fast-shell .fast-item small{font-size:10px;color:#e4c989}
+.fast-shell .fast-shards{margin-top:8px}
+.fast-adjustments{padding:10px 12px;border:1px solid #283341;border-radius:8px;background:#111720;margin:10px 0}
+.fast-adjustments>summary{font-size:12px;font-weight:600;color:#dce6f2;cursor:pointer}
+.fast-adjustments .build-controls{position:static;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 0;margin:0;border:0;background:transparent}
+.fast-adjustments .build-control-preference{grid-column:1/-1}
+.fast-adjustments .build-controls input{min-width:0;width:100%;font-size:12px}
+.fast-adjustments .build-control-metric strong{font-size:14px}
+.fast-adjustments .build-controls small{font-size:10px}
+.fast-adjustments .quick-objectives{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:8px}
+.fast-adjustments .quick-objectives label{display:grid;gap:4px;font-size:11px;color:#b8c8dc;min-width:0}
+.fast-adjustments select{width:100%;min-width:0;font-size:12px;padding:7px;min-height:34px}
+.fast-adjustments .hint{font-size:11px;color:#b8c8dc;line-height:1.4;margin:8px 0 0}
+@media(max-width:600px){.fast-adjustments .build-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.fast-adjustments .quick-objectives{grid-template-columns:1fr}.fast-adjustments select,.fast-adjustments button{min-height:40px}.fast-shell .fast-summary h1{font-size:20px}.catalog-status{align-items:flex-start}.fast-shell .fast-item{min-height:100px}}
+
+.fast-shell .fast-layout{align-items:start}

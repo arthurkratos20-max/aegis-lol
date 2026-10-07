@@ -1,0 +1,1 @@
+export default function ModelBadge(){return <span className="testing-tag model-badge" data-is-exact-formula="false" title="Recomendação heurística por kit, rota e confronto. Fórmulas e efeitos têm cobertura parcial; não representa um ótimo matemático comprovado.">Estimativa algorítmica</span>;}
