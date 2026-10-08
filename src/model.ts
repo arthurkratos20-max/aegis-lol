@@ -8,6 +8,12 @@ export const growth=(level:number)=>.7025*(level-1)+.0175*(level-1)**2;
 export const hasteCooldown=(cooldown:number,haste:number)=>cooldown*100/(100+Math.max(0,haste));
 export const mitigate=(damage:number,resistance:number)=>damage*(resistance>=0?100/(100+resistance):2-100/(100-resistance));
 export const effectiveResistance=(resistance:number,percentPen:number,flatPen:number)=>resistance<=0?resistance:Math.max(0,resistance*(1-percentPen)-flatPen);
+/** Flat reduction → percent reduction → percent penetration → flat penetration. */
+export function combatResistance(resistance:number,percentPen=0,flatPen=0,percentReduction=0,flatReduction=0):number {
+ const reduced=resistance-Math.max(0,flatReduction);
+ const final=reduced>0?reduced*(1-Math.max(0,Math.min(1,percentReduction))):reduced;
+ return effectiveResistance(final,Math.max(0,Math.min(1,percentPen)),Math.max(0,flatPen));
+}
 export const plain=(text:string)=>text.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
 export const itemEligible=(id:string,data:Dataset,champion:string)=>{const i=data.items[id];return !!i&&i.maps['11']&&i.gold.purchasable&&i.inStore!==false&&!i.requiredAlly&&(!i.requiredChampion||i.requiredChampion===champion);};
 export const isBoot=(id:string,data:Dataset)=>data.items[id]?.tags.includes('Boots')??false;

@@ -1,0 +1,17 @@
+'use client';
+import {useState} from 'react';
+import type {Dataset,Scenario} from './contracts';
+import {EXACT_PATCH,exactAction,exactEffectsFor,exactFormulaStatus,exactRaw,skillRank} from './exactKits';
+import {statsFor} from './model';
+import {useAuth} from './auth/AuthProvider';
+import GateKeepPro from './auth/GateKeepPro';
+const number=(n:number)=>n.toLocaleString('pt-BR',{maximumFractionDigits:1});
+export default function ExactKitReview({scenario:s,data,onChange}:{scenario:Scenario;data:Dataset;onChange?:(s:Scenario)=>void}){
+ const {isPro}=useAuth();const [at,setAt]=useState(0),[error,setError]=useState(''),effects=exactEffectsFor(s.player.champion);if(!effects.length)return null;
+ const actor=statsFor(s.player,data),base=statsFor({...s.player,items:[],overrides:{},runes:{...s.player.runes,shards:[]}},data),target=s.matchupUnknown?{...statsFor(s.enemy,data),hp:2500}:statsFor(s.enemy,data);
+ return <section className="exact-kit-review" aria-label="Efeitos com fórmulas validadas"><div className="panel-head"><h3>Efeitos validados · {EXACT_PATCH}</h3><span className="testing-tag">Kit global: estimativa</span></div><p className="hint">O badge valida apenas a matemática do efeito com os atributos configurados e nas condições descritas. A sequência de combate, as passivas restantes e a recomendação de build continuam estimativas. Os efeitos entram no motor quando adicionados explicitamente.</p>{onChange&&!isPro&&<GateKeepPro><span/></GateKeepPro>}<label className="field"><span>Instante da ação (s)</span><input aria-label="Instante do efeito validado" type="number" min="0" max={s.duration} step="0.1" value={at} onChange={e=>setAt(Math.max(0,Math.min(s.duration,Number(e.target.value)||0)))}/></label><div className="guide-item-grid">{effects.map(e=>{
+  const learned=skillRank(s.player,e.key)>0,status=exactFormulaStatus(e.id,data);let raw:number|null=null;
+  if(learned)try{raw=exactRaw(e.id,s.player,actor,base,target,s.matchupUnknown?2500:target.hp*s.enemy.initialHP);}catch{raw=null;}
+  return <article className="guide-card" key={e.id}><div className="panel-head"><h4>{e.label}</h4><span className="testing-tag" data-is-exact-formula={status.isExactFormula}>{status.isExactFormula?'Fórmula exata · efeito':'Snapshot incompatível'}</span></div><p className="hint">{e.note}</p><p>{!learned?'Habilidade ainda não evoluída':raw===null?'Impacto indisponível':e.mode==='passive'?e.id==='vayne-w'?`Proc de referência: ${number(raw)} de dano verdadeiro.`:e.id==='jinx-minigun'?`AS extra máxima: ${number(raw*100)}%.`:'Penetração aplicada conforme rank de E.':e.mode==='buff'?`Bônus/ataque de referência: ${number(raw)}. Ativação não causa dano isolado.`:`${e.id==='lux-w'||e.mode==='shield'?'Escudo':'Dano'} bruto de referência: ${number(raw)}.`}</p>{onChange&&isPro&&<button disabled={!learned||!status.isExactFormula||raw===null} onClick={()=>{try{const a=exactAction(s.player,data,e.id,Math.min(at,Math.max(0,s.duration-.01)));onChange({...s,player:{...s.player,actions:[...s.player.actions,a]}});setError('');}catch(err){setError(err instanceof Error?err.message:String(err));}}}>Adicionar em {number(at)}s</button>}</article>;
+ })}</div>{error&&<p role="alert">{error}</p>}<p className="hint">Fonte: <a href={exactFormulaStatus(effects[0].id,data).source??undefined} target="_blank" rel="noreferrer">arquivo do cliente via CommunityDragon · 16.20</a>. Valores de referência não são DPS nem validação do kit inteiro.</p></section>;
+}

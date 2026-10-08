@@ -5,7 +5,7 @@ export function calculateNative(node:CalcNode,spell:NativeSpell,rank:number,leve
  if(depth>12)throw Error('Calculation depth exceeded');
  const child=(v:unknown)=>calculateNative(v as CalcNode,spell,rank,level,stats,base,depth+1);
  const dataValue=(name:unknown)=>{const v=spell.values[String(name)];if(!v||v[rank]===undefined)throw Error(`DataValue not found: ${String(name)}`);return v[rank];};
- const stat=()=>{const code=Number(node.mStat??0),total=code===0?stats.ap:code===2?stats.ad:code===12?stats.hp:code===9?stats.critMultiplier:NaN;const original=code===0?base.ap:code===2?base.ad:code===12?base.hp:code===9?base.critMultiplier:NaN;if(!Number.isFinite(total))throw Error(`Unsupported stat ${code}`);return Number(node.mStatFormula??0)===2?total-original:total;};
+ const stat=()=>{const code=Number(node.mStat??0),total=code===0?stats.ap:code===1?stats.armor:code===8?stats.crit:code===2?stats.ad:code===12?stats.hp:code===9?stats.critMultiplier:NaN;const original=code===0?base.ap:code===1?base.armor:code===8?base.crit:code===2?base.ad:code===12?base.hp:code===9?base.critMultiplier:NaN;if(!Number.isFinite(total))throw Error(`Unsupported stat ${code}`);return Number(node.mStatFormula??0)===2?total-original:total;};
  switch(node.__type){
  case 'GameCalculation':return (node.mFormulaParts as CalcNode[]).reduce((a,n)=>a+child(n),0)*(node.mMultiplier?child(node.mMultiplier):1);
  case 'GameCalculationModified':{const ref=spell.calculations[String(node.mModifiedGameCalculation)];if(!ref)throw Error('Missing calculation reference');return child(ref)*(node.mMultiplier?child(node.mMultiplier):1);}
@@ -16,6 +16,7 @@ export function calculateNative(node:CalcNode,spell:NativeSpell,rank:number,leve
  case 'StatBySubPartCalculationPart':return stat()*child(node.mSubpart);
  case 'ProductOfSubPartsCalculationPart':return child(node.mPart1)*child(node.mPart2);
  case 'SumOfSubPartsCalculationPart':return (node.mSubparts as CalcNode[]).reduce((a,n)=>a+child(n),0);
+ case 'ByCharLevelFormulaCalculationPart':{const value=(node.values as number[])[level];if(!Number.isFinite(value))throw Error('Level formula missing');return value;}
  case 'ByCharLevelInterpolationCalculationPart':if(node.mScaleByStatProgressionMultiplier)throw Error('Stat progression interpolation not validated');return Number(node.mStartValue)+(Number(node.mEndValue)-Number(node.mStartValue))*(level-1)/17;
  case 'ByCharLevelBreakpointsCalculationPart':{let v=Number(node.mLevel1Value??0),per=Number(node.mInitialBonusPerLevel??0);const bp=(node.mBreakpoints??[]) as {mLevel:number;mAdditionalBonusAtThisLevel?:number;mBonusPerLevelAtAndAfter?:number}[];for(let l=2;l<=level;l++){const b=bp.find(b=>b.mLevel===l);if(b?.mBonusPerLevelAtAndAfter!==undefined)per=b.mBonusPerLevelAtAndAfter;v+=per+(b?.mAdditionalBonusAtThisLevel??0);}return v;}
  default:throw Error(`Calculation not implemented: ${node.__type}`);

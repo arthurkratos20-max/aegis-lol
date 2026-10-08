@@ -1,3 +1,5 @@
+import {simulate} from './engine.ts';
+import {exactValue} from './exactKits.ts';
 import {attributePreferences,preferenceScore} from './advancedPreferences.ts';
 import {championForCounter} from './counterAdapters.ts';
 import {teamContext} from './teamContext.ts';
@@ -24,6 +26,7 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
  const f={...s.player,items},x=statsFor(f,data),base=statsFor({...f,items:[],overrides:{}},data),e=s.matchupUnknown?{...statsFor(s.enemy,data),hp:2500,armor:100,mr:100,armorPen:0,armorPenPercent:0,magicPen:0,magicPenPercent:0}:statsFor(s.enemy,data),T=Math.max(.1,s.duration);
  const resistance=(type:string)=>type==='physical'?effectiveResistance(e.armor,x.armorPenPercent,x.armorPen):effectiveResistance(e.mr,x.magicPenPercent,x.magicPen);
  const rawDPSByType={physical:0,magic:0,true:0};
+ let modeledDeath:number|null=null,shieldBudget=0,defenseReduction=0;
  let attackDamage=0,damage=0,burstDamage=0,singleDamage=0,omitted=0,resource=x.mana*f.initialResource,lockedUntil=0;const cooldown=new Map<string,number>();
  const rawAA=x.ad*(1+Math.min(1,Math.max(0,x.crit))*(x.critMultiplier-1));
  const aa=x.ad*(1+Math.min(1,Math.max(0,x.crit))*(x.critMultiplier-1))*mitigate(1,resistance('physical'));
@@ -33,13 +36,26 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
  events.sort((a,b)=>a.at-b.at);
  for(const ev of events){if(ev.at<0||ev.at>=T||ev.at<lockedUntil)continue;const a=ev.a;if(!a){damage+=aa;attackDamage+=aa;singleDamage=Math.max(singleDamage,aa);if(ev.at<Math.min(T,3))burstDamage+=aa;rawDPSByType.physical+=rawAA;continue;}if(!['attack','spell'].includes(a.kind))continue;if(a.kind==='attack'){damage+=aa*a.hit;attackDamage+=aa*a.hit;singleDamage=Math.max(singleDamage,aa*a.hit);if(ev.at<Math.min(T,3))burstDamage+=aa*a.hit;rawDPSByType.physical+=rawAA*a.hit;continue;}if(ev.at<(cooldown.get(a.key)??0)||a.cost>resource)continue;
   let raw=0;try{if(a.native)raw=nativeDamage(a,f,data,x,e);else{const z=a.formula;raw=z.base+z.ad*x.ad+z.bonusAD*(x.ad-base.ad)+z.ap*x.ap+z.ownMaxHP*x.hp+z.targetMaxHP*e.hp+z.targetCurrentHP*e.hp;if(z.targetMissingHP)omitted++;}}catch{omitted++;continue;}
-  resource-=a.cost;cooldown.set(a.key,ev.at+a.cooldown/(1+x.haste/100));lockedUntil=ev.at+a.cast;rawDPSByType[a.type]+=Math.max(0,raw)*Math.max(0,Math.min(1,a.hit));const delivered=Math.max(0,raw)*Math.max(0,Math.min(1,a.hit))*(a.type==='true'?1:mitigate(1,resistance(a.type)));damage+=delivered;singleDamage=Math.max(singleDamage,delivered);if(ev.at<Math.min(T,3))burstDamage+=delivered;
+  resource-=a.cost;cooldown.set(a.key,ev.at+a.cooldown/(1+(x.haste+(a.key==='R'?(x.ultimateHaste??0):['Q','W','E'].includes(a.key)?(x.basicHaste??0):0))/100));lockedUntil=ev.at+a.cast;rawDPSByType[a.type]+=Math.max(0,raw)*Math.max(0,Math.min(1,a.hit));const delivered=Math.max(0,raw)*Math.max(0,Math.min(1,a.hit))*(a.type==='true'?1:mitigate(1,resistance(a.type)));damage+=delivered;singleDamage=Math.max(singleDamage,delivered);if(ev.at<Math.min(T,3))burstDamage+=delivered;
  }
  if(!f.actions.length){damage=f.automaticAttacks&&s.distance<=x.range?aa*rate*T:0;rawDPSByType.physical=f.automaticAttacks&&s.distance<=x.range?rawAA*rate*T:0;attackDamage=damage;}
+ if(f.actions.some(a=>a.kitEffect)){
+  const duel=simulate({...s,mode:'exploratory',player:f,enemy:s.matchupUnknown?{...s.enemy,initialHP:1,overrides:{hp:2500,armor:100,mr:100},actions:[],automaticAttacks:false}:s.enemy},data);
+  const hits=duel.events.filter(ev=>ev.actor==='player'&&ev.damage>0);
+  modeledDeath=duel.enemy.death;shieldBudget=duel.events.filter(ev=>ev.actor==='player'&&ev.kind==='shield').reduce((n,ev)=>n+ev.raw,0);
+  for(const a of f.actions.filter(a=>a.kitEffect==='garen-w'))if(duel.events.some(ev=>ev.actor==='player'&&ev.actionId===a.id&&ev.kind==='shield'&&ev.raw>0)){
+   const rank=f.skills.slice(0,f.level).filter(k=>k==='W').length;defenseReduction+=exactValue('Garen','GarenW','DRPercent',rank)*Math.max(0,Math.min(T,a.at+4)-a.at)/T;
+  }
+  defenseReduction=Math.min(.99,defenseReduction);
+  damage=duel.player.damage;attackDamage=hits.filter(ev=>ev.kind==='attack'||f.actions.some(a=>a.name===ev.source&&a.onHit)).reduce((n,ev)=>n+ev.damage,0);
+  burstDamage=hits.filter(ev=>ev.at<Math.min(T,3)).reduce((n,ev)=>n+ev.damage,0);
+  const perAction=new Map<string,number>();for(const ev of hits){const id=ev.actionId??`${ev.at}:${ev.source}`;perAction.set(id,(perAction.get(id)??0)+ev.damage);}singleDamage=Math.max(0,...perAction.values());
+  for(const type of ['physical','magic','true'] as const)rawDPSByType[type]=duel.events.filter(ev=>ev.actor==='player'&&ev.type===type).reduce((n,ev)=>n+ev.raw,0);
+ }
  for(const type of ['physical','magic','true'] as const)rawDPSByType[type]/=T;
  const axis=enemyAxis(s,data),incoming=s.matchupUnknown?{armorPenPercent:0,armorPen:0,magicPenPercent:0,magicPen:0}:statsFor(s.enemy,data),phys=mitigate(1,effectiveResistance(x.armor,incoming.armorPenPercent,incoming.armorPen)),magic=mitigate(1,effectiveResistance(x.mr,incoming.magicPenPercent,incoming.magicPen));
  const recovery=s.defensiveObjective==='sustain'?Math.max(0,x.hpRegen)*T/5+attackDamage*Math.max(0,x.lifesteal):s.defensiveObjective==='survive'?Math.max(0,x.hpRegen)*T/5:0;
- const ehp=(x.hp+recovery)/(axis==='physical'?phys:axis==='magic'?magic:.5*phys+.5*magic);
+ const ehp=(x.hp+recovery+shieldBudget)/(1-defenseReduction)/(axis==='physical'?phys:axis==='magic'?magic:.5*phys+.5*magic);
  let dps=damage/T;
  const champion=data.champions[f.champion];
  // Empty spell data must not make all AP items tie with zero offensive value.
@@ -92,7 +108,7 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
  const attackIndex=getChampionScaling(champion,data).hasAttackSpeedScaling?rawAA*rate:0;
  const attributeIndex=s.objective==='single'?Math.max(impactIndex,f.automaticAttacks&&s.distance<=x.range?rawAA:0):s.objective==='burst'?impactIndex*(1+Math.max(0,x.haste)/100*Math.min(T,3)/T)+attackIndex*Math.min(T,3):impactIndex*(1+Math.max(0,x.haste)/100)+attackIndex;
  const attributes={AD:x.ad,AP:x.ap,HP:x.hp,Armadura:x.armor,RM:x.mr,AS:x.as,Haste:x.haste,Movimento:x.move};
- return {attributes,exactDPS:null,offenseBasis:f.actions.length?'configured-actions':'attribute-index',isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue:f.actions.length?offenseValue:attributeIndex,ttk:dps>0?e.hp/dps:Infinity,omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
+ return {attributes,exactDPS:null,offenseBasis:f.actions.length?'configured-actions':'attribute-index',isExactFormula:false,rawDPSByType,dps,ehp,utility,offenseValue:f.actions.length?offenseValue:attributeIndex,ttk:modeledDeath??(dps>0?e.hp/dps:Infinity),omitted:omitted+(kit?.omitted??0),...(!f.actions.length?{estimatedRotationDPS:rotationDPS}:{}),...(kitPotential!==undefined?{kitPotential,kitCovered:kit!.covered}:estimateMagic?{magicPotential,magicPotentialBasis}:{})};
 }
 /** Weighted target comparison, not simultaneous 5v5 combat. Harmonic EHP mixes damage taken. */
 export function evaluateBuild(items:string[],s:Scenario,data:Dataset):BuildMetrics {
