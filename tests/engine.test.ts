@@ -89,3 +89,11 @@ test('exact optimizer enumerates every legal build in a bounded candidate set',(
  assert.equal(result.evaluated,expected.size);
  assert.deepEqual(new Set(result.alternatives.map(a=>[...a.items].sort().join(','))),expected);
 });
+
+test('invalid skill allocation and native multipliers fail closed',()=>{
+ const s=scene();s.player.skills=['R'];assert.throws(()=>simulate(s,data),/Ordem de habilidades/);
+ const native=scene();native.player.champion='Shen';native.player.skills=conservative(data,'Shen');const a=nativeAction(native.player,data,0);a.native!.multiplier=NaN;native.player.actions=[a];assert.throws(()=>simulate(native,data),/Ação inválida/);
+});
+test('duplicate action identifiers are rejected before event attribution',()=>{
+ const s=scene();s.player.actions=[action({id:'duplicate'}),action({id:'duplicate',at:1})];assert.throws(()=>simulate(s,data),/IDs de ações duplicados/);
+});
