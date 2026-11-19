@@ -28,7 +28,8 @@ export function applyOfficialPatchCorrections(data:Dataset):Dataset{
  const sources={
   patch2620:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-20-notes/',
   patch2621:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-21-notes/',
-  patch2622:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-22-notes/'
+  patch2622:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-22-notes/',
+  patch2623:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/'
  };
  const ledger=[
   {champion:'Ashe',stat:'attackdamageperlevel',value:3,since:'16.20.1',source:sources.patch2620},
@@ -43,7 +44,8 @@ export function applyOfficialPatchCorrections(data:Dataset):Dataset{
   {champion:'Mel',stat:'attackdamage',value:52,since:'16.22.1',source:sources.patch2622},
   {champion:'Mel',stat:'attackspeedperlevel',value:2.75,since:'16.22.1',source:sources.patch2622},
   {champion:'Thresh',stat:'attackdamage',value:54,since:'16.22.1',source:sources.patch2622},
-  {champion:'Viktor',stat:'hpperlevel',value:105,since:'16.22.1',source:sources.patch2622}
+  {champion:'Viktor',stat:'hpperlevel',value:105,since:'16.22.1',source:sources.patch2622},
+  {champion:'Azir',stat:'attackrange',value:550,since:'16.23.1',source:sources.patch2623}
  ];
  const corrections=ledger.filter(fix=>comparePatch(data.version,fix.since)>=0);
  const champions={...data.champions};
