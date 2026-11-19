@@ -1,50 +1,71 @@
-# Cobertura de kits — auditoria atualizada em 19 de novembro de 2026
+# Cobertura de kits — auditoria executada em 19 de novembro de 2026
 
-O processamento dos 173 campeões agora conta com um fallback de classe. A cobertura exata e integral dos kits **não está concluída**. Veja `attribute-preferences.md` para a versão híbrida atual.
+O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales pt_BR/en_US. A ingestão está na branch de trabalho. A cobertura de fórmulas de combate para esse catálogo, porém, é **0/173**: zero kits parciais, 173 sem adapters numéricos nativos ativos e zero kits integralmente validados.
 
-Catálogo Data Dragon 16.23.1 (patch 26.23), com 173 campeões e os locales pt_BR/en_US, foi ingerido e commitado na branch de trabalho após testes, TypeScript, build e auditoria de cobertura aprovados. `mechanics.json` permanece em 16.19.1 e os efeitos isolados de `exactKits` permanecem certificados em 16.20.1. Nenhum desses snapshots divergentes é combinado: em 16.23.1, os efeitos antigos são desativados e a interface deve manter cobertura estimada/ausente. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados. As mudanças de balanceamento do patch atual estão inventariadas em `docs/patch-26.23-audit.md`; elas ainda não são adapters executáveis.
+## Resultado reproduzido
 
-| Campeão | Fórmulas disponíveis | Pendentes |
-|---|---|---|
-| Darius | Q, R | P, W, E |
-| Ezreal | Q, W (detonação manual), E, R | P |
-| Riven | Q, W, E, R (mínimo manual) | P |
-| Shen | Q, E | P, W, R |
-| Yasuo | Q, E, R (alvo no ar manual) | P, W |
-| Yone | Q | P, W, E, R |
+A auditoria executada no commit `8549f9b3ee0b858f083e58514dea5a997e18ae7d`, pelo workflow CI run 44576440785, produziu:
 
-## Implementado
+| Métrica | Resultado |
+|---|---:|
+| Patch do catálogo | 16.23.1 |
+| Campeões auditados | 173 |
+| Kits parciais ativos | 0 |
+| Kits sem adapters ativos | 173 |
+| Kits completos validados | 0 |
 
-- Cobertura identificada por campeão e compartilhada entre a montagem de builds e os avisos da simulação.
-- Na ausência de ações configuradas, os seis kits disponíveis são comparados por impactos isolados das fórmulas do snapshot: um impacto por habilidade suportada/evoluída, custo de recurso e mitigação do alvo. Um ataque físico é somado quando habilitado e em alcance. Não representa DPS, repetição automática, ordem temporal validada ou combo completo.
-- Duplicação das variantes do Q de Shen evitada; bônus não considerado quando os ataques estão desativados ou fora de alcance. Escudos são mantidos separados do dano e não adicionados arbitrariamente ao EHP.
-- Ações manuais permanecem autoritativas. O simulador continua executando apenas essas ações e os ataques habilitados; não inventa habilidades/passivas ausentes.
-- DPS/TTK existentes não recebem dano fictício da estimativa. A comparação por potencial mágico continua estimada quando não há adapters nem ações configuradas.
-- O caminho de reserva do carregamento agora anexa mecânicas compatíveis com o patch. Snapshots de outro patch ou com estrutura de atributos inválida são rejeitados; flags inferidas são recalculadas após carregar fórmulas.
-- Cobertura parcial/ausente aparece na interface e nas advertências.
+O relatório JSON foi gerado em `artifacts/kit-coverage-16.23.1.json` e incluído no artefato `aegis-static-export` do workflow.
 
-- W de Ezreal, R de Yasuo e dano mínimo do R de Riven disponíveis como impactos manuais condicionais. Não entram no índice automático; seus requisitos e interações pendentes aparecem junto à ação. Fórmulas verificadas contra valores base e coeficientes AD/AP do snapshot.
+## Por que os adapters antigos não contam
 
-## Validação
+- `public/data/mechanics.json` permanece em 16.19.1.
+- `src/exactKits.ts` e seu snapshot de efeitos estão certificados apenas para 16.20.1.
+- O catálogo atual é 16.23.1. O carregador rejeita a combinação de snapshots incompatíveis e os efeitos exatos antigos ficam desativados.
+- `manualMechanicsTemplate` contém apenas seis registros vazios de piloto; não fornece fórmulas executáveis.
+- Portanto, os seis kits parciais documentados anteriormente **não estão ativos no patch 16.23.1**. O inventário foi corrigido para refletir o resultado efetivamente produzido pelo script e pelo CI.
 
-180 testes passaram; TypeScript e compilação passaram. A varredura adicional cobriu 173 campeões × 18 níveis × três pesos (0/50/100), totalizando 9.342 builds e páginas de runas em adversário desconhecido, sem erros de legalidade ou métricas não finitas detectados. Não é validação de fidelidade integral ao jogo, de todas as habilidades ou de todos os matchups.
+## O que continua funcionando
 
-Para reproduzir o inventário de cobertura:
+- Catálogo de campeões, habilidades descritivas, itens e runas do Data Dragon.
+- Seleção de campeões e cenários, pesos ofensivo/defensivo/utilidade e otimização heurística de itens/runas.
+- Ações de combate inseridas manualmente pelo usuário.
+- Fórmulas isoladas dos seis campeões-piloto somente quando executadas com o snapshot certificado correspondente (16.20.1); elas não são promovidas automaticamente para 16.23.1.
+- Avisos de cobertura e bloqueio de modo estrito evitam apresentar estimativas como dano exato.
 
-    node --experimental-strip-types scripts/audit-kit-coverage.mjs
+Essas funcionalidades não equivalem a um simulador fiel de todos os kits no patch atual. A otimização de builds usa heurísticas onde não há cálculo validado.
 
-## Compatibilidade de patch
+## Validação técnica
 
-A atualização proposta do Data Dragon não altera automaticamente a versão de `mechanics.json` nem certifica os efeitos isolados. Os testes de `exactKits` usam uma fixture pinada em 16.20.1 e incluem uma regressão que rejeita esses efeitos em 16.23.1. Para reativar fórmulas no patch atual, cada campeão afetado precisa de comparação com as notas oficiais e dados atuais, atualização de valores/cooldowns e fixtures independentes.
+No CI run 44576440785:
+- 370 testes passaram, 0 falharam.
+- TypeScript passou.
+- Build estático Next.js passou.
+- Auditoria dos 173 campeões passou e gerou o relatório acima.
+- Artefato estático e relatório foram enviados com sucesso.
 
-## Bloqueio para concluir
+Para reproduzir a auditoria:
 
-O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403. O espelho alternativo acessível expõe dados do patch 14.10.1 e apenas 167 campeões; esses coeficientes não foram incorporados ao catálogo 16.19.1. Uma consulta adicional ao CDN original de Meraki encontrou 171 campeões, com últimas alterações até 25.15; não confirma compatibilidade com 16.19 e não foi incorporada. A base de fórmulas atuais por campeão precisa ser obtida antes de implementar e validar os adapters restantes.
+```bash
+npm run audit:coverage
+```
 
-Ainda faltam os adapters de passivas, múltiplos impactos/DoT, recasts, cargas, formas, pets, conversões de atributos, cura/escudos, CC, efeitos de itens/runas e interações específicas não modeladas. Os pesos de Utilidade e os objetivos de Dano/Defesa foram conectados à montagem ao vivo na implementação híbrida descrita em `attribute-preferences.md`.
+## Bloqueio para concluir os kits
 
-## Evolução do motor nativo — 19 de novembro de 2026
+O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403 nas tentativas anteriores. O espelho alternativo acessível era antigo/incompleto; a consulta ao CDN Meraki disponível não confirmou cobertura e compatibilidade com o patch 26.23. Descrições do Data Dragon e notas de balanceamento não fornecem, sozinhas, todas as fórmulas, condições, múltiplos impactos, recasts, pets, geometria e interações necessárias.
 
-A camada de interpretação de cálculos nativos agora falha explicitamente diante de dados ausentes ou malformados: rank/nível fora do intervalo, nós sem tipo, valores nomeados inexistentes, partes numéricas não finitas, cálculos sem partes, referências quebradas e breakpoints duplicados/inválidos. Foram adicionadas fixtures aritméticas independentes para valores nomeados, coeficientes de atributos, multiplicadores, referências, produtos, interpolação e progressão por breakpoints.
+Ainda faltam:
+- Adapters de dano/escudo/cura para P/Q/W/E/R de cada campeão.
+- Passivas, stacks, marcas, recasts, cargas, formas, pets, DoT, projéteis e condições espaciais.
+- Procs, efeitos e grupos exclusivos de itens e runas integrados à simulação.
+- Fixtures independentes por campeão e por patch, comparadas com fontes atuais.
+- Revalidação do modo estrito após cobertura suficiente e testes de combos/DPS/TTK.
 
-A validação de cenários também rejeita alocações de habilidades impossíveis, metadados nativos incompletos, multiplicadores não finitos e IDs de ação duplicados. Aphelios permanece tratado como exceção de alocação de habilidades. Essas melhorias aumentam a segurança do cálculo, mas não adicionam fórmulas novas aos 167 campeões sem adapters nem certificam kits completos.
+Não é seguro preencher essas lacunas com coeficientes inferidos ou inventados. Cada adapter só deve ser ativado depois de fonte patchada, implementação explícita e fixture independente.
+
+## Próximos marcos
+
+1. Obter uma fonte atual, acessível e verificável de mecânicas para 26.23.
+2. Atualizar os snapshots mecânicos e criar fixtures por campeão.
+3. Implementar e validar kits em lotes pequenos, sem marcar como completos os campeões ainda incompletos.
+4. Integrar efeitos de itens/runas e interações ao motor de combate.
+5. Revalidar combos, DPS, EHP, TTK e o otimizador; só então considerar liberar modo estrito.
