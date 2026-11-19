@@ -58,7 +58,7 @@ test('current shipped catalog matches confirmed 26.20 values and full detail cov
 test('browser falls back to current bundle when Riot unavailable, never to a missing static API',async()=>{
  const original=globalThis.fetch,urls:string[]=[];
  globalThis.fetch=async(input)=>{const url=String(input);urls.push(url);if(url.startsWith('https://'))throw Error('offline');if(url==='/data/mechanics.json')return Response.json({version:'16.19.1',champions:{}});return Response.json(current);};
- try{const r=await loadPatch('pt_BR');assert.equal(r.data.version,current.version);assert.equal(r.state.fallback,true);assert.equal(r.data.mechanics,undefined);assert.ok(!urls.some(u=>u.startsWith('/api/')));}finally{globalThis.fetch=original;}
+ try{const r=await loadPatch('pt_BR');assert.equal(r.data.version,current.version);assert.equal(r.state.fallback,true);assert.equal(r.data.mechanics,undefined);assert.ok(r.state.warnings?.some(w=>w.includes('Mecânicas do patch')));assert.ok(!urls.some(u=>u.startsWith('/api/')));}finally{globalThis.fetch=original;}
 });
 
 test('newest valid fallback beats stale IndexedDB and refuses rollback',()=>{
