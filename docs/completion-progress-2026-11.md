@@ -24,7 +24,7 @@
 - CI em commits anteriores `6ce00af7` e `e8613699`: testes, TypeScript, build e artefato aprovados.
 - Workflow de dependências: Next.js 16.4.6, lockfile atualizado, `npm audit` com 0 vulnerabilidades e testes/typecheck/build aprovados.
 - Workflow de catálogo: ingestão 16.23.1, testes, TypeScript e build aprovados; criação automática do PR falhou porque as configurações do repositório não permitem que o GitHub Actions crie PRs. A branch foi publicada e o PR #2 foi aberto manualmente.
-- A revisão mais recente com o teste de enumeração do otimizador e as últimas regressões está sendo revalidada pelo CI.
+- CI no commit `159028d7`: **sucesso integral** em push e pull_request, incluindo testes, TypeScript, build estático e artifact. Inclui teste de enumeração limitada do otimizador e aviso de incompatibilidade entre snapshots.
 
 ## Pendências de implementação
 
