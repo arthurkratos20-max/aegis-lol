@@ -1,8 +1,8 @@
-# Cobertura de kits — 6 de outubro de 2026
+# Cobertura de kits — auditoria atualizada em 19 de novembro de 2026
 
 O processamento dos 173 campeões agora conta com um fallback de classe. A cobertura exata e integral dos kits **não está concluída**. Veja `attribute-preferences.md` para a versão híbrida atual.
 
-Snapshot de referência deste inventário: 16.19.1. O PR #2 propõe catálogo Data Dragon 16.23.1; `mechanics.json` permanece em 16.19.1 e os efeitos isolados de `exactKits` permanecem certificados em 16.20.1. Nenhum desses snapshots divergentes é combinado: em 16.23.1, os efeitos antigos são desativados e a interface deve manter cobertura estimada/ausente. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados.
+Catálogo Data Dragon 16.23.1 (patch 26.23), com 173 campeões e os locales pt_BR/en_US, foi ingerido e commitado na branch de trabalho após testes, TypeScript, build e auditoria de cobertura aprovados. `mechanics.json` permanece em 16.19.1 e os efeitos isolados de `exactKits` permanecem certificados em 16.20.1. Nenhum desses snapshots divergentes é combinado: em 16.23.1, os efeitos antigos são desativados e a interface deve manter cobertura estimada/ausente. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados. As mudanças de balanceamento do patch atual estão inventariadas em `docs/patch-26.23-audit.md`; elas ainda não são adapters executáveis.
 
 | Campeão | Fórmulas disponíveis | Pendentes |
 |---|---|---|
