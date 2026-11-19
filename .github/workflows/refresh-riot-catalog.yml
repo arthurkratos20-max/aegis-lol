@@ -54,12 +54,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- public/data; then
+          if [ -z "$(git status --porcelain -- public/data)" ]; then
             echo "Catalog is already current; no commit needed."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json public/data/meraki-candidates.json
+          git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json
+          git add -f public/data/meraki-candidates.json
           git commit -m "chore(data): refresh Riot catalog"
           git push origin "HEAD:${GITHUB_REF_NAME}"
