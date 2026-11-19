@@ -1,7 +1,7 @@
 import type {Dataset} from './contracts.ts';
 export const RIOT_CDN='https://ddragon.leagueoflegends.com';
 export const PATCH_CHECK_INTERVAL=5*60*1000;
-function patchParts(version:string):number[]{if(!/^\\d+\\.\\d+\\.\\d+$/.test(version))throw Error('Versão de patch inválida');return version.split('.').map(Number);}
+function patchParts(version:string):number[]{if(!/^\d+\.\d+\.\d+$/.test(version))throw Error('Versão de patch inválida');return version.split('.').map(Number);}
 export function comparePatch(a:string,b:string):number{
  const x=patchParts(a),y=patchParts(b);
  for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]-y[i];return 0;
