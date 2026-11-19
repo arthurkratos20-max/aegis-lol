@@ -51,7 +51,11 @@ npm run audit:coverage
 
 ## Bloqueio para concluir os kits
 
-O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403 nas tentativas anteriores. O espelho alternativo acessível era antigo/incompleto; a consulta ao CDN Meraki disponível não confirmou cobertura e compatibilidade com o patch 26.23. Descrições do Data Dragon e notas de balanceamento não fornecem, sozinhas, todas as fórmulas, condições, múltiplos impactos, recasts, pets, geometria e interações necessárias.
+A ingestão Meraki encontrou 171/173 campeões, com slots P/Q/W/E/R presentes, mas a auditoria do campo `patchLastChanged` revelou que os registros mais recentes chegam somente ao patch 25.15. O catálogo Data Dragon 16.23.1 corresponde ao patch de jogo 26.23. A fonte está, portanto, desatualizada e não pode ser usada para certificar fórmulas atuais. Locke e Zaahen não aparecem no snapshot Meraki.
+
+Foi adicionado `scripts/extract-meraki-formula-review.mjs`, que transforma os efeitos estruturados em um inventário de candidatos para revisão, preservando descrição, valores, unidades, tipo de dano, slot, condições de alvo e notas. O resultado `public/data/meraki-formula-review.json` mantém cada candidato como `unreviewed` e `runtimeEnabled: false`. Isso permite auditar e priorizar fórmulas sem executar coeficientes antigos. A auditoria compara agora a versão mais recente da fonte com a versão de jogo do catálogo, em vez de apenas verificar se os campos existem.
+
+O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403 nas tentativas anteriores. Descrições do Data Dragon e notas de balanceamento não fornecem, sozinhas, todas as fórmulas, condições, múltiplos impactos, recasts, pets, geometria e interações necessárias.
 
 Ainda faltam:
 - Adapters de dano/escudo/cura para P/Q/W/E/R de cada campeão.
@@ -69,3 +73,13 @@ Não é seguro preencher essas lacunas com coeficientes inferidos ou inventados.
 3. Implementar e validar kits em lotes pequenos, sem marcar como completos os campeões ainda incompletos.
 4. Integrar efeitos de itens/runas e interações ao motor de combate.
 5. Revalidar combos, DPS, EHP, TTK e o otimizador; só então considerar liberar modo estrito.
+
+
+## Inventário externo em quarentena
+
+- Fonte: Meraki Analytics / dados derivados da League of Legends Wiki.
+- Cobertura observada: 171/173 campeões; Locke e Zaahen ausentes.
+- Atualidade observada: último marcador de alteração 25.15, contra patch de jogo 26.23 no catálogo.
+- Todos os registros são apenas candidatos de revisão; nenhum é ativado pelo runtime.
+- O inventário preserva fórmulas/descrições estruturadas, mas não resolve automaticamente passivas, recasts, sweetspots, stacks, modificadores condicionais, pets ou geometria.
+- A fonte só poderá ser promovida depois de confirmação da versão por campeão, revisão de cada impacto e fixture independente comparada ao patch atual.
