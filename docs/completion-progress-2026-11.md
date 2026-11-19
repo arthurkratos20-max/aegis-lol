@@ -9,6 +9,11 @@
 - Atualização automatizada do catálogo em `.github/workflows/refresh-riot-catalog.yml`: execução diária e manual, ingestão de ambos os idiomas, testes, typecheck e build; propõe PR para revisão e não grava diretamente na `main`.
 - Documentação de configuração do segredo Cloudflare e das permissões necessárias para o GitHub Actions criar PRs.
 
+
+- Validação do catálogo reforçada: rejeita versões malformadas, habilidades com dados inválidos, economia/recursos inválidos de itens e árvores de runas incompletas; preserva entradas legadas sem nome quando não são compráveis.
+- Testes adicionais para versões inválidas, integridade dos itens e estrutura das árvores de runas.
+- O CI identificou um falso positivo inicial na validação de entradas legadas do item 2008; a regra foi ajustada para exigir nome apenas de itens compráveis. A execução do CI para o commit atual está em andamento; o ajuste ainda precisa de aprovação automatizada.
+
 ## Validação observada
 
 - Antes das alterações de segurança, o CI do commit `956e6484` concluiu com sucesso testes, typecheck e build.
