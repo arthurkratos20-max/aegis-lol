@@ -21,15 +21,23 @@ export function newestCatalog(a:Dataset|null,b:Dataset|null):Dataset|null{
  return b&&(!a||comparePatch(b.version,a.version)>0)?b:a;
 }
 /** Patch-scoped corrections explicitly stated in official Riot notes, never inferred coefficients. */
+/** Patch-scoped corrections explicitly stated in official Riot notes, accumulated forward. */
 export function applyOfficialPatchCorrections(data:Dataset):Dataset{
- const corrections=data.version==='16.20.1'?[
-  {champion:'Ashe',stat:'attackdamageperlevel',value:3,source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-20-notes/'},
-  {champion:'Lucian',stat:'attackdamageperlevel',value:2.9,source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-20-notes/'}
- ]:[];
+ const sources={
+  patch2620:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-20-notes/',
+  patch2621:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-21-notes/'
+ };
+ const ledger=[
+  {champion:'Ashe',stat:'attackdamageperlevel',value:3,since:'16.20.1',source:sources.patch2620},
+  {champion:'Lucian',stat:'attackdamageperlevel',value:2.9,since:'16.20.1',source:sources.patch2620},
+  {champion:'Jinx',stat:'attackdamageperlevel',value:3,since:'16.21.1',source:sources.patch2621}
+ ];
+ const corrections=ledger.filter(fix=>comparePatch(data.version,fix.since)>=0);
  const champions={...data.champions};
  for(const fix of corrections)if(champions[fix.champion])champions[fix.champion]={...champions[fix.champion],stats:{...champions[fix.champion].stats,[fix.stat]:fix.value}};
  const missingGrowth=Object.values(champions).filter(c=>c.stats.attackdamageperlevel===0).length;
- return {...data,champions,statCorrections:corrections,catalogWarnings:missingGrowth>100?[`Data Dragon retorna crescimento de AD zero em ${missingGrowth} campeões. Apenas correções confirmadas nas notas deste patch são aplicadas; os demais escalamentos permanecem incompletos.`]:[]};
+ const catalogWarnings=missingGrowth>100?['Data Dragon retorna crescimento de AD zero em '+missingGrowth+' campeões. Apenas correções confirmadas nas notas deste patch são aplicadas; os demais escalamentos permanecem incompletos.']:[];
+ return {...data,champions,statCorrections:corrections,catalogWarnings};
 }
 export async function latestRiotPatch(fetcher:typeof fetch=fetch):Promise<string>{
  const r=await fetcher(`${RIOT_CDN}/api/versions.json`,{cache:'no-store',signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error(`Riot HTTP ${r.status}`);
