@@ -44,4 +44,3 @@ jobs:
             O catálogo só é proposto após validação de ambos os idiomas, testes,
             verificação TypeScript e build. Fórmulas exatas continuam versionadas
             separadamente e não são certificadas automaticamente por esta atualização.
-          labels: automated,catalog
