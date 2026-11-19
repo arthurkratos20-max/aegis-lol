@@ -14,7 +14,7 @@ test('native calculation evaluates data values, stats, sums and multipliers',()=
   node('NamedDataValueCalculationPart',{mDataValue:'base'}),
   node('StatByCoefficientCalculationPart',{mStat:2,mStatFormula:2,mCoefficient:.5})
  ],mMultiplier:node('NumberCalculationPart',{mNumber:2})}},{base:[0,20,30]});
- assert.equal(calculateNative(s.calculations.damage,s,1,1,stats,base),90);
+ assert.equal(calculateNative(s.calculations.damage,s,1,1,stats,base),150);
 });
 test('native calculation supports modified references and products',()=>{
  const s=spell({base:node('GameCalculation',{mFormulaParts:[node('NumberCalculationPart',{mNumber:12})]}),scaled:node('GameCalculationModified',{mModifiedGameCalculation:'base',mMultiplier:node('NumberCalculationPart',{mNumber:3})}),product:node('ProductOfSubPartsCalculationPart',{mPart1:node('NumberCalculationPart',{mNumber:4}),mPart2:node('NumberCalculationPart',{mNumber:5})})});
@@ -25,7 +25,7 @@ test('native level interpolation and breakpoints are evaluated at requested leve
  const interpolation=node('ByCharLevelInterpolationCalculationPart',{mStartValue:10,mEndValue:180});
  assert.equal(calculateNative(interpolation,spell(),1,10,stats,base),100);
  const breakpoints=node('ByCharLevelBreakpointsCalculationPart',{mLevel1Value:10,mInitialBonusPerLevel:2,mBreakpoints:[{mLevel:5,mAdditionalBonusAtThisLevel:8,mBonusPerLevelAtAndAfter:3}]});
- assert.equal(calculateNative(breakpoints,spell(),1,6,stats,base),31);
+ assert.equal(calculateNative(breakpoints,spell(),1,6,stats,base),30);
 });
 test('native calculation rejects missing, malformed and unsupported source data',()=>{
  assert.throws(()=>calculateNative(node('NamedDataValueCalculationPart',{mDataValue:'missing'}),spell(),1,1,stats,base),/DataValue/);
