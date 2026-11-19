@@ -68,3 +68,19 @@ test('strict mode remains blocked until patch-level fixtures certify the combat 
  const s=scene();s.mode='strict';
  assert.throws(()=>simulate(s,data),/Modo Estrito indisponível/);
 });
+
+
+test('exact optimizer enumerates every legal build in a bounded candidate set',()=>{
+ const s=scene();s.player.items=[];s.player.owned=[];s.player.locked=[];s.slots=2;s.budget=10000;
+ const candidates=['3031','3072','3089','3157','3084'];
+ const expected=new Set<string>();
+ for(let mask=0;mask<(1<<candidates.length);mask++){
+  const items=candidates.filter((_,i)=>(mask&(1<<i))!==0);
+  if(items.length<=s.slots&&legalBuild(items,s,data))expected.add([...items].sort().join(','));
+ }
+ const result=optimize(s,data,{exact:true,candidates,limit:1000,timeoutMs:60000});
+ assert.equal(result.complete,true);
+ assert.match(result.method,/Enumeração completa/);
+ assert.equal(result.evaluated,expected.size);
+ assert.deepEqual(new Set(result.alternatives.map(a=>[...a.items].sort().join(','))),expected);
+});
