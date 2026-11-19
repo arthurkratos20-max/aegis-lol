@@ -41,7 +41,8 @@ test('official champion growth corrections accumulate only from their effective 
  assert.equal(latest.champions.Ashe.stats.attackdamageperlevel,3);
  assert.equal(latest.champions.Lucian.stats.attackdamageperlevel,2.9);
  assert.equal(latest.champions.Jinx.stats.attackdamageperlevel,3);
- assert.deepEqual(latest.statCorrections?.map(x=>x.champion),['Ashe','Lucian','Jinx']);
+ assert.equal(latest.champions.Jinx.stats.hp,610);
+ assert.deepEqual(latest.statCorrections?.map(x=>`${x.champion}:${x.stat}`),['Ashe:attackdamageperlevel','Lucian:attackdamageperlevel','Jinx:attackdamageperlevel','Jinx:hp']);
 });
 test('new patch does not certify previous-patch skill samples',()=>{
  assert.equal(baseSkillPlan({...old,version:'16.20.1'},'Ashe','Bot').coverage,'estimated');
