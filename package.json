@@ -14,7 +14,8 @@
     "pretest": "node scripts/prepare-image-assets.mjs",
     "sync:kits": "node --experimental-strip-types scripts/sync-kits.mjs",
     "audit:kits": "node --experimental-strip-types scripts/audit-kits.mjs",
-    "preingest": "node --experimental-strip-types scripts/prepare-catalog.mjs"
+    "preingest": "node --experimental-strip-types scripts/prepare-catalog.mjs",
+    "audit:coverage": "node --experimental-strip-types scripts/audit-kit-coverage.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
