@@ -17,6 +17,7 @@
     "preingest": "node --experimental-strip-types scripts/prepare-catalog.mjs",
     "audit:coverage": "node --experimental-strip-types scripts/audit-kit-coverage.mjs",
     "ingest:meraki": "node scripts/ingest-meraki-candidates.mjs",
+    "extract:meraki-review": "node scripts/extract-meraki-formula-review.mjs",
     "audit:meraki": "node scripts/audit-meraki-candidates.mjs"
   },
   "dependencies": {
