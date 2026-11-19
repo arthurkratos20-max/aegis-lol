@@ -16,10 +16,9 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
-  group: riot-catalog-refresh
+  group: riot-catalog-refresh-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -28,6 +27,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -35,22 +36,22 @@ jobs:
       - run: npm ci
       - name: Download and validate the latest Riot catalog
         run: npm run ingest
-      - name: Verify tests, types and production export
+      - name: Verify tests, types, build and champion coverage
         run: |
           npm test
           npm run typecheck
           npm run build
-      - name: Open a reviewable catalog update
-        continue-on-error: true
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: automation/riot-catalog-refresh
-          delete-branch: true
-          commit-message: 'chore(data): refresh Riot catalog'
-          title: 'chore(data): refresh Riot catalog'
-          body: |
-            Atualização automática dos dados oficiais do Data Dragon.
-            O catálogo só é proposto após validação de ambos os idiomas, testes,
-            verificação TypeScript e build. Fórmulas exatas continuam versionadas
-            separadamente e não são certificadas automaticamente por esta atualização.
+          npm run audit:coverage
+      - name: Commit validated catalog to the same working branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- public/data; then
+            echo "Catalog is already current; no commit needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json
+          git commit -m "chore(data): refresh Riot catalog"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
