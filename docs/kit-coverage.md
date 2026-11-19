@@ -18,7 +18,7 @@ O relatório JSON foi gerado em `artifacts/kit-coverage-16.23.1.json` e incluíd
 
 ## Por que os adapters antigos não contam
 
-- `public/data/mechanics.json` permanece em 16.19.1.
+- `public/data/mechanics.json` permanece em 16.19.1.\n- `src/officialAdapters.ts` contém um adapter de Bardo Q, explicitamente vinculado ao patch 16.23.1 e às notas oficiais Riot; não depende do snapshot antigo.
 - `src/exactKits.ts` e seu snapshot de efeitos estão certificados apenas para 16.20.1.
 - O catálogo atual é 16.23.1. O carregador rejeita a combinação de snapshots incompatíveis e os efeitos exatos antigos ficam desativados.
 - `manualMechanicsTemplate` contém apenas seis registros vazios de piloto; não fornece fórmulas executáveis.
