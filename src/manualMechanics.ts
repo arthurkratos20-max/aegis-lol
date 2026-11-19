@@ -1,4 +1,4 @@
-import type {CalcNode,NativeSpell} from './contracts.ts';
+import type {CalcNode,Dataset,NativeSpell} from './contracts.ts';
 
 export type ManualEffectKey='P'|'Q'|'W'|'E'|'R';
 export type ManualValidation='draft'|'reviewed'|'verified';
@@ -72,3 +72,31 @@ export const manualMechanicsPilots=['Shen','Ezreal','Yasuo','Yone','Riven','Dari
 export const manualMechanicsTemplate:ManualChampionRecord[]=manualMechanicsPilots.map(champion=>({
  champion,patch:'16.23.1',sourceUrl:'https://www.leagueoflegends.com/',effects:[],notes:['Preencher P/Q/W/E/R com dados da versão declarada.','Registrar condições, limitações e fonte específica por efeito.','Marcar verified somente após conferência independente e testes.']
 }));
+
+
+/**
+ * Merge only independently verified, same-patch manual snapshots.
+ * Existing champion attack-speed ratios and crit multipliers are never inferred here.
+ */
+export function mergeVerifiedManualMechanics(data:Dataset,records:ManualChampionRecord[]):Dataset{
+ const mechanics={...(data.mechanics??{})};
+ const warnings=[...(data.catalogWarnings??[])];
+ for(const record of records){
+  if(record.patch!==data.version){if(record.effects.some(effect=>effect.validation==='verified'))warnings.push(`Mecânicas manuais de ${record.champion} ignoradas: patch ${record.patch} difere de ${data.version}.`);continue;}
+  if(!data.champions[record.champion]){warnings.push(`Mecânicas manuais ignoradas: campeão ${record.champion} não existe no catálogo.`);continue;}
+  const validationErrors=validateManualChampionRecord(record);
+  if(validationErrors.length){warnings.push(`Mecânicas manuais de ${record.champion} ignoradas: registro inválido.`);continue;}
+  const verified=record.effects.filter(effect=>effect.validation==='verified');
+  if(!verified.length)continue;
+  const current=mechanics[record.champion];
+  if(!current){warnings.push(`Mecânicas manuais de ${record.champion} não aplicadas: faltam atributos-base certificados (ratio/critMultiplier).`);continue;}
+  const spells={...current.spells};
+  for(const effect of verified){
+   const spellId=effect.spell.path.split('/').filter(Boolean).at(-1);
+   if(!spellId){warnings.push(`Mecânica manual ${record.champion} ${effect.key} ignorada: caminho nativo inválido.`);continue;}
+   spells[spellId]=effect.spell;
+  }
+  mechanics[record.champion]={...current,spells,source:`${current.source}; manual verificado: ${record.sourceUrl}`};
+ }
+ return {...data,mechanics,catalogWarnings:warnings};
+}
