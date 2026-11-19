@@ -4,7 +4,7 @@ O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales
 
 ## Resultado reproduzido
 
-A auditoria executada no commit `8549f9b3ee0b858f083e58514dea5a997e18ae7d`, pelo workflow CI run 44576440785, produziu:
+A cobertura declarada abaixo inclui o adapter patch-scoped recém-adicionado. A auditoria automatizada correspondente está sendo executada no CI do commit atual; o resultado gerado pelo workflow ainda precisa ser confirmado antes de tratar estes números como aprovados.
 
 | Métrica | Resultado |
 |---|---:|
@@ -14,11 +14,12 @@ A auditoria executada no commit `8549f9b3ee0b858f083e58514dea5a997e18ae7d`, pelo
 | Kits sem adapters ativos | 172 |
 | Kits completos validados | 0 |
 
-O relatório JSON foi gerado em `artifacts/kit-coverage-16.23.1.json` e incluído no artefato `aegis-static-export` do workflow.
+O relatório JSON será produzido em `artifacts/kit-coverage-16.23.1.json` pelo CI atual, caso os testes e a auditoria terminem com sucesso.
 
 ## Por que os adapters antigos não contam
 
-- `public/data/mechanics.json` permanece em 16.19.1.\n- `src/officialAdapters.ts` contém um adapter de Bardo Q, explicitamente vinculado ao patch 16.23.1 e às notas oficiais Riot; não depende do snapshot antigo.
+- `public/data/mechanics.json` permanece em 16.19.1.
+- `src/officialAdapters.ts` contém um adapter de Bardo Q, explicitamente vinculado ao patch 16.23.1 e às notas oficiais Riot; não depende do snapshot antigo.
 - `src/exactKits.ts` e seu snapshot de efeitos estão certificados apenas para 16.20.1.
 - O catálogo atual é 16.23.1. O carregador rejeita a combinação de snapshots incompatíveis e os efeitos exatos antigos ficam desativados.
 - `manualMechanicsTemplate` contém apenas seis registros vazios de piloto; não fornece fórmulas executáveis.
@@ -36,10 +37,7 @@ Essas funcionalidades não equivalem a um simulador fiel de todos os kits no pat
 
 ## Validação técnica
 
-No CI run 44576440785:
-- 370 testes passaram, 0 falharam.
-- TypeScript passou.
-- Build estático Next.js passou.
+CI anterior (44576440785) validou a base anterior, não este adapter. A validação do novo adapter está pendente no workflow atual.
 - Auditoria dos 173 campeões passou e gerou o relatório acima.
 - Artefato estático e relatório foram enviados com sucesso.
 
