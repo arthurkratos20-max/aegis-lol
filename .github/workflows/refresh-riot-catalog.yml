@@ -41,6 +41,7 @@ jobs:
           npm run typecheck
           npm run build
       - name: Open a reviewable catalog update
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
