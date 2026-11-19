@@ -42,7 +42,10 @@ test('official champion growth corrections accumulate only from their effective 
  assert.equal(latest.champions.Lucian.stats.attackdamageperlevel,2.9);
  assert.equal(latest.champions.Jinx.stats.attackdamageperlevel,3);
  assert.equal(latest.champions.Jinx.stats.hp,610);
- assert.deepEqual(latest.statCorrections?.map(x=>`${x.champion}:${x.stat}`),['Ashe:attackdamageperlevel','Lucian:attackdamageperlevel','Jinx:attackdamageperlevel','Jinx:hp']);
+ assert.deepEqual(latest.statCorrections?.map(x=>`${x.champion}:${x.stat}`),['Ashe:attackdamageperlevel','Lucian:attackdamageperlevel','Jinx:attackdamageperlevel','Jinx:hp','Mel:hp','Mel:hpperlevel','Mel:mp','Mel:mpperlevel','Mel:armorperlevel','Mel:attackdamage','Mel:attackspeedperlevel','Thresh:attackdamage','Viktor:hpperlevel']);
+ assert.equal(latest.champions.Mel.stats.hp,590);assert.equal(latest.champions.Mel.stats.hpperlevel,107);assert.equal(latest.champions.Mel.stats.mp,455);assert.equal(latest.champions.Mel.stats.mpperlevel,38);assert.equal(latest.champions.Mel.stats.armorperlevel,5.4);assert.equal(latest.champions.Mel.stats.attackdamage,52);assert.equal(latest.champions.Mel.stats.attackspeedperlevel,2.75);
+ assert.equal(latest.champions.Thresh.stats.attackdamage,54);assert.equal(latest.champions.Viktor.stats.hpperlevel,105);
+ const before2622=applyOfficialPatchCorrections({...old,version:'16.21.1'});assert.notEqual(before2622.champions.Mel.stats.hp,590);
 });
 test('new patch does not certify previous-patch skill samples',()=>{
  assert.equal(baseSkillPlan({...old,version:'16.20.1'},'Ashe','Bot').coverage,'estimated');
