@@ -65,3 +65,16 @@ test('newest valid fallback beats stale IndexedDB and refuses rollback',()=>{
  assert.equal(newestCatalog(old,newer),newer);assert.equal(newestCatalog(newer,old),newer);
  assert.equal(newestCatalog(null,newer),newer);assert.equal(newestCatalog(old,null),old);
 });
+
+test('patch version comparison rejects malformed versions instead of returning NaN',()=>{
+ assert.equal(comparePatch('16.23.1','16.9.9')>0,true);
+ assert.throws(()=>comparePatch('16.23','16.9.9'),/Versão de patch inválida/);
+ assert.throws(()=>patchLabel('latest'),/Versão de patch inválida/);
+ assert.equal(patchLabel('16.23.1'),'26.23');
+});
+test('catalog validation rejects malformed item economics and rune trees',()=>{
+ const brokenItem=structuredClone(current);const first=Object.keys(brokenItem.items)[0];brokenItem.items[first].gold.total=NaN;
+ assert.throws(()=>validatePatchCatalog(brokenItem),/Item inválido/);
+ const brokenRune=structuredClone(current);brokenRune.runes[0].slots.pop();
+ assert.throws(()=>validatePatchCatalog(brokenRune),/Árvore de runas inválida/);
+});
