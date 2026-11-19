@@ -32,7 +32,8 @@ export function applyOfficialPatchCorrections(data:Dataset):Dataset{
  const ledger=[
   {champion:'Ashe',stat:'attackdamageperlevel',value:3,since:'16.20.1',source:sources.patch2620},
   {champion:'Lucian',stat:'attackdamageperlevel',value:2.9,since:'16.20.1',source:sources.patch2620},
-  {champion:'Jinx',stat:'attackdamageperlevel',value:3,since:'16.21.1',source:sources.patch2621}
+  {champion:'Jinx',stat:'attackdamageperlevel',value:3,since:'16.21.1',source:sources.patch2621},
+  {champion:'Jinx',stat:'hp',value:610,since:'16.21.1',source:sources.patch2621}
  ];
  const corrections=ledger.filter(fix=>comparePatch(data.version,fix.since)>=0);
  const champions={...data.champions};
