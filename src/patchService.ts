@@ -14,13 +14,15 @@ async function json(url:string){const r=await fetch(url,{cache:'no-store',signal
 async function withMechanics(data:Dataset):Promise<Dataset>{
  try{
   const m=await json('/data/mechanics.json');
-  const mechanics=m.version===data.version?Object.fromEntries(Object.entries(m.champions??{}).filter(([id,value])=>{
+  const compatible=m.version===data.version;
+  const mechanics=compatible?Object.fromEntries(Object.entries(m.champions??{}).filter(([id,value])=>{
    const c=value as Record<string,unknown>;
    return data.champions[id]&&Number.isFinite(c.ratio)&&Number.isFinite(c.critMultiplier)&&c.spells&&typeof c.spells==='object'&&!Array.isArray(c.spells);
   })):undefined;
   // Previously inferred flags must be recomputed with the newly loaded formulas.
   const champions=Object.fromEntries(Object.entries(data.champions).map(([id,c])=>[id,c.scaling?.coverage==='estimated'?{...c,scaling:undefined}:c]));
-  return {...data,champions,mechanics:mechanics as Dataset['mechanics']};
+  const catalogWarnings=compatible?data.catalogWarnings:[...(data.catalogWarnings??[]),`Mecânicas do patch ${String(m.version??'desconhecido')} ignoradas: catálogo ${data.version}.`];
+  return {...data,champions,mechanics:mechanics as Dataset['mechanics'],catalogWarnings};
  }catch{return data;}
 }
 const pending=new Map<string,Promise<{data:Dataset;state:PatchState}>>();
