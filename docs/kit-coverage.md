@@ -83,3 +83,22 @@ Não é seguro preencher essas lacunas com coeficientes inferidos ou inventados.
 - Todos os registros são apenas candidatos de revisão; nenhum é ativado pelo runtime.
 - O inventário preserva fórmulas/descrições estruturadas, mas não resolve automaticamente passivas, recasts, sweetspots, stacks, modificadores condicionais, pets ou geometria.
 - A fonte só poderá ser promovida depois de confirmação da versão por campeão, revisão de cada impacto e fixture independente comparada ao patch atual.
+
+### Métricas do inventário gerado em 19/11/2026
+
+O refresh run [44606542886](https://github.com/arthurkratos20-max/aegis-lol/actions/runs/44606542886) concluiu com sucesso e persistiu o inventário na branch:
+
+| Métrica | Resultado |
+|---|---:|
+| Campeões Meraki encontrados | 171/173 |
+| Último patch indicado pela fonte | 25.15 |
+| Patch do catálogo | 26.23 |
+| Habilidades/slots inventariados | 927 |
+| Efeitos estruturados examinados | 2.515 |
+| Efeitos com tabelas de nivelamento | 1.019 |
+| Candidatos de fórmula extraídos | 1.709 |
+| Modificadores com unidade ainda não suportada | 655 |
+| Modificadores estruturalmente malformados | 0 |
+| Efeitos sem tabela de nivelamento | 1.496 |
+
+Os 1.709 candidatos são linhas de revisão, não 1.709 fórmulas prontas: muitos pertencem a habilidades antigas, condicionais ou com múltiplos impactos. Todos permanecem `unreviewed` e `runtimeEnabled: false`. O campo de unidade desconhecida é preservado em vez de descartado ou convertido por aproximação.
