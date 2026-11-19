@@ -22,7 +22,7 @@ O relatório JSON foi gerado em `artifacts/kit-coverage-16.23.1.json` e incluíd
 - `src/exactKits.ts` e seu snapshot de efeitos estão certificados apenas para 16.20.1.
 - O catálogo atual é 16.23.1. O carregador rejeita a combinação de snapshots incompatíveis e os efeitos exatos antigos ficam desativados.
 - `manualMechanicsTemplate` contém apenas seis registros vazios de piloto; não fornece fórmulas executáveis.
-- Portanto, os seis kits parciais documentados anteriormente **não estão ativos no patch 16.23.1**. O inventário foi corrigido para refletir o resultado efetivamente produzido pelo script e pelo CI.
+- Portanto, os seis kits parciais do snapshot antigo **não estão ativos no patch 16.23.1**. A única cobertura parcial atual é o adapter novo do Bardo Q, com escopo limitado e sem certificação de kit completo.
 
 ## O que continua funcionando
 
