@@ -12,12 +12,12 @@
 
 - Validação do catálogo reforçada: rejeita versões malformadas, habilidades com dados inválidos, economia/recursos inválidos de itens e árvores de runas incompletas; preserva entradas legadas sem nome quando não são compráveis.
 - Testes adicionais para versões inválidas, integridade dos itens e estrutura das árvores de runas.
-- O CI identificou um falso positivo inicial na validação de entradas legadas do item 2008; a regra foi ajustada para exigir nome apenas de itens compráveis. A execução do CI para o commit atual está em andamento; o ajuste ainda precisa de aprovação automatizada.
+- O CI identificou entradas legadas de itens fora do mapa Summoner's Rift; a regra foi ajustada para exigir nome apenas de itens compráveis no mapa 11. A validação do commit `3983c3ea` encontrou ainda um erro real: regex de versão com barras invertidas duplicadas. A expressão foi corrigida no commit `6ce00af7`.
 
 ## Validação observada
 
 - Antes das alterações de segurança, o CI do commit `956e6484` concluiu com sucesso testes, typecheck e build.
-- Para as alterações mais recentes, os workflows CI foram disparados e estavam em execução no momento desta atualização. Não declarar essas alterações aprovadas até o término das execuções.
+- CI no commit `6ce00af7`: **sucesso integral** em testes automatizados, TypeScript, build estático e upload do artifact. Execuções push e pull_request concluídas com sucesso.
 - A ingestão automática do catálogo ainda não foi executada nesta sessão; o catálogo embarcado não foi substituído por dados que não passaram pela rotina de ingestão.
 
 ## Pendências que exigem implementação adicional
@@ -33,6 +33,7 @@
 9. Implementar e validar computação PRO no servidor. Atualmente `pro-access` informa `serverComputeAvailable: false`; o endpoint continua corretamente sem prometer processamento protegido.
 10. Executar ciclo completo de cobrança em sandbox (checkout, webhook, idempotência, renovação, cancelamento e expiração) antes de habilitar cobrança real.
 11. Configurar o segredo `PATCH_SYNC_TOKEN` no ambiente Cloudflare e habilitar a permissão do GitHub Actions para criar pull requests.
+12. Revisar e corrigir as 2 vulnerabilidades reportadas pelo `npm ci` (1 alta e 1 crítica) com atualização controlada de dependências e novo CI. Não foi executado `npm audit fix --force`, para evitar atualizações incompatíveis sem análise.
 
 ## Limites desta entrega
 
