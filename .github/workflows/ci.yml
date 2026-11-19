@@ -44,11 +44,16 @@ jobs:
       - name: Build static production export
         run: npm run build
 
+      - name: Audit champion kit coverage (173 champions)
+        run: npm run audit:coverage
+
       - name: Upload static export
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: aegis-static-export
-          path: out/
+          path: |
+            out/
+            artifacts/kit-coverage-*.json
           if-no-files-found: error
           retention-days: 7
