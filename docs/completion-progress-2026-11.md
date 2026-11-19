@@ -35,7 +35,7 @@
 
 ## Pendências de implementação
 
-1. Obter fonte atual, verificável e acessível para mecânicas do patch 26.23; Meraki disponível está defasado (25.15), Data Dragon e notas de patch não bastam para todas as fórmulas.
+1. Continuar adapters oficiais isolados patch-scoped (começando por buffs/nerfs numéricos do 26.23), mantendo em paralelo a busca por fonte atual para passivas e interações complexas; Meraki disponível está defasado (25.15).
 2. Atualizar `mechanics.json` e implementar adapters P/Q/W/E/R, passivas e condições para os 173 campeões, com fixtures independentes por patch.
 3. Integrar passivas de itens/runas, procs, grupos únicos, cura, escudos, recursos, DoT, recasts, pets, projéteis e geometria.
 4. Validar combos, DPS/TTK/EHP e o otimizador. A enumeração exata atual prova ótimo apenas dentro do conjunto finito testado; não prova ótimo global do catálogo.
