@@ -1,6 +1,11 @@
 name: Refresh Riot catalog
 
 on:
+  push:
+    branches:
+      - 'aegis/**'
+    paths:
+      - '.github/workflows/refresh-riot-catalog.yml'
   schedule:
     - cron: '17 9 * * *'
   workflow_dispatch:
