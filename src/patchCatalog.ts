@@ -1,26 +1,28 @@
 import type {Dataset} from './contracts.ts';
 export const RIOT_CDN='https://ddragon.leagueoflegends.com';
 export const PATCH_CHECK_INTERVAL=5*60*1000;
+function patchParts(version:string):number[]{if(!/^\\d+\\.\\d+\\.\\d+$/.test(version))throw Error('Versão de patch inválida');return version.split('.').map(Number);}
 export function comparePatch(a:string,b:string):number{
- const x=a.split('.').map(Number),y=b.split('.').map(Number);
+ const x=patchParts(a),y=patchParts(b);
  for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]-y[i];return 0;
 }
 export function patchLabel(version:string):string{
- const [season,patch]=version.split('.').map(Number);
+ const [season,patch]=patchParts(version);
  return season>=15?`${season+10}.${patch}`:version;
 }
 export function validatePatchCatalog(d:Dataset,version=d.version,locale=d.locale):Dataset{
  if(!/^\d+\.\d+\.\d+$/.test(version)||d.version!==version||d.locale!==locale||!Object.keys(d.champions??{}).length||!Object.keys(d.items??{}).length||!Array.isArray(d.runes)||d.runes.length!==5)throw Error('Catálogo incompleto ou patch divergente');
  for(const [id,c] of Object.entries(d.champions)){
   if(c.id!==id||!c.stats||!['hp','attackdamage','armor','spellblock','attackspeed','attackrange'].every(k=>Number.isFinite(c.stats[k]))||c.spells?.length!==4||!c.skins?.length||!c.passive)throw Error(`Campeão incompleto: ${id}`);
-  for(const spell of c.spells)if(!Number.isFinite(spell.maxrank)||spell.maxrank<1||!spell.cooldown?.length||spell.cooldown.some(n=>!Number.isFinite(n)||n<0))throw Error(`Habilidade inválida: ${id}`);
+  for(const spell of c.spells)if(!spell.id||!Number.isFinite(spell.maxrank)||spell.maxrank<1||!Array.isArray(spell.cooldown)||!spell.cooldown.length||spell.cooldown.some(n=>!Number.isFinite(n)||n<0)||!Array.isArray(spell.cost)||spell.cost.some(n=>!Number.isFinite(n)||n<0)||!spell.image?.full)throw Error(`Habilidade inválida: ${id}`);
  }
+ for(const [id,item] of Object.entries(d.items))if(!id||!item.name||!item.image?.full||!item.gold||!Number.isFinite(item.gold.total)||!Number.isFinite(item.gold.sell)||item.gold.total<0||item.gold.sell<0||!item.maps||!Array.isArray(item.tags)||!item.stats)throw Error(`Item inválido: ${id}`);
+ for(const tree of d.runes)if(!Number.isFinite(tree.id)||!tree.name||!Array.isArray(tree.slots)||tree.slots.length!==4||tree.slots.some(slot=>!Array.isArray(slot.runes)||!slot.runes.length))throw Error(`Árvore de runas inválida: ${tree.id}`);
  return d;
 }
 export function newestCatalog(a:Dataset|null,b:Dataset|null):Dataset|null{
  return b&&(!a||comparePatch(b.version,a.version)>0)?b:a;
 }
-/** Patch-scoped corrections explicitly stated in official Riot notes, never inferred coefficients. */
 /** Patch-scoped corrections explicitly stated in official Riot notes, accumulated forward. */
 export function applyOfficialPatchCorrections(data:Dataset):Dataset{
  const sources={
