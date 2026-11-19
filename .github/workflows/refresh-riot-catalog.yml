@@ -9,6 +9,9 @@ on:
       - 'tests/exactKits.test.ts'
       - 'package-lock.json'
       - 'src/patchCatalog.ts'
+      - 'scripts/ingest-meraki-candidates.mjs'
+      - 'scripts/audit-meraki-candidates.mjs'
+      - 'package.json'
       - 'tests/patchCatalog.test.ts'
   schedule:
     - cron: '17 9 * * *'
@@ -36,12 +39,17 @@ jobs:
       - run: npm ci
       - name: Download and validate the latest Riot catalog
         run: npm run ingest
+      - name: Import Meraki champion mechanics as review-only candidates
+        run: npm run ingest:meraki
+      - name: Audit imported candidate coverage (never runtime-enabled)
+        run: npm run audit:meraki
       - name: Verify tests, types, build and champion coverage
         run: |
           npm test
           npm run typecheck
           npm run build
           npm run audit:coverage
+          npm run audit:meraki
       - name: Commit validated catalog to the same working branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,6 +60,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json
+          git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json public/data/meraki-candidates.json
           git commit -m "chore(data): refresh Riot catalog"
           git push origin "HEAD:${GITHUB_REF_NAME}"
