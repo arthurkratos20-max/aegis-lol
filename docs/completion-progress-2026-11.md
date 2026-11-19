@@ -20,7 +20,7 @@
 - `src/exactKits.ts`/snapshot de efeitos: certificado somente para 16.20.1.
 - `validatedPatch`: null.
 - Esses snapshots incompatíveis não são combinados; os efeitos antigos ficam desativados no catálogo 16.23.1.
-- **Auditoria reproduzida no CI run 44576440785: 0 kits parciais ativos, 173 campeões sem adapters ativos e 0 kits completos validados.** Os seis pilotos manuais são templates vazios, não seis kits funcionais no patch atual. A documentação anterior que indicava seis parciais/167 ausentes foi corrigida.
+- **Após o adapter oficial do Bardo Q: 1 kit parcial ativo (somente Q), 172 sem adapters e 0 kits completos validados no patch 16.23.1.** Os seis pilotos manuais são templates vazios, não seis kits funcionais no patch atual. A documentação anterior que indicava seis parciais/167 ausentes foi corrigida.
 - Modo estrito permanece bloqueado. Build heurístico e ações manuais não equivalem à validação completa de dano por campeão.
 
 ## Validação mais recente
