@@ -27,13 +27,23 @@ export function newestCatalog(a:Dataset|null,b:Dataset|null):Dataset|null{
 export function applyOfficialPatchCorrections(data:Dataset):Dataset{
  const sources={
   patch2620:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-20-notes/',
-  patch2621:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-21-notes/'
+  patch2621:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-21-notes/',
+  patch2622:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-22-notes/'
  };
  const ledger=[
   {champion:'Ashe',stat:'attackdamageperlevel',value:3,since:'16.20.1',source:sources.patch2620},
   {champion:'Lucian',stat:'attackdamageperlevel',value:2.9,since:'16.20.1',source:sources.patch2620},
   {champion:'Jinx',stat:'attackdamageperlevel',value:3,since:'16.21.1',source:sources.patch2621},
-  {champion:'Jinx',stat:'hp',value:610,since:'16.21.1',source:sources.patch2621}
+  {champion:'Jinx',stat:'hp',value:610,since:'16.21.1',source:sources.patch2621},
+  {champion:'Mel',stat:'hp',value:590,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'hpperlevel',value:107,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'mp',value:455,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'mpperlevel',value:38,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'armorperlevel',value:5.4,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'attackdamage',value:52,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'attackspeedperlevel',value:2.75,since:'16.22.1',source:sources.patch2622},
+  {champion:'Thresh',stat:'attackdamage',value:54,since:'16.22.1',source:sources.patch2622},
+  {champion:'Viktor',stat:'hpperlevel',value:105,since:'16.22.1',source:sources.patch2622}
  ];
  const corrections=ledger.filter(fix=>comparePatch(data.version,fix.since)>=0);
  const champions={...data.champions};
