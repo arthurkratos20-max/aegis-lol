@@ -10,7 +10,8 @@ import {nativeAction,nativeDamage} from '../src/native.ts';
 const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 data.mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8')).champions;
 function scene():Scenario{const s=initialScenario(data);s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;s.player.overrides={hp:1000,ad:100,armor:100,mr:100,mana:100};s.enemy.overrides={hp:1000,ad:100,armor:100,mr:100,mana:100};return s;}
-let actionSequence=0;\nfunction action(p:Partial<Action>={}):Action{return {id:p.id??`test-action-${++actionSequence}`,at:0,kind:'spell',key:'Q',name:'Test spell',type:'physical',formula:{...EMPTY_FORMULA,base:100},cooldown:0,cost:0,cast:0,duration:1,hit:1,onHit:false,custom:true,coverage:'testing',...p};}
+let actionSequence=0;
+function action(p:Partial<Action>={}):Action{return {id:p.id??`test-action-${++actionSequence}`,at:0,kind:'spell',key:'Q',name:'Test spell',type:'physical',formula:{...EMPTY_FORMULA,base:100},cooldown:0,cost:0,cast:0,duration:1,hit:1,onHit:false,custom:true,coverage:'testing',...p};}
 test('growth reaches level 18 scaling, without assuming linear progression',()=>{assert.equal(growth(1),0);assert.equal(growth(18),17);assert.equal(growth(2),.72);});
 test('mitigation positive resistance',()=>assert.equal(mitigate(100,100),50));
 test('negative resistance amplifies damage',()=>assert.equal(mitigate(100,-100),150));
