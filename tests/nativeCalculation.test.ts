@@ -32,7 +32,7 @@ test('native calculation rejects missing, malformed and unsupported source data'
  assert.throws(()=>calculateNative(node('NamedDataValueCalculationPart',{mDataValue:'missing'}),spell(),1,1,stats,base),/DataValue/);
  assert.throws(()=>calculateNative(node('NumberCalculationPart'),spell(),1,1,stats,base),/Invalid numeric/);
  assert.throws(()=>calculateNative(node('UnknownCalculationPart'),spell(),1,1,stats,base),/not implemented/);
- assert.throws(()=>calculateNative(node('NumberCalculationPart',{mNumber:1}),spell(),0,1,stats,base),/Rank\\/level/);
+ assert.throws(()=>calculateNative(node('NumberCalculationPart',{mNumber:1}),spell(),0,1,stats,base),/Rank\/level/);
  assert.throws(()=>calculateNative(node('GameCalculation',{mFormulaParts:[]}),spell(),1,1,stats,base),/no formula parts/);
 });
 test('native calculation rejects duplicate or invalid level breakpoints',()=>{
