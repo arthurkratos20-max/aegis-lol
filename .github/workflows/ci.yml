@@ -1,0 +1,54 @@
+name: Aegis CI
+
+on:
+  push:
+    branches:
+      - main
+      - "aegis/**"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aegis-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Test, typecheck and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run automated tests
+        run: npm test
+
+      - name: Check TypeScript
+        run: npm run typecheck
+
+      - name: Build static production export
+        run: npm run build
+
+      - name: Upload static export
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aegis-static-export
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
