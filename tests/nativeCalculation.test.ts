@@ -9,11 +9,12 @@ const node=(__type:string,fields:Record<string,unknown>={}):CalcNode=>({__type,.
 const spell=(calculations:Record<string,CalcNode>={},values:Record<string,number[]>={}):NativeSpell=>({path:'fixture',cooldown:[1,1,1,1,1,1,1],cost:[0,0,0,0,0,0,0],values,calculations});
 
 test('native calculation evaluates data values, stats, sums and multipliers',()=>{
- const s=spell({damage:node('GameCalculation',{mFormulaParts:[
+ const calculation=node('GameCalculation',{mFormulaParts:[
   node('NumberCalculationPart',{mNumber:10}),
   node('NamedDataValueCalculationPart',{mDataValue:'base'}),
   node('StatByCoefficientCalculationPart',{mStat:2,mStatFormula:2,mCoefficient:.5})
- ],mMultiplier:node('NumberCalculationPart',{mNumber:2})}},{base:[0,20,30]});
+ ],mMultiplier:node('NumberCalculationPart',{mNumber:2})});
+ const s=spell({damage:calculation},{base:[0,20,30]});
  assert.equal(calculateNative(s.calculations.damage,s,1,1,stats,base),150);
 });
 test('native calculation supports modified references and products',()=>{
@@ -31,7 +32,7 @@ test('native calculation rejects missing, malformed and unsupported source data'
  assert.throws(()=>calculateNative(node('NamedDataValueCalculationPart',{mDataValue:'missing'}),spell(),1,1,stats,base),/DataValue/);
  assert.throws(()=>calculateNative(node('NumberCalculationPart'),spell(),1,1,stats,base),/Invalid numeric/);
  assert.throws(()=>calculateNative(node('UnknownCalculationPart'),spell(),1,1,stats,base),/not implemented/);
- assert.throws(()=>calculateNative(node('NumberCalculationPart',{mNumber:1}),spell(),0,1,stats,base),/Rank\/level/);
+ assert.throws(()=>calculateNative(node('NumberCalculationPart',{mNumber:1}),spell(),0,1,stats,base),/Rank\\/level/);
  assert.throws(()=>calculateNative(node('GameCalculation',{mFormulaParts:[]}),spell(),1,1,stats,base),/no formula parts/);
 });
 test('native calculation rejects duplicate or invalid level breakpoints',()=>{
