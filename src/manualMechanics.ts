@@ -39,30 +39,17 @@ export function validateManualEffect(effect:ManualEffectRecord):string[]{
  if(!effect.spell.cost.length||effect.spell.cost.some(v=>!Number.isFinite(v)||v<0))errors.push('Custo inválido');
  return errors;
 }
-function validNode(value:CalcNode,depth=0):boolean{
- if(!value||typeof value!=='object'||typeof value.__type!=='string'||depth>12)return false;
- for(const [key,child] of Object.entries(value)){
-  if(key==='__type')continue;
-  if(child&&typeof child==='object'){
-   if(Array.isArray(child)){if(child.some(item=>item&&typeof item==='object'&&!validNode(item as CalcNode,depth+1)))return false;}
-   else if('__type' in child&&!validNode(child as CalcNode,depth+1))return false;
-  }else if(typeof child==='number'&&!Number.isFinite(child))return false;
- }
- return true;
+function validNested(value:unknown,depth:number):boolean{
+ if(depth>12)return false;
+ if(value===null||value===undefined)return true;
+ if(typeof value==='number')return Number.isFinite(value);
+ if(typeof value==='string'||typeof value==='boolean')return true;
+ if(Array.isArray(value))return value.every(item=>validNested(item,depth+1));
+ if(typeof value==='object')return Object.values(value).every(item=>validNested(item,depth+1));
+ return false;
 }
-export function validateManualChampionRecord(record:ManualChampionRecord):string[]{
- const errors:string[]=[];
- if(!record.champion.trim())errors.push('Campeão ausente');
- if(!PATCH.test(record.patch))errors.push('Patch inválido');
- if(!isHttps(record.sourceUrl))errors.push('Fonte do campeão precisa ser HTTPS');
- if(!Array.isArray(record.effects))errors.push('Lista de efeitos inválida');
- const ids=new Set<string>();
- for(const effect of record.effects??[]){
-  if(ids.has(effect.key))errors.push(`Efeito duplicado: ${effect.key}`);
-  ids.add(effect.key);
-  errors.push(...validateManualEffect(effect).map(message=>`${effect.key}: ${message}`));
- }
- return errors;
+function validNode(value:CalcNode,depth=0):boolean{
+ return !!value&&typeof value==='object'&&typeof value.__type==='string'&&depth<=12&&validNested(Object.fromEntries(Object.entries(value).filter(([key])=>key!=='__type')),depth+1);
 }
 export const manualMechanicsPilots=['Shen','Ezreal','Yasuo','Yone','Riven','Darius'] as const;
 /** Empty pilot slots are intentional: no unverified damage values are fabricated. */
