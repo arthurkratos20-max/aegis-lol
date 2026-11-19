@@ -5,7 +5,15 @@ import {manualMechanicsTemplate,validateManualChampionRecord,validateManualEffec
 
 const effect:ManualEffectRecord={
  key:'Q',label:'Habilidade Q',damageType:'magic',
- spell:{path:'Characters/Test/Spells/TestQ',values:{Base:[0,20,40]},calculations:{Damage:{__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:100},{__type:'ByCharLevelBreakpointsCalculationPart',mLevel1Value:0,mInitialBonusPerLevel:1,mBreakpoints:[{mLevel:6,mAdditionalBonusAtThisLevel:10}]}]}}},cooldown:[8,7,6],cost:[50,50,50]},
+ spell:{
+  path:'Characters/Test/Spells/TestQ',
+  values:{Base:[0,20,40]},
+  calculations:{Damage:{__type:'GameCalculation',mFormulaParts:[
+   {__type:'NumberCalculationPart',mNumber:100},
+   {__type:'ByCharLevelBreakpointsCalculationPart',mLevel1Value:0,mInitialBonusPerLevel:1,mBreakpoints:[{mLevel:6,mAdditionalBonusAtThisLevel:10}]}
+  ]}},
+  cooldown:[8,7,6],cost:[50,50,50]
+ },
  conditions:['Alvo atingido'],limitations:['Sem colisão com múltiplos alvos'],validation:'draft',sourceUrl:'https://example.org/official-data'
 };
 const record:ManualChampionRecord={champion:'Test',patch:'16.23.1',sourceUrl:'https://example.org/official-data',effects:[effect],notes:[]};
