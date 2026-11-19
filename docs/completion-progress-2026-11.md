@@ -7,6 +7,8 @@
 - Validação do catálogo: versões, dados de habilidades, economia de itens e estrutura de runas.
 - Proteção de `POST /api/patch/sync` com Bearer `PATCH_SYNC_TOKEN` de pelo menos 32 caracteres, falhando fechado sem segredo.
 - Workflow diário/manual de ingestão pt_BR e en_US. O catálogo Data Dragon 16.23.1 (26.23), 173 campeões, foi baixado e validado na branch de trabalho. Refresh Riot catalog run 44575892851 passou em todas as etapas.
+- Importador Meraki review-only e auditoria de atualidade: 171/173 campeões encontrados, mas a fonte mais recente marca 25.15, abaixo do patch 26.23; Locke e Zaahen estão ausentes. Nenhum dado Meraki é ativado.
+- Extrator de fórmulas candidatas criado para preservar efeitos estruturados, descrições, modificadores e unidades em `public/data/meraki-formula-review.json`, sempre com `reviewStatus: unreviewed` e `runtimeEnabled: false`.
 - Next.js atualizado para 16.4.6; lockfile sincronizado; `npm audit` retornou 0 vulnerabilidades.
 - Regressões para compatibilidade de snapshots, validação do motor nativo, ações manuais e enumeração exata em um conjunto pequeno e finito de candidatos.
 - Documentação de implantação, segurança, cobertura e limitações atualizada.
@@ -33,7 +35,7 @@
 
 ## Pendências de implementação
 
-1. Obter fonte atual, verificável e acessível para mecânicas do patch 26.23; Data Dragon e notas de patch não bastam para todas as fórmulas.
+1. Obter fonte atual, verificável e acessível para mecânicas do patch 26.23; Meraki disponível está defasado (25.15), Data Dragon e notas de patch não bastam para todas as fórmulas.
 2. Atualizar `mechanics.json` e implementar adapters P/Q/W/E/R, passivas e condições para os 173 campeões, com fixtures independentes por patch.
 3. Integrar passivas de itens/runas, procs, grupos únicos, cura, escudos, recursos, DoT, recasts, pets, projéteis e geometria.
 4. Validar combos, DPS/TTK/EHP e o otimizador. A enumeração exata atual prova ótimo apenas dentro do conjunto finito testado; não prova ótimo global do catálogo.
@@ -56,3 +58,8 @@
 ## Auditoria do patch 26.23
 
 `docs/patch-26.23-audit.md` inventaria alterações numéricas das notas oficiais do patch e separa Summoner's Rift de Arena, ARAM: Mayhem e Classic. Essas alterações ainda precisam de adapters e fixtures antes de serem usadas pelo motor.
+
+
+## Nova auditoria da fonte Meraki (19/11/2026)
+
+A auditoria de `patchLastChanged` foi corrigida para comparar a versão de jogo (26.23) derivada do catálogo 16.23.1. O snapshot disponível tem 171 campeões, todos com slots P/Q/W/E/R estruturados, mas o marcador mais recente é 25.15; Locke e Zaahen não constam. O pipeline agora extrai candidatos de fórmula para revisão, sem permitir execução. A geração e a auditoria são executadas pelo workflow de refresh antes de qualquer commit do snapshot.
