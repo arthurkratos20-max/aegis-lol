@@ -2,7 +2,7 @@
 
 O processamento dos 173 campeões agora conta com um fallback de classe. A cobertura exata e integral dos kits **não está concluída**. Veja `attribute-preferences.md` para a versão híbrida atual.
 
-Patch do catálogo: 16.19.1. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados.
+Snapshot de referência deste inventário: 16.19.1. O PR #2 propõe catálogo Data Dragon 16.23.1; `mechanics.json` permanece em 16.19.1 e os efeitos isolados de `exactKits` permanecem certificados em 16.20.1. Nenhum desses snapshots divergentes é combinado: em 16.23.1, os efeitos antigos são desativados e a interface deve manter cobertura estimada/ausente. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados.
 
 | Campeão | Fórmulas disponíveis | Pendentes |
 |---|---|---|
@@ -32,6 +32,10 @@ Patch do catálogo: 16.19.1. Cobertura: seis kits parciais, 167 sem adapters num
 Para reproduzir o inventário de cobertura:
 
     node --experimental-strip-types scripts/audit-kit-coverage.mjs
+
+## Compatibilidade de patch
+
+A atualização proposta do Data Dragon não altera automaticamente a versão de `mechanics.json` nem certifica os efeitos isolados. Os testes de `exactKits` usam uma fixture pinada em 16.20.1 e incluem uma regressão que rejeita esses efeitos em 16.23.1. Para reativar fórmulas no patch atual, cada campeão afetado precisa de comparação com as notas oficiais e dados atuais, atualização de valores/cooldowns e fixtures independentes.
 
 ## Bloqueio para concluir
 
