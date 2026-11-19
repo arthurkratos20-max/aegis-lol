@@ -64,6 +64,11 @@ test('CC seconds merge overlaps and stop at window boundary',()=>{const s=scene(
 test('manual and automatic actions share exclusive window endpoint',()=>{const s=scene();s.player.actions=[action({at:s.duration,type:'true'})];assert.equal(simulate(s,data).player.damage,0);});
 
 
+test('strict mode also blocks optimizer before any candidate is evaluated',()=>{
+ const s=scene();s.mode='strict';
+ assert.throws(()=>optimize(s,data,{exact:true,candidates:['3031'],limit:10}),/Otimização estrita indisponível/);
+});
+
 test('strict mode remains blocked until patch-level fixtures certify the combat model', () => {
  const s=scene();s.mode='strict';
  assert.throws(()=>simulate(s,data),/Modo Estrito indisponível/);
