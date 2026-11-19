@@ -63,3 +63,7 @@
 ## Nova auditoria da fonte Meraki (19/11/2026)
 
 A auditoria de `patchLastChanged` foi corrigida para comparar a versão de jogo (26.23) derivada do catálogo 16.23.1. O snapshot disponível tem 171 campeões, todos com slots P/Q/W/E/R estruturados, mas o marcador mais recente é 25.15; Locke e Zaahen não constam. O pipeline agora extrai candidatos de fórmula para revisão, sem permitir execução. A geração e a auditoria são executadas pelo workflow de refresh antes de qualquer commit do snapshot.
+
+### Resultado quantitativo do inventário review-only
+
+Refresh run [44606542886](https://github.com/arthurkratos20-max/aegis-lol/actions/runs/44606542886) passou e salvou `public/data/meraki-candidates.json` e `public/data/meraki-formula-review.json` na branch. Foram inventariados 927 registros de habilidade, 2.515 efeitos, 1.019 efeitos com tabelas de nivelamento e 1.709 candidatos de fórmula. Há 655 modificadores com unidades ainda não suportadas e zero modificadores estruturalmente malformados. Todos os candidatos continuam `unreviewed` e `runtimeEnabled: false`; a fonte é 25.15, não 26.23.
