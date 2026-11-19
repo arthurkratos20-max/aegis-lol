@@ -10,8 +10,8 @@ A auditoria executada no commit `8549f9b3ee0b858f083e58514dea5a997e18ae7d`, pelo
 |---|---:|
 | Patch do catálogo | 16.23.1 |
 | Campeões auditados | 173 |
-| Kits parciais ativos | 0 |
-| Kits sem adapters ativos | 173 |
+| Kits parciais ativos | 1 (Bardo: Q) |
+| Kits sem adapters ativos | 172 |
 | Kits completos validados | 0 |
 
 O relatório JSON foi gerado em `artifacts/kit-coverage-16.23.1.json` e incluído no artefato `aegis-static-export` do workflow.
