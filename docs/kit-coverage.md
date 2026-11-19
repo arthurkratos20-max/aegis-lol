@@ -68,7 +68,7 @@ Não é seguro preencher essas lacunas com coeficientes inferidos ou inventados.
 
 ## Próximos marcos
 
-1. Obter uma fonte atual, acessível e verificável de mecânicas para 26.23.
+1. Continuar ampliando adapters isolados patch-scoped a partir de notas oficiais, com fixtures e limites explícitos; obter também uma fonte atual de mecânicas para passivas e interações complexas.
 2. Atualizar os snapshots mecânicos e criar fixtures por campeão.
 3. Implementar e validar kits em lotes pequenos, sem marcar como completos os campeões ainda incompletos.
 4. Integrar efeitos de itens/runas e interações ao motor de combate.
