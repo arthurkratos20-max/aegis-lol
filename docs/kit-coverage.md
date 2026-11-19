@@ -1,6 +1,6 @@
 # Cobertura de kits — auditoria executada em 19 de novembro de 2026
 
-O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales pt_BR/en_US. A ingestão está na branch de trabalho. A cobertura de fórmulas de combate para esse catálogo, porém, é **0/173**: zero kits parciais, 173 sem adapters numéricos nativos ativos e zero kits integralmente validados.
+O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales pt_BR/en_US. A ingestão está na branch de trabalho. A cobertura de fórmulas de combate para esse catálogo, porém, é **1/173**: um kit parcial (Bardo, somente Q) e 172 sem adapters ativos; zero kits integralmente validados. O adapter do Bardo é isolado, patch-scoped e não inclui passiva, colisão/segundo alvo ou controle de grupo.
 
 ## Resultado reproduzido
 
