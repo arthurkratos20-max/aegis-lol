@@ -77,5 +77,6 @@ export function validateScenario(s:Scenario,data:Dataset):string[]{
    const validNative=!a.native||(!!a.native.spell&&!!a.native.calculation&&(a.native.multiplier===undefined||(Number.isFinite(a.native.multiplier)&&a.native.multiplier>=0)));
    if(!a.id||!a.key||!validType||!validKind||!Number.isFinite(a.at)||a.at<0||a.at>s.duration||!Number.isFinite(a.hit)||a.hit<0||a.hit>1||formulaValues.some(v=>!Number.isFinite(v)||v<0)||!validNative)errors.push('Ação inválida: tipo, identificador, fórmula ou cálculo nativo inconsistente');
   }
+ }
  return errors;
 }
