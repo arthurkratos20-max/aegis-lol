@@ -25,8 +25,23 @@ test('mixed patches, incomplete details and invalid locale are rejected before p
  await assert.rejects(()=>fetchPatchCatalog('16.20.1','pt_BR',upstream('16.20.1',true)),/patches diferentes/);
  await assert.rejects(()=>fetchPatchCatalog('16.20.1','xx',upstream('16.20.1')),/inválido/);
  const broken=structuredClone(old);broken.champions.Ashe.spells.pop();assert.throws(()=>validatePatchCatalog(broken),/incompleto/);
- assert.equal(applyOfficialPatchCorrections({...old,version:'16.21.1'}).champions.Ashe.stats.attackdamageperlevel,0);
+ assert.equal(applyOfficialPatchCorrections({...old,version:'16.19.1'}).champions.Ashe.stats.attackdamageperlevel,0);
  assert.equal(comparePatch('16.20.1','16.19.1')>0,true);assert.equal(patchLabel('16.20.1'),'26.20');
+});
+test('official champion growth corrections accumulate only from their effective patch',()=>{
+ const before=applyOfficialPatchCorrections({...old,version:'16.19.1'});
+ assert.equal(before.champions.Ashe.stats.attackdamageperlevel,0);
+ assert.equal(before.champions.Lucian.stats.attackdamageperlevel,0);
+ assert.equal(before.champions.Jinx.stats.attackdamageperlevel,0);
+ const patch20=applyOfficialPatchCorrections({...old,version:'16.20.1'});
+ assert.equal(patch20.champions.Ashe.stats.attackdamageperlevel,3);
+ assert.equal(patch20.champions.Lucian.stats.attackdamageperlevel,2.9);
+ assert.equal(patch20.champions.Jinx.stats.attackdamageperlevel,0);
+ const latest=applyOfficialPatchCorrections({...old,version:'16.23.1'});
+ assert.equal(latest.champions.Ashe.stats.attackdamageperlevel,3);
+ assert.equal(latest.champions.Lucian.stats.attackdamageperlevel,2.9);
+ assert.equal(latest.champions.Jinx.stats.attackdamageperlevel,3);
+ assert.deepEqual(latest.statCorrections?.map(x=>x.champion),['Ashe','Lucian','Jinx']);
 });
 test('new patch does not certify previous-patch skill samples',()=>{
  assert.equal(baseSkillPlan({...old,version:'16.20.1'},'Ashe','Bot').coverage,'estimated');
