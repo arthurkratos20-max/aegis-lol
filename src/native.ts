@@ -3,22 +3,25 @@ import {EMPTY_FORMULA} from './contracts.ts';
 import {statsFor} from './model.ts';
 export function calculateNative(node:CalcNode,spell:NativeSpell,rank:number,level:number,stats:Stats,base:Stats,depth=0):number{
  if(depth>12)throw Error('Calculation depth exceeded');
- const child=(v:unknown)=>calculateNative(v as CalcNode,spell,rank,level,stats,base,depth+1);
- const dataValue=(name:unknown)=>{const v=spell.values[String(name)];if(!v||v[rank]===undefined)throw Error(`DataValue not found: ${String(name)}`);return v[rank];};
+ if(!Number.isInteger(rank)||rank<1||rank>6||!Number.isInteger(level)||level<1||level>18)throw Error('Rank/level outside supported range');
+ if(!node||typeof node!=='object'||typeof node.__type!=='string')throw Error('Malformed calculation node');
+ const child=(v:unknown)=>{if(!v||typeof v!=='object')throw Error('Malformed calculation child');return calculateNative(v as CalcNode,spell,rank,level,stats,base,depth+1);};
+ const dataValue=(name:unknown)=>{const v=spell.values[String(name)];if(!Array.isArray(v)||!Number.isFinite(v[rank]))throw Error(`DataValue not found or invalid: ${String(name)}`);return v[rank];};
+ const finite=(value:unknown,label:string)=>{const n=Number(value);if(!Number.isFinite(n))throw Error(`Invalid numeric value: ${label}`);return n;};
  const stat=()=>{const code=Number(node.mStat??0),total=code===0?stats.ap:code===1?stats.armor:code===8?stats.crit:code===2?stats.ad:code===12?stats.hp:code===9?stats.critMultiplier:NaN;const original=code===0?base.ap:code===1?base.armor:code===8?base.crit:code===2?base.ad:code===12?base.hp:code===9?base.critMultiplier:NaN;if(!Number.isFinite(total))throw Error(`Unsupported stat ${code}`);return Number(node.mStatFormula??0)===2?total-original:total;};
  switch(node.__type){
- case 'GameCalculation':return (node.mFormulaParts as CalcNode[]).reduce((a,n)=>a+child(n),0)*(node.mMultiplier?child(node.mMultiplier):1);
+ case 'GameCalculation':{if(!Array.isArray(node.mFormulaParts)||!node.mFormulaParts.length)throw Error('GameCalculation has no formula parts');const result=(node.mFormulaParts as CalcNode[]).reduce((a,n)=>a+child(n),0)*(node.mMultiplier?child(node.mMultiplier):1);if(!Number.isFinite(result))throw Error('Non-finite GameCalculation');return result;}
  case 'GameCalculationModified':{const ref=spell.calculations[String(node.mModifiedGameCalculation)];if(!ref)throw Error('Missing calculation reference');return child(ref)*(node.mMultiplier?child(node.mMultiplier):1);}
  case 'NamedDataValueCalculationPart':return dataValue(node.mDataValue);
- case 'NumberCalculationPart':return Number(node.mNumber??0);
- case 'StatByCoefficientCalculationPart':return stat()*Number(node.mCoefficient??0);
+ case 'NumberCalculationPart':return finite(node.mNumber,'mNumber');
+ case 'StatByCoefficientCalculationPart':return stat()*finite(node.mCoefficient,'mCoefficient');
  case 'StatByNamedDataValueCalculationPart':return stat()*dataValue(node.mDataValue);
  case 'StatBySubPartCalculationPart':return stat()*child(node.mSubpart);
  case 'ProductOfSubPartsCalculationPart':return child(node.mPart1)*child(node.mPart2);
  case 'SumOfSubPartsCalculationPart':return (node.mSubparts as CalcNode[]).reduce((a,n)=>a+child(n),0);
- case 'ByCharLevelFormulaCalculationPart':{const value=(node.values as number[])[level];if(!Number.isFinite(value))throw Error('Level formula missing');return value;}
- case 'ByCharLevelInterpolationCalculationPart':if(node.mScaleByStatProgressionMultiplier)throw Error('Stat progression interpolation not validated');return Number(node.mStartValue)+(Number(node.mEndValue)-Number(node.mStartValue))*(level-1)/17;
- case 'ByCharLevelBreakpointsCalculationPart':{let v=Number(node.mLevel1Value??0),per=Number(node.mInitialBonusPerLevel??0);const bp=(node.mBreakpoints??[]) as {mLevel:number;mAdditionalBonusAtThisLevel?:number;mBonusPerLevelAtAndAfter?:number}[];for(let l=2;l<=level;l++){const b=bp.find(b=>b.mLevel===l);if(b?.mBonusPerLevelAtAndAfter!==undefined)per=b.mBonusPerLevelAtAndAfter;v+=per+(b?.mAdditionalBonusAtThisLevel??0);}return v;}
+ case 'ByCharLevelFormulaCalculationPart':{const values=node.values;if(!Array.isArray(values))throw Error('Level formula missing');const value=values[level];if(!Number.isFinite(value))throw Error('Level formula missing');return value;}
+ case 'ByCharLevelInterpolationCalculationPart':{if(node.mScaleByStatProgressionMultiplier)throw Error('Stat progression interpolation not validated');const start=finite(node.mStartValue,'mStartValue'),end=finite(node.mEndValue,'mEndValue');return start+(end-start)*(level-1)/17;}
+ case 'ByCharLevelBreakpointsCalculationPart':{let v=finite(node.mLevel1Value??0,'mLevel1Value'),per=finite(node.mInitialBonusPerLevel??0,'mInitialBonusPerLevel');const bp=(node.mBreakpoints??[]) as {mLevel:number;mAdditionalBonusAtThisLevel?:number;mBonusPerLevelAtAndAfter?:number}[];if(!Array.isArray(bp)||bp.some(b=>!Number.isInteger(b.mLevel)||b.mLevel<2||b.mLevel>18||(b.mAdditionalBonusAtThisLevel!==undefined&&!Number.isFinite(b.mAdditionalBonusAtThisLevel))||(b.mBonusPerLevelAtAndAfter!==undefined&&!Number.isFinite(b.mBonusPerLevelAtAndAfter))))throw Error('Invalid level breakpoints');for(let l=2;l<=level;l++){const matches=bp.filter(b=>b.mLevel===l);if(matches.length>1)throw Error('Duplicate level breakpoint');const b=matches[0];if(b?.mBonusPerLevelAtAndAfter!==undefined)per=b.mBonusPerLevelAtAndAfter;v+=per+(b?.mAdditionalBonusAtThisLevel??0);}return v;}
  default:throw Error(`Calculation not implemented: ${node.__type}`);
  }
 }
