@@ -8,6 +8,8 @@ on:
       - '.github/workflows/refresh-riot-catalog.yml'
       - 'tests/exactKits.test.ts'
       - 'package-lock.json'
+      - 'src/patchCatalog.ts'
+      - 'tests/patchCatalog.test.ts'
   schedule:
     - cron: '17 9 * * *'
   workflow_dispatch:
