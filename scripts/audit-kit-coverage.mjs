@@ -1,7 +1,14 @@
 import fs from 'node:fs';
+import {mkdir} from 'node:fs/promises';
 import {championKitCoverage} from '../src/championKit.ts';
 const data=JSON.parse(fs.readFileSync(new URL('../public/data/pt_BR.json',import.meta.url)));
 const snapshot=JSON.parse(fs.readFileSync(new URL('../public/data/mechanics.json',import.meta.url)));
 if(snapshot.version===data.version)data.mechanics=snapshot.champions;
-const kits=Object.keys(data.champions).map(id=>championKitCoverage(id,data));
-console.log(JSON.stringify({patch:data.version,total:kits.length,partial:kits.filter(k=>k.status==='partial').length,missing:kits.filter(k=>k.status==='missing').length,fullyValidated:0,kits},null,2));
+const kits=Object.keys(data.champions).sort().map(id=>championKitCoverage(id,data));
+const report={patch:data.version,total:kits.length,partial:kits.filter(k=>k.status==='partial').length,missing:kits.filter(k=>k.status==='missing').length,fullyValidated:kits.filter(k=>k.isExactFormula).length,kits};
+if(kits.length!==173)throw new Error(`Expected 173 champions; got ${kits.length}`);
+if(report.partial+report.missing!==report.total)throw new Error('Coverage totals do not reconcile');
+await mkdir('artifacts',{recursive:true});
+const output=`artifacts/kit-coverage-${data.version}.json`;
+fs.writeFileSync(output,JSON.stringify(report,null,2));
+console.log(JSON.stringify({...report,kits:undefined,reportFile:output},null,2));
