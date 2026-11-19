@@ -85,7 +85,7 @@ function evaluateSingleBuild(items:string[],s:Scenario,data:Dataset):BuildMetric
    const coefficients=normalized.coefficients;
    if(coefficients.length)power.raw=base.ad*rank/Math.max(1,spell.maxrank)+coefficients.reduce((sum,c)=>sum+c.value*(c.stat==='bonusAD'?x.ad-base.ad:x[c.stat]),0);
    const nativeIndex=(nativeOptions[f.champion]??[]).findIndex(o=>o.key===key&&o.automatic!==false&&!o.kind);
-   if(nativeIndex>=0&&data.mechanics?.[f.champion])try{
+   if(nativeIndex>=0)try{
     const action=nativeAction(f,data,nativeIndex);power.raw=nativeDamage(action,f,data,x,e);power.type=action.type==='magic'?'magic':'physical';
    }catch{omitted++;}
    const hit=power.raw*mitigate(1,resistance(power.type));
