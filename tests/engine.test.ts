@@ -62,3 +62,9 @@ test('beneficial missing-health formulas use actor rather than opponent',()=>{co
 test('zero hit cannot heal, shield or apply control',()=>{for(const kind of ['heal','shield','cc'] as const){const s=scene();s.player.initialHP=.5;s.player.actions=[action({kind,hit:0,duration:3})];s.enemy.actions=[action({at:1,type:'true'})];const r=simulate(s,data);assert.equal(r.player.healing,0);assert.equal(r.player.shielding,0);assert.equal(r.player.ccSeconds,0);assert.equal(r.enemy.damage,100);}});
 test('CC seconds merge overlaps and stop at window boundary',()=>{const s=scene();s.duration=3;s.player.actions=[action({kind:'cc',duration:2}),action({at:1,key:'W',kind:'cc',duration:5})];assert.equal(simulate(s,data).player.ccSeconds,3);});
 test('manual and automatic actions share exclusive window endpoint',()=>{const s=scene();s.player.actions=[action({at:s.duration,type:'true'})];assert.equal(simulate(s,data).player.damage,0);});
+
+
+test('strict mode remains blocked until patch-level fixtures certify the combat model', () => {
+ const s=scene();s.mode='strict';
+ assert.throws(()=>simulate(s,data),/Modo Estrito indisponível/);
+});
