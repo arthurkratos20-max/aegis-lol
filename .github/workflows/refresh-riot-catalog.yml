@@ -1,0 +1,47 @@
+name: Refresh Riot catalog
+
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: riot-catalog-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Download and validate the latest Riot catalog
+        run: npm run ingest
+      - name: Verify tests, types and production export
+        run: |
+          npm test
+          npm run typecheck
+          npm run build
+      - name: Open a reviewable catalog update
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/riot-catalog-refresh
+          delete-branch: true
+          commit-message: 'chore(data): refresh Riot catalog'
+          title: 'chore(data): refresh Riot catalog'
+          body: |
+            Atualização automática dos dados oficiais do Data Dragon.
+            O catálogo só é proposto após validação de ambos os idiomas, testes,
+            verificação TypeScript e build. Fórmulas exatas continuam versionadas
+            separadamente e não são certificadas automaticamente por esta atualização.
+          labels: automated,catalog
