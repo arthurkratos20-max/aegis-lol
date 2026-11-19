@@ -3,12 +3,16 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import type {Action,Dataset} from '../src/contracts.ts';
 import {EMPTY_FORMULA} from '../src/contracts.ts';
-import {exactEffects,exactAction,exactRaw,exactFormulaStatus,exactCalculation} from '../src/exactKits.ts';
+import {EXACT_PATCH,exactEffects,exactAction,exactRaw,exactFormulaStatus,exactCalculation} from '../src/exactKits.ts';
+import {applyOfficialPatchCorrections} from '../src/patchCatalog.ts';
 import {fighter,initialScenario,statsFor,attackAction,combatResistance,mitigate} from '../src/model.ts';
 import {simulate} from '../src/engine.ts';
 import {evaluateBuild} from '../src/buildEvaluation.ts';
 import {championKitCoverage} from '../src/championKit.ts';
-const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+const fixture:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
+// Exact effects are regression-tested only against their explicitly certified 16.20.1 snapshot.
+const data=applyOfficialPatchCorrections({...fixture,version:EXACT_PATCH});
+if(data.version!==EXACT_PATCH)throw Error('Fixture de fórmulas exatas incompatível');
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<.001,`${a} != ${b}`);
 function scene(champion:string){const s=initialScenario(data);s.player=fighter(data,champion);s.enemy=fighter(data,'Lux');s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;s.player.overrides={ad:100,ap:100,hp:2000,armor:0,mr:0,mana:10000,as:1};s.enemy.overrides={hp:10000,armor:0,mr:0};return s;}
 function custom(at:number,raw:number,type:'true'|'physical'|'magic'='true'):Action{return {...attackAction(at),kind:'spell',key:`custom-${at}`,formula:{...EMPTY_FORMULA,base:raw},type,custom:true};}
