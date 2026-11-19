@@ -42,3 +42,9 @@ A atualização proposta do Data Dragon não altera automaticamente a versão de
 O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403. O espelho alternativo acessível expõe dados do patch 14.10.1 e apenas 167 campeões; esses coeficientes não foram incorporados ao catálogo 16.19.1. Uma consulta adicional ao CDN original de Meraki encontrou 171 campeões, com últimas alterações até 25.15; não confirma compatibilidade com 16.19 e não foi incorporada. A base de fórmulas atuais por campeão precisa ser obtida antes de implementar e validar os adapters restantes.
 
 Ainda faltam os adapters de passivas, múltiplos impactos/DoT, recasts, cargas, formas, pets, conversões de atributos, cura/escudos, CC, efeitos de itens/runas e interações específicas não modeladas. Os pesos de Utilidade e os objetivos de Dano/Defesa foram conectados à montagem ao vivo na implementação híbrida descrita em `attribute-preferences.md`.
+
+## Evolução do motor nativo — 19 de novembro de 2026
+
+A camada de interpretação de cálculos nativos agora falha explicitamente diante de dados ausentes ou malformados: rank/nível fora do intervalo, nós sem tipo, valores nomeados inexistentes, partes numéricas não finitas, cálculos sem partes, referências quebradas e breakpoints duplicados/inválidos. Foram adicionadas fixtures aritméticas independentes para valores nomeados, coeficientes de atributos, multiplicadores, referências, produtos, interpolação e progressão por breakpoints.
+
+A validação de cenários também rejeita alocações de habilidades impossíveis, metadados nativos incompletos, multiplicadores não finitos e IDs de ação duplicados. Aphelios permanece tratado como exceção de alocação de habilidades. Essas melhorias aumentam a segurança do cálculo, mas não adicionam fórmulas novas aos 167 campeões sem adapters nem certificam kits completos.
