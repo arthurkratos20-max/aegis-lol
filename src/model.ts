@@ -62,6 +62,20 @@ export function validateScenario(s:Scenario,data:Dataset):string[]{
   }
   for(const key of ['as','hp'] as const)if(f.overrides[key]!==undefined&&f.overrides[key]!<=0)errors.push('HP/velocidade de ataque deve ser positiva');
   for(const key of ['crit','lifesteal','armorPenPercent','magicPenPercent'] as const)if(f.overrides[key]!==undefined&&f.overrides[key]!>1)errors.push('Atributo percentual inválido');
-if(!data.champions[f.champion])errors.push('Campeão inválido');if(!Number.isInteger(f.level)||f.level<1||f.level>18)errors.push('Nível inválido');if(f.champion==='Aphelios'?f.skills.length!==0:!skillValid(f.skills,data,f.champion))errors.push('Ordem de habilidades inválida para o campeão/nível');if(f.items.length>6||new Set(f.items).size!==f.items.length)errors.push('Itens duplicados ou slots excedidos');if(f.items.some(id=>!itemEligible(id,data,f.champion)))errors.push('Item não elegível');if(f.items.filter(id=>isBoot(id,data)).length>1)errors.push('Somente um par de botas');for(const v of Object.values(f.overrides))if(!Number.isFinite(v)||v<0)errors.push('Override inválido');if(new Set(f.actions.map(a=>a.id)).size!==f.actions.length)errors.push('IDs de ações duplicados');if(f.actions.some(a=>!a.id||!a.key||!['physical','magic','true'].includes(a.type)||!['attack','spell','heal','shield','cc','stasis'].includes(a.kind)||!Number.isFinite(a.at)||a.at<0||a.at>s.duration||!Number.isFinite(a.hit)||a.hit<0||a.hit>1||Object.values(a.formula).some(v=>!Number.isFinite(v)||v<0)||(a.native!==undefined&&(!a.native.spell||!a.native.calculation||(a.native.multiplier!==undefined&&(!Number.isFinite(a.native.multiplier)||a.native.multiplier<0)))))errors.push('Ação inválida: tipo, identificador, fórmula ou cálculo nativo inconsistente');}
+  if(!data.champions[f.champion])errors.push('Campeão inválido');
+  if(!Number.isInteger(f.level)||f.level<1||f.level>18)errors.push('Nível inválido');
+  if(f.champion==='Aphelios'?f.skills.length!==0:!skillValid(f.skills,data,f.champion))errors.push('Ordem de habilidades inválida para o campeão/nível');
+  if(f.items.length>6||new Set(f.items).size!==f.items.length)errors.push('Itens duplicados ou slots excedidos');
+  if(f.items.some(id=>!itemEligible(id,data,f.champion)))errors.push('Item não elegível');
+  if(f.items.filter(id=>isBoot(id,data)).length>1)errors.push('Somente um par de botas');
+  for(const v of Object.values(f.overrides))if(!Number.isFinite(v)||v<0)errors.push('Override inválido');
+  if(new Set(f.actions.map(a=>a.id)).size!==f.actions.length)errors.push('IDs de ações duplicados');
+  for(const a of f.actions){
+   const formulaValues=Object.values(a.formula);
+   const validType=['physical','magic','true'].includes(a.type);
+   const validKind=['attack','spell','heal','shield','cc','stasis'].includes(a.kind);
+   const validNative=!a.native||(!!a.native.spell&&!!a.native.calculation&&(a.native.multiplier===undefined||(Number.isFinite(a.native.multiplier)&&a.native.multiplier>=0)));
+   if(!a.id||!a.key||!validType||!validKind||!Number.isFinite(a.at)||a.at<0||a.at>s.duration||!Number.isFinite(a.hit)||a.hit<0||a.hit>1||formulaValues.some(v=>!Number.isFinite(v)||v<0)||!validNative)errors.push('Ação inválida: tipo, identificador, fórmula ou cálculo nativo inconsistente');
+  }
  return errors;
 }
