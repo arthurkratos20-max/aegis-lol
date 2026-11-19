@@ -11,6 +11,7 @@ on:
       - 'src/patchCatalog.ts'
       - 'scripts/ingest-meraki-candidates.mjs'
       - 'scripts/audit-meraki-candidates.mjs'
+      - 'scripts/extract-meraki-formula-review.mjs'
       - 'package.json'
       - 'tests/patchCatalog.test.ts'
   schedule:
@@ -41,6 +42,8 @@ jobs:
         run: npm run ingest
       - name: Import Meraki champion mechanics as review-only candidates
         run: npm run ingest:meraki
+      - name: Extract formula candidates for human review only
+        run: npm run extract:meraki-review
       - name: Audit imported candidate coverage (never runtime-enabled)
         run: npm run audit:meraki
       - name: Verify tests, types, build and champion coverage
@@ -61,6 +64,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json
-          git add -f public/data/meraki-candidates.json
+          git add -f public/data/meraki-candidates.json public/data/meraki-formula-review.json
           git commit -m "chore(data): refresh Riot catalog"
           git push origin "HEAD:${GITHUB_REF_NAME}"
