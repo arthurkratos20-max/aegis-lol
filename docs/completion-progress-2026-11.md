@@ -8,7 +8,7 @@
 - Proteção de `POST /api/patch/sync` com Bearer `PATCH_SYNC_TOKEN` de pelo menos 32 caracteres, falhando fechado sem segredo; testes cobrem método, segredo ausente, token inválido e token válido.
 - Workflow diário/manual de ingestão pt_BR e en_US. A atualização Data Dragon 16.23.1 (26.23) foi baixada e passou em testes, TypeScript e build. A proposta está no [PR #2](https://github.com/arthurkratos20-max/aegis-lol/pull/2); não foi incorporada à main.
 - Dependências: Next.js atualizado para 16.4.6, package-lock sincronizado. `npm audit` retornou **0 vulnerabilidades** após atualização sem `--force`; a rotina de atualização executou testes, typecheck e build.
-- Regressões adicionais: fórmulas exatas são testadas contra seu snapshot certificado 16.20.1; snapshot 16.23.1 não recebe fórmulas antigas. O otimizador tem teste de enumeração completa em um conjunto finito e controlado de candidatos.
+- Regressões adicionais: fórmulas exatas são testadas contra seu snapshot certificado 16.20.1; snapshot 16.23.1 não recebe fórmulas antigas. O otimizador tem teste de enumeração completa em um conjunto finito e controlado de candidatos. O modo estrito do otimizador também tem regressão explícita para garantir que ele falhe fechado antes de avaliar candidatos enquanto não houver fixtures de patch.
 - Documentação de implantação, segurança, cobertura e limitações atualizada.
 
 ## Estado dos snapshots e exatidão
