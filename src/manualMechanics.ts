@@ -51,6 +51,22 @@ function validNested(value:unknown,depth:number):boolean{
 function validNode(value:CalcNode,depth=0):boolean{
  return !!value&&typeof value==='object'&&typeof value.__type==='string'&&depth<=12&&validNested(Object.fromEntries(Object.entries(value).filter(([key])=>key!=='__type')),depth+1);
 }
+/** Validate a complete champion entry; empty effects are allowed for an explicitly unfinished template. */
+export function validateManualChampionRecord(record:ManualChampionRecord):string[]{
+ const errors:string[]=[];
+ if(!record.champion.trim())errors.push('Campeão ausente');
+ if(!PATCH.test(record.patch))errors.push('Patch inválido');
+ if(!isHttps(record.sourceUrl))errors.push('Fonte do campeão precisa ser HTTPS');
+ if(!Array.isArray(record.effects))return [...errors,'Lista de efeitos inválida'];
+ const seen=new Set<string>();
+ for(const effect of record.effects){
+  if(seen.has(effect.key))errors.push(`Efeito duplicado: ${effect.key}`);
+  seen.add(effect.key);
+  errors.push(...validateManualEffect(effect).map(error=>`${effect.key}: ${error}`));
+ }
+ if(!Array.isArray(record.notes)||record.notes.some(note=>typeof note!=='string'||!note.trim()))errors.push('Notas inválidas');
+ return errors;
+}
 export const manualMechanicsPilots=['Shen','Ezreal','Yasuo','Yone','Riven','Darius'] as const;
 /** Empty pilot slots are intentional: no unverified damage values are fabricated. */
 export const manualMechanicsTemplate:ManualChampionRecord[]=manualMechanicsPilots.map(champion=>({
