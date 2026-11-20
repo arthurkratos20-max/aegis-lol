@@ -41,7 +41,8 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
   {key:'Q',spell:'GravesQ',calculation:'Detonation',type:'physical',automatic:false,label:'Q · detonação',note:'Summoner’s Rift: 80/125/170/215/260 + 55/70/85/100/115% DdA adicional; não soma automaticamente ao impacto.'},
   {key:'W',spell:'GravesW',calculation:'Impact',type:'magic',label:'W · impacto inicial',note:'Summoner’s Rift: 60/110/160/210/260 + 60% AP; nuvem/slow/nearsight pendentes.'},
   {key:'R',spell:'GravesR',calculation:'DirectHit',type:'physical',label:'R · impacto direto',note:'Summoner’s Rift: 275/425/575 + 150% DdA adicional.'},
-  {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · explosão em cone',note:'Summoner’s Rift: 200/320/440 + 120% DdA adicional; variante separada.'}
+  {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · explosão em cone',note:'Summoner’s Rift: 200/320/440 + 120% DdA adicional; variante separada.'},
+  {key:'E',spell:'GravesE',calculation:'Activate',type:'physical',label:'E · Quickdraw / True Grit',note:'Ativa um stack de armadura e resistência mágica por 4s; recarga de munição e redução de cooldown por pellets pendentes.'}
  ],
  Gwen:[
   {key:'Q',spell:'GwenQ',calculation:'MinimumSnips',type:'magic',label:'Q · mínimo (sem Snippy)',note:'70/99/128/157/186 + 40% AP; dano mágico agregado externo. Centro verdadeiro, passiva e área não simulados.'},
