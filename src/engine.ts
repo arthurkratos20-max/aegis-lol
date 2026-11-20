@@ -20,8 +20,8 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
  const st={player:statsFor(s.player,data),enemy:statsFor(s.enemy,data)};
  const bases={player:statsFor({...s.player,items:[],overrides:{},runes:{...s.player.runes,shards:[]}},data),enemy:statsFor({...s.enemy,items:[],overrides:{},runes:{...s.enemy.runes,shards:[]}},data)};
  const kits={player:kitState(s.player),enemy:kitState(s.enemy)};
- if(data.version!==EXACT_PATCH){kits.player.active=false;kits.enemy.active=false;}
- for(const side of sides)if(kits[side].active)warnings.push(`${side}: efeitos explícitos do snapshot 16.20; geometria, bônus de velocidade não mapeados, periodicidade da Hemorragia e demais passivas omitidos. Fórmula exata aplica-se somente à matemática isolada.`);
+ 
+ for(const side of sides)if(kits[side].active){const champion=s[side].champion;if(['Shen','Ezreal','Yasuo','Yone','Riven','Darius'].includes(champion)&&data.version===EXACT_PATCH)warnings.push(`${side}: efeitos explícitos do snapshot 16.20; geometria e interações secundárias permanecem limitadas.`);else if(['Gragas','Graves','Gwen','Hecarim','Heimerdinger','Illaoi'].includes(champion))warnings.push(`${side}: interações nativas parciais do kit do Summoner’s Rift; alcance, geometria, múltiplos alvos e efeitos não declarados podem não estar simulados.`);}
  const hp={player:st.player.hp*s.player.initialHP,enemy:st.enemy.hp*s.enemy.initialHP};const resource={player:st.player.mana*s.player.initialResource,enemy:st.enemy.mana*s.enemy.initialResource};
  const summary=():CombatSummary=>({damage:0,raw:0,dps:0,hp:0,death:null,healing:0,shielding:0,ccSeconds:0,composition:{physical:0,magic:0,true:0}});
  const results={player:summary(),enemy:summary()};const cooldowns:Record<string,number>={};const locks={player:0,enemy:0};const cc={player:0,enemy:0};const stasis={player:0,enemy:0};const shields:{player:{amount:number;expires:number}[];enemy:{amount:number;expires:number}[]}={player:[],enemy:[]};
