@@ -72,8 +72,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   champion:'Ezreal',patch:'16.23.1',spell:'EzrealR',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
   damageType:'magic',baseByRank:[350,600,850],apRatioByRank:[1.2,1.2,1.2],bonusADRatioByRank:[1.1,1.1,1.1],
   note:'R · dano contra campeão após a redução por alvos não campeões; colisões, redução por unidades atravessadas e trajetória não simuladas.'
- }
-
+ },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenQ',calculation:'MinimumSnips',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
   damageType:'magic',baseByRank:[70,99,128,157,186],apRatioByRank:[0.4,0.4,0.4,0.4,0.4],
