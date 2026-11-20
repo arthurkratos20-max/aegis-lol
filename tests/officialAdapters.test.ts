@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import type {Dataset,SkillKey} from '../src/contracts.ts';
-import {officialDamageAdapters,evaluateOfficialAdapter,officialAdapterFor} from '../src/officialAdapters.ts';
+import {officialDamageAdapters,evaluateOfficialAdapter,officialAdapterFor,validateOfficialDamageAdapters} from '../src/officialAdapters.ts';
 import {nativeAction,nativeDamage,nativeOptions} from '../src/native.ts';
 import {championKitCoverage,kitImpactPotential} from '../src/championKit.ts';
 import {fighter,statsFor} from '../src/model.ts';
@@ -39,4 +39,14 @@ test('Bard adapter metadata remains source-scoped and does not certify a full ki
  assert.ok(a?.source.includes('leagueoflegends.com'));
  assert.equal(nativeOptions.Bard.length,1);
  assert.match(nativeOptions.Bard[0].note,/colisão, segundo alvo, atordoamento e passiva não simulados/);
+});
+
+test('official adapter registry rejects stale, malformed, duplicate or untraceable rows',()=>{
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+ const valid=officialDamageAdapters[0];
+ assert.ok(valid);
+ assert.ok(validateOfficialDamageAdapters([{...valid,source:'https://example.com/fake'}]).some(e=>e.includes('official Riot')));
+ assert.ok(validateOfficialDamageAdapters([{...valid,baseByRank:[80]}]).some(e=>e.includes('five finite')));
+ assert.ok(validateOfficialDamageAdapters([valid,valid]).some(e=>e.includes('duplicate')));
+ assert.ok(validateOfficialDamageAdapters([{...valid,patch:'current'}]).some(e=>e.includes('patch version')));
 });
