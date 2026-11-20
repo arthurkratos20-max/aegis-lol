@@ -20,11 +20,11 @@ const declare=(champion:string,source:string,abilities:KitDeclaration['abilities
 
 export const kitDeclarations:Record<string,KitDeclaration>={
  Gragas:declare('Gragas','https://www.leagueoflegends.com/en-us/champions/gragas/',{
-  P:{name:'Happy Hour',role:'passiva: cura periódica ao conjurar habilidade',damageModel:'pending',notes:'Cooldown e cura dependem do nível e precisam ser modelados.'},
-  Q:{name:'Barrel Roll',role:'barril arremessado, recast/detonação e dano/slow que escalam com fermentação',damageModel:'pending',notes:'Modelar tempo no chão, recast, dano mínimo/máximo, área e redução contra tropas.'},
-  W:{name:'Drunken Rage',role:'canalização defensiva e próximo ataque fortalecido com dano mágico',damageModel:'pending',notes:'Dano depende da vida máxima do alvo; redução de dano durante canalização/efeito.'},
-  E:{name:'Body Slam',role:'avanço, colisão em área, dano mágico, controle e redução de recarga ao acertar',damageModel:'pending',notes:'Colisão e redução de recarga exigem estado e geometria.'},
-  R:{name:'Explosive Cask',role:'projétil em área que causa dano mágico e deslocamento',damageModel:'pending',notes:'Trajetória, raio, knockback e colisão com terreno.'}
+  P:{name:'Happy Hour',role:'passiva: cura periódica ao conjurar habilidade',damageModel:'partial',notes:'Cura de 5,5% da vida máxima e cooldown estático 12/10/8/6s nos níveis 1/6/11/16 implementados; efeitos de mapa não incluídos.'},
+  Q:{name:'Barrel Roll',role:'barril arremessado, recast/detonação e dano/slow que escalam com fermentação',damageModel:'partial',notes:'Dano mínimo e máximo do patch 26.17 implementados; fermentação temporal, slow, área e redução contra tropas ainda não simulados.'},
+  W:{name:'Drunken Rage',role:'canalização defensiva e próximo ataque fortalecido com dano mágico',damageModel:'partial',notes:'Canalização de 0,75s, redução de dano por 2,5s e bônus mágico no próximo ataque com 7% da vida máxima do alvo implementados; área, estruturas e limite contra monstros pendentes.'},
+  E:{name:'Body Slam',role:'avanço, colisão em área, dano mágico, controle e redução de recarga ao acertar',damageModel:'partial',notes:'Dano, atordoamento de 1s e redução de 40% do cooldown em acerto confirmado implementados; dash, geometria e dano em área pendentes.'},
+  R:{name:'Explosive Cask',role:'projétil em área que causa dano mágico e deslocamento',damageModel:'partial',notes:'Dano-base e escalamento AP implementados; trajetória, área, knockback e colisão com terreno pendentes.'}
  }),
  Graves:declare('Graves','https://wiki.leagueoflegends.com/en-us/Graves',{
   P:{name:'New Destiny',role:'ataques de espingarda com munição, recarga e múltiplos projéteis',damageModel:'pending',notes:'Contagem de projéteis, cone, primeiro alvo por projétil e recarga dependente de velocidade de ataque.'},
