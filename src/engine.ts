@@ -44,6 +44,7 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   if(ki?.cancel){record(side,a,0,0,0,0,`Ação cancelada: ${ki.cancel}`);continue;}
   const actualCooldown=hasteCooldown(a.cooldown,actor.haste+(a.key==='R'?(actor.ultimateHaste??0):['Q','W','E'].includes(a.key)?(actor.basicHaste??0):0));
   resource[side]-=a.cost;if(!skipCooldown&&!ki?.deferCooldown)cooldowns[key]=a.at+actualCooldown;if(!entry.proc)locks[side]=a.at+a.cast;
+  if(s[side].champion==='Gragas'&&a.kind==='spell'&&['Q','W','E','R'].includes(a.key)&&a.at>=kits[side].gragasPassiveReadyAt){const level=s[side].level,passiveCooldown=level>=16?6:level>=11?8:level>=6?10:12,healing=Math.min(st[side].hp-hp[side],st[side].hp*.055*(1-s.conditions.grievous));hp[side]+=healing;results[side].healing+=healing;kits[side].gragasPassiveReadyAt=a.at+passiveCooldown;}
   if(ki?.deferCooldown)cooldowns[key]=a.at+3+actualCooldown;
   if(ki?.consumedQCooldown!==undefined)cooldowns[`${side}:Q`]=a.at+hasteCooldown(ki.consumedQCooldown,actor.haste+(actor.basicHaste??0));
   if(ki?.passive){record(side,a,0,0,0,0,'Efeito ativado; não é impacto independente de dano');continue;}
