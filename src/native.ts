@@ -46,7 +46,10 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  Gwen:[
   {key:'Q',spell:'GwenQ',calculation:'MinimumSnips',type:'magic',label:'Q · mínimo (sem Snippy)',note:'70/99/128/157/186 + 40% AP; dano mágico agregado externo. Centro verdadeiro, passiva e área não simulados.'},
   {key:'Q',spell:'GwenQ',calculation:'MaximumSnips',type:'magic',automatic:false,label:'Q · máximo (4 stacks Snippy)',note:'110/155/200/245/290 + 60% AP; variante manual com seis cortes. Centro verdadeiro, passiva e área não simulados.'},
-  {key:'R',spell:'GwenR',calculation:'FirstNeedle',type:'magic',label:'R · primeiro agulhão',note:'30/50/70 + 10% AP por agulha no primeiro lançamento; recasts e passiva não simulados.'}
+  {key:'E',spell:'GwenE',calculation:'EmpoweredAttack',type:'magic',automatic:false,label:'E · ataque fortalecido',note:'15 + 20% AP em um ataque fortalecido; velocidade de ataque e reembolso não simulados.'},
+  {key:'R',spell:'GwenR',calculation:'FirstNeedle',type:'magic',label:'R · primeiro agulhão',note:'30/50/70 + 10% AP por agulha no primeiro lançamento; recasts e passiva não simulados.'},
+  {key:'R',spell:'GwenR',calculation:'SecondCast',type:'magic',automatic:false,label:'R · segundo lançamento (3 agulhas)',note:'Dano agregado das três agulhas; variante manual, não soma automaticamente ao primeiro lançamento.'},
+  {key:'R',spell:'GwenR',calculation:'ThirdCast',type:'magic',automatic:false,label:'R · terceiro lançamento (5 agulhas)',note:'Dano agregado das cinco agulhas; variante manual, não soma automaticamente aos lançamentos anteriores.'}
  ],
  Hecarim:[
   {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 90% DdA adicional; sem stacks, área ou sequência de recasts.'},
