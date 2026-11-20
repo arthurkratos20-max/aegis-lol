@@ -13,7 +13,7 @@ function kitDeclarationsPlaceholder(){return Object.values(kitDeclarations.Grave
 
 const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
 
-test('Gragas Q standard Summoner's Rift minimum and fully fermented impacts are separate',()=>{
+test('Gragas Q standard Summoner\'s Rift minimum and fully fermented impacts are separate',()=>{
  const q=officialAdapterFor('Gragas','GragasQ','Damage','16.23.1');assert.ok(q);assert.deepEqual(q.baseByRank,[80,120,160,200,240]);assert.equal(evaluateOfficialAdapter(q,5,{ap:100}),320);
  const max=officialAdapterFor('Gragas','GragasQ','MaxFermentedDamage','16.23.1');assert.ok(max);assert.deepEqual(max.baseByRank,[120,180,240,300,360]);assert.equal(evaluateOfficialAdapter(max,5,{ap:100}),480);
  const w=officialAdapterFor('Gragas','GragasW','EmpoweredAttack','16.23.1');assert.ok(w);assert.equal(evaluateOfficialAdapter(w,5,{ap:100,targetMaxHP:2000}),350);
