@@ -72,7 +72,7 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  ],
  Illaoi:[
   {key:'E',spell:'IllaoiE',calculation:'Activate',type:'physical',label:'E · ativar Teste de Espírito',note:'Marca o alvo por 7s; o dano pré-mitigação causado ao espírito ecoa em 25–45% + 8% por 100 AD, limitado pela vida do espírito.'},
-  {key:'W',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',type:'physical',label:'W · bônus de vida máxima',note:'3/3,5/4/4,5/5% da vida máxima + 0,035% por ponto de AD total; ataque básico e tentáculos não incluídos.'},
+  {key:'W',spell:'IllaoiW',calculation:'Activate',type:'physical',automatic:false,label:'W · preparar ataque fortalecido',note:'Prepara o próximo ataque básico por até 6s; o bônus de vida máxima é aplicado ao ataque que consumir a preparação.'},{key:'W',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',type:'physical',label:'W · bônus de vida máxima',note:'3/3,5/4/4,5/5% da vida máxima + 0,035% por ponto de AD total; ataque básico e tentáculos não incluídos.'},
   {key:'Q',spell:'IllaoiQ',calculation:'TentacleStrike',type:'physical',label:'Q · golpe de tentáculo',note:'9–200,12 por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q; um golpe isolado.'},
   {key:'R',spell:'IllaoiR',calculation:'Damage',type:'physical',label:'R · impacto inicial',note:'150/250/350 + 50% DdA adicional; sem área, tentáculos invocados ou golpes subsequentes.'}
  ]
