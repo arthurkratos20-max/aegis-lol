@@ -34,7 +34,7 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   shields.player=shields.player.filter(x=>x.expires>a.at);shields.enemy=shields.enemy.filter(x=>x.expires>a.at);
   if(hp[side]<=0){record(side,a,0,0,0,0,'Ação cancelada: morto');continue;}if(!entry.proc&&(a.at<cc[side]||a.at<stasis[side]||a.at<locks[side])){record(side,a,0,0,0,0,'Ação cancelada: CC, estase ou cast em andamento');continue;}
   if(a.kitEffect&&(a.custom||!exactEffect(a.kitEffect)||exactEffect(a.kitEffect)?.champion!==s[side].champion||data.version!==EXACT_PATCH)){record(side,a,0,0,0,0,'Ação cancelada: efeito/snapshot incompatível');continue;}
-  const def=exactEffect(a.kitEffect),skipCooldown=entry.proc||!!def&&['passive','tick','secondary'].includes(def.mode??'');
+  const def=exactEffect(a.kitEffect),skipCooldown=entry.proc||!!def&&['passive','tick','secondary'].includes(def.mode??'')||s[side].champion==='Hecarim'&&a.native?.spell==='HecarimW'&&a.native.calculation==='SingleTick';
   const key=`${side}:${a.key}`;if(!skipCooldown&&a.at<(cooldowns[key]??0)){record(side,a,0,0,0,0,'Ação cancelada: cooldown');continue;}if(resource[side]<a.cost){record(side,a,0,0,0,0,'Ação cancelada: recurso insuficiente');continue;}
   const shredBefore=kits[side].armorShredExpires>a.at;
   if((a.kitEffect||kits[side].active&&a.kind==='attack')&&hp[other]<=0&&a.kind!=='shield'){record(side,a,0,0,0,0,'Alvo morto');continue;}
