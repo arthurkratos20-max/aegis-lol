@@ -115,8 +115,8 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'FirstNeedle',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
-  damageType:'magic',baseByRank:[30,50,70],apRatioByRank:[0.1,0.1,0.1],targetMaxHPRatio:0.01,targetMaxHPRatioPer100AP:0.006,
-  note:'R · um único agulhão do primeiro lançamento. Não inclui recasts, quantidade crescente de agulhas, passiva, slow ou acertos múltiplos.'
+  damageType:'magic',baseByRank:[35,65,95],apRatioByRank:[0.1,0.1,0.1],targetMaxHPRatio:0.01,targetMaxHPRatioPer100AP:0.006,
+  note:'R · um único agulhão (35/65/95 + 10% AP) do primeiro lançamento. Não inclui recasts, quantidade crescente de agulhas, passiva, slow ou acertos múltiplos.'
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimQ',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
@@ -160,12 +160,12 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'SecondCast',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
-  damageType:'magic',baseByRank:[90,150,210],apRatioByRank:[0.3,0.3,0.3],targetMaxHPRatioByRank:[0.03,0.03,0.03],targetMaxHPRatioPer100AP:0.018,
+  damageType:'magic',baseByRank:[105,195,285],apRatioByRank:[0.3,0.3,0.3],targetMaxHPRatioByRank:[0.03,0.03,0.03],targetMaxHPRatioPer100AP:0.018,
   note:'R · segundo lançamento: três agulhas, dano agregado 90/150/210 + 30% AP + 3% (+1,8% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'ThirdCast',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
-  damageType:'magic',baseByRank:[150,250,350],apRatioByRank:[0.5,0.5,0.5],targetMaxHPRatioByRank:[0.05,0.05,0.05],targetMaxHPRatioPer100AP:0.03,
+  damageType:'magic',baseByRank:[175,325,475],apRatioByRank:[0.5,0.5,0.5],targetMaxHPRatioByRank:[0.05,0.05,0.05],targetMaxHPRatioPer100AP:0.03,
   note:'R · terceiro lançamento: cinco agulhas, dano agregado 150/250/350 + 50% AP + 5% (+3% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
  },
  {
