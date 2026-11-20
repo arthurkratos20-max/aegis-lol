@@ -28,7 +28,7 @@ export const kitDeclarations:Record<string,KitDeclaration>={
  }),
  Graves:declare('Graves','https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-19-notes/',{
   P:{name:'New Destiny',role:'ataques de espingarda com múltiplos projéteis, munição e recarga',damageModel:'pending',notes:'A passiva afeta o modelo de ataques básicos: projéteis, recarga, crítico e colisão. Ainda não integrada ao ciclo de DPS.'},
-  Q:{name:'End of the Line',role:'projétil explosivo com impacto inicial e detonação após 1s ou colisão com terreno',damageModel:'partial',notes:'Impacto inicial e detonação com tabelas separadas do Summoner’s Rift implementados. Trajetória, colisão com terreno, área e combinação temporal dos impactos pendentes.'},
+  Q:{name:'End of the Line',role:'projétil explosivo com impacto inicial e detonação após 1s ou colisão com terreno',damageModel:'partial',notes:'Impacto inicial (65% DdA adicional) e detonação (55–115% DdA adicional por rank) com tabelas atuais do Summoner’s Rift implementados. Trajetória, colisão com terreno, área e combinação temporal dos impactos pendentes.'},
   W:{name:'Smoke Screen',role:'nuvem que reduz visão; impacto inicial causa dano mágico e slow',damageModel:'partial',notes:'Dano mágico do impacto inicial implementado. Nuvem de 4s, slow e bloqueio de visão pendentes.'},
   E:{name:'Quickdraw',role:'dash que recarrega um cartucho e concede stacks de armadura e resistência mágica',damageModel:'pending',notes:'Falta integrar recarga de munição, stacks defensivos, duração e redução de cooldown por projéteis de ataques básicos.'},
   R:{name:'Collateral Damage',role:'projétil que causa dano ao primeiro alvo e explode em cone, recuando Graves',damageModel:'partial',notes:'Impacto direto e explosão em cone implementados como impactos separados com valores do Summoner’s Rift. Recuo, trajetória, área e seleção de alvos pendentes.'}
@@ -42,7 +42,7 @@ export const kitDeclarations:Record<string,KitDeclaration>={
  }),
  Hecarim:declare('Hecarim','https://wiki.leagueoflegends.com/en-us/Hecarim',{
   P:{name:'Warpath',role:'converte velocidade de movimento adicional em dano de ataque',damageModel:'pending',notes:'Conversão dependente do nível e fontes elegíveis de velocidade.'},
-  Q:{name:'Rampage',role:'dano físico em área com stacks que amplificam dano e reduzem recarga',damageModel:'partial',notes:'Impacto-base por rank e razão de DdA adicional implementados. Stacks, expiração, redução de recarga, área e dano contra tropas pendentes.'},
+  Q:{name:'Rampage',role:'dano físico em área com stacks que amplificam dano e reduzem recarga',damageModel:'partial',notes:'Impacto-base (60/90/120/150/180 + 95% DdA adicional) implementado. Stacks, expiração, redução de recarga, área e dano contra tropas pendentes.'},
   W:{name:'Spirit of Dread',role:'dano mágico periódico em área e cura baseada no dano sofrido pelos inimigos',damageModel:'partial',notes:'Dano total dos quatro ticks por rank implementado. Ticks, área, resistências bônus e cura por dano de aliados/inimigos pendentes.'},
   E:{name:'Devastating Charge',role:'velocidade crescente e próximo ataque com dano físico e knockback',damageModel:'pending',notes:'Dano escala com distância percorrida; duração e distância alteram resultado.'},
   R:{name:'Onslaught of Shadows',role:'investida com cavaleiros espectrais, dano mágico e medo ao final',damageModel:'pending',notes:'Múltiplos impactos e medo dependem da posição/direção e distância.'}
