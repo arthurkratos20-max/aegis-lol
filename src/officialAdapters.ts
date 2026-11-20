@@ -115,13 +115,13 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'FirstNeedle',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
-  damageType:'magic',baseByRank:[30,50,70],apRatioByRank:[0.1,0.1,0.1],
+  damageType:'magic',baseByRank:[30,50,70],apRatioByRank:[0.1,0.1,0.1],targetMaxHPRatio:0.01,targetMaxHPRatioPer100AP:0.006,
   note:'R · um único agulhão do primeiro lançamento. Não inclui recasts, quantidade crescente de agulhas, passiva, slow ou acertos múltiplos.'
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimQ',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
   damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.9,0.9,0.9,0.9,0.9],
-  note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 95% DdA adicional. Não inclui stacks de amplificação/redução de recarga, área nem sequência de recasts.'
+  note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 90% DdA adicional. Não inclui stacks de amplificação/redução de recarga, área nem sequência de recasts.'
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'TotalDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
@@ -137,6 +137,16 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerW',calculation:'FirstRocket',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
   damageType:'magic',baseByRank:[50,75,100,125,150],apRatioByRank:[0.55,0.55,0.55,0.55,0.55],
   note:'W · primeiro foguete da salva: 50/75/100/125/150 + 55% AP (patch 26.3+). Foguetes subsequentes, convergência, distribuição, redução por acertos repetidos e carga de torretas não simulados.'
+ },
+ {
+  champion:'Graves',patch:'16.23.1',spell:'GravesE',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
+  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
+  note:'E · Quickdraw: ação sem dano que concede um stack de True Grit por 4s. O modelo de ataque básico usa apenas o primeiro projétil como baseline conservador; munição/recarga e pellets adicionais não simulados.'
+ },
+ {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenE',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
+  note:'E · Skip n Slash: ação sem dano que ativa 4s de velocidade de ataque e ataques fortalecidos. Dash e reembolso de cooldown não simulados.'
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenE',calculation:'EmpoweredAttack',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
@@ -187,7 +197,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
   damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],targetMaxHPRatioByRank:[0.03,0.035,0.04,0.045,0.05],targetMaxHPADRatio:0.00035,minimumDamageByRank:[20,30,40,50,60],
-  note:'W · bônus físico do ataque fortalecido: 3/3,5/4/4,5/5% da vida máxima + 3,5% por 100 AD. O dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo não incluídos.'
+  note:'W · bônus físico do ataque fortalecido: 3/3,5/4/4,5/5% da vida máxima + 3,5% por 100 AD, com mínimo 20/30/40/50/60. Limite de 300 contra não campeões, ataque básico e golpes de tentáculo não incluídos.'
  },
  {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiR',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
