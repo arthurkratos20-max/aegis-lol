@@ -239,6 +239,13 @@ test('Illaoi Test of Spirit echoes pre-mitigation damage during its seven-second
  const result=simulate(s,data);const attack=result.events.find(e=>e.source==='Ataque básico');assert.ok(attack);assert.ok(attack.raw>100);assert.ok(result.player.damage>100);
 });
 
+test('Graves conservative basic attack baseline uses current first-pellet level scaling',()=>{
+ const f=fighter(data,'Graves');f.level=18;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data);
+ const impact=kitImpact(attackAction(0),f,data,actor,base,target,target.hp,kitState(f));assert.ok(impact);
+ assert.equal(impact.raw,actor.ad*1.1);
+});
+
 test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
  const initial=officialAdapterFor('Graves','GravesQ','InitialHit','16.23.1');assert.ok(initial);
  assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),215);
