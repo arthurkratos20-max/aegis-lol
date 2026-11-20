@@ -26,7 +26,7 @@ O teste de lote verifica agora que todas as opções nativas declaradas para est
 | Gwen | P: dano adicional em ataques; Q: faixas agregadas; W: resistências temporárias; E: AS e ataque fortalecido; R: lançamentos separados e dano por vida máxima | Centro verdadeiro do Q e stacks Snippy; cura da P; fronteira/untargetability da W; dash/reembolso do E; condições e slow dos recasts do R |
 | Hecarim | P: conversão de velocidade em AD; Q: stacks com expiração escalonada, amplificação e redução de recarga; W: dano agregado, resistências e cura do próprio dano; E: mínimo/máximo; R: dano | Ticks/área e cura de aliados no W; carga/distância/knockback do E; trajetória, alvos e fear do R |
 | Heimerdinger | P: bônus de movimento quando proximidade é informada; Q: tiro básico; W: primeiro foguete e salva completa de cinco foguetes contra um campeão; E: impacto; R+E: explosão | Proximidade automática; ciclo de torretas/laser/cargas; distribuição/convergência e múltiplos alvos da salva; área/stun; variantes R+Q e R+W |
-| Illaoi | Q: golpe isolado; W: bônus de vida máxima; E: espírito, duração e eco limitado pela vida do espírito; R: impacto inicial | Cadência/cura da P; ataques e tentáculos do W; vida/mitigação/slow do espírito e tentáculos do E; área, número de alvos e tentáculos acelerados do R |
+| Illaoi | Q: golpe isolado; W: bônus de vida máxima; E: espírito, duração e eco limitado pela vida do espírito, cuja vida considera a mitigação por resistências; R: impacto inicial | Cadência/cura da P; ataques e tentáculos do W; vida/mitigação/slow do espírito e tentáculos do E; área, número de alvos e tentáculos acelerados do R |
 
 ## Restrições de interpretação
 
