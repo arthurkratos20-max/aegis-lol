@@ -83,7 +83,7 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   if(hp[other]===0&&results[other].death===null)results[other].death=a.at;
   if((a.kind==='attack'||def?.mode==='attack')&&damageType==='physical'&&st[side].lifesteal>0){const h=Math.min(st[side].hp-hp[side],actual*st[side].lifesteal*(1-s.conditions.grievous));hp[side]+=h;results[side].healing+=h;}
   if(a.cooldownReduction&&a.hit>0)for(const k of Object.keys(cooldowns).filter(k=>k.startsWith(`${side}:`)))cooldowns[k]=Math.max(a.at,cooldowns[k]-a.cooldownReduction);
-  record(side,{...a,type:damageType},raw,actual,absorbed,overkill,a.hit<1?'Dano em valor esperado; chance configurada':undefined);
+  record(side,{...a,type:damageType},raw+spiritEchoRaw,actual,absorbed,overkill,a.hit<1?'Dano em valor esperado; chance configurada':undefined);
  }
  for(const side of sides){results[side].hp=hp[side];results[side].dps=results[side].damage/s.duration;}
  return {events,player:results.player,enemy:results.enemy,warnings:[...new Set(warnings)],coverage:'testing',custom:s.player.actions.some(a=>a.custom)||s.enemy.actions.some(a=>a.custom)||Object.keys(s.player.overrides).length>0||Object.keys(s.enemy.overrides).length>0||s.player.runes.shards.length>0||s.enemy.runes.shards.length>0};
