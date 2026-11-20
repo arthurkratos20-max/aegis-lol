@@ -37,7 +37,6 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
   state.illaoiSpiritExpires=at+7;state.illaoiSpiritHP=currentHP;state.illaoiEchoRatio=Math.min(1,baseRatio+.08*actor.ad/100);impact.passive=true;return impact;
  }
  if(f.champion==='Gwen'&&a.native?.spell==='GwenW'&&a.native.calculation==='Activate'){state.gwenWExpires=at+4;impact.passive=true;return impact;}
- if(f.champion==='Gwen'&&a.native?.spell==='GwenR'&&['FirstNeedle','SecondCast','ThirdCast'].includes(a.native.calculation??'')){const count=a.native.calculation==='FirstNeedle'?1:a.native.calculation==='SecondCast'?3:5;const passive=target.hp*(.01+.006*actor.ap/100);for(let needle=0;needle<count;needle++)extra.push({raw:passive,type:'magic',name:`P · A Thousand Cuts (R ${needle+1}/${count})`});}
  if(f.champion==='Hecarim'&&a.native?.spell==='HecarimW')state.hecarimWExpires=at+4;
  if(f.champion==='Hecarim'&&a.native?.spell==='HecarimQ'&&a.native.calculation==='Damage'){
   const stacks=state.hecarimQStackExpiries.filter(expires=>expires>at).length;
