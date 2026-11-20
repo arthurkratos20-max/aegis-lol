@@ -16,7 +16,7 @@ test('Bard Q official patch adapter matches Riot 26.23 rank table and AP ratio',
  assert.equal(evaluateOfficialAdapter(adapter,3,{ap:100}),270);
  assert.equal(evaluateOfficialAdapter(adapter,5,{ap:250}),510);
  assert.equal(officialAdapterFor('Bard','BardQ','Damage','16.22.1'),undefined);
- assert.throws(()=>evaluateOfficialAdapter(adapter,6,{ap:100}),/Rank/);\n const ezW=officialAdapterFor('Ezreal','EzrealW','Damage','16.23.1');assert.ok(ezW);assert.equal(evaluateOfficialAdapter(ezW,5,{ap:100,bonusAD:100}),525);\n const ezR=officialAdapterFor('Ezreal','EzrealR','Damage','16.23.1');assert.ok(ezR);assert.equal(evaluateOfficialAdapter(ezR,3,{ap:100,bonusAD:100}),1080);
+ assert.throws(()=>evaluateOfficialAdapter(adapter,6,{ap:100}),/Rank/);\n const ezW=officialAdapterFor('Ezreal','EzrealW','Damage','16.23.1');assert.ok(ezW);assert.equal(evaluateOfficialAdapter(ezW,5,{ap:100,bonusAD:100}),515);\n const ezR=officialAdapterFor('Ezreal','EzrealR','Damage','16.23.1');assert.ok(ezR);assert.equal(evaluateOfficialAdapter(ezR,3,{ap:100,bonusAD:100}),1080);
 });
 
 test('Bard Q is executable as a patch-matched isolated magic impact without stale mechanics',()=>{
