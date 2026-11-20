@@ -64,9 +64,10 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
   }
   impact.passive=true;return impact;
  }
+ if(f.champion==='Gwen'&&a.native?.spell==='GwenQ'&&a.native.calculation==='MaximumSnipsCenter'){const center=officialAdapterFor('Gwen','GwenQ','MaximumSnipsCenter',data.version);if(center){const total=evaluateOfficialAdapter(center,skillRank(f,'Q'),{ap:actor.ap,targetMaxHP:target.hp});impact.damageMultiplier=.5;extra.push({raw:total*.5,type:'true',name:'Q · cortes centrais verdadeiros'});}}
  const attack=a.kind==='attack'||e?.mode==='attack',crit=1+Math.max(0,Math.min(1,actor.crit))*(actor.critMultiplier-1);
  if(e?.id==='garen-w'){state.garenDRExpires=at+exactValue('Garen','GarenW','DRDuration',skillRank(f,'W'));state.garenDR=exactValue('Garen','GarenW','DRPercent',skillRank(f,'W'));}
- if(e)impact.raw=exactRaw(e.id,f,actor,base,target,currentHP,state.bleedExpires>at?state.bleedStacks:0);else if(!attack&&!(f.champion==='Gwen'&&(a.native?.spell==='GwenR'||a.native?.calculation==='EmpoweredAttack')||f.champion==='Hecarim'&&a.native?.spell==='HecarimQ'))return null;
+ if(e)impact.raw=exactRaw(e.id,f,actor,base,target,currentHP,state.bleedExpires>at?state.bleedStacks:0);else if(!attack&&!(f.champion==='Gwen'&&(a.native?.spell==='GwenR'||a.native?.calculation==='EmpoweredAttack'||a.native?.calculation==='MaximumSnipsCenter')||f.champion==='Hecarim'&&a.native?.spell==='HecarimQ'))return null;
  if(attack){
   if(!e)impact.raw=f.champion==='Graves'?actor.ad*crit*(.7+.3*(f.level-1)/17):actor.ad*crit;
   if(f.champion==='Gragas'&&hit&&state.gragasWReadyAt<=at&&state.gragasWExpires>at){const adapter=officialAdapterFor('Gragas','GragasW','EmpoweredAttack',data.version);if(adapter)extra.push({raw:evaluateOfficialAdapter(adapter,skillRank(f,'W'),{ap:actor.ap,targetMaxHP:target.hp}),type:'magic',name:'W · bônus do ataque fortalecido'});state.gragasWExpires=0;state.gragasWReadyAt=0;}
