@@ -57,7 +57,8 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  ],
  Hecarim:[
   {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 90% DdA adicional; o motor aplica amplificação e redução de recarga por stacks e expiração escalonada. Área e dano reduzido contra tropas ainda não simulados.'},
-  {key:'W',spell:'HecarimW',calculation:'TotalDamage',type:'magic',label:'W · quatro ticks',note:'80/120/160/200/240 + 80% AP em 4s; sem ticks, área, resistências bônus ou cura.'},
+  {key:'W',spell:'HecarimW',calculation:'TotalDamage',type:'magic',label:'W · dano total (4 ticks)',note:'80/120/160/200/240 + 80% AP agregado em 4s; variante resumida, não usar junto dos ticks individuais.'},
+  {key:'W',spell:'HecarimW',calculation:'SingleTick',type:'magic',automatic:false,label:'W · um tick (25% do total)',note:'Um quarto do dano total por tick. Adicione até quatro ações manuais em intervalos de 1s durante 4s; cura do próprio dano e resistências de W são aplicadas enquanto ativo.'},
   {key:'E',spell:'HecarimE',calculation:'MinimumDamage',type:'physical',automatic:false,label:'E · dano mínimo',note:'30/45/60/75/90 + 50% DdA adicional; variante manual de carga mínima.'},
   {key:'E',spell:'HecarimE',calculation:'MaximumDamage',type:'physical',automatic:false,label:'E · dano máximo',note:'60/90/120/150/180 + 100% DdA adicional; variante manual de carga máxima.'},
   {key:'R',spell:'HecarimR',calculation:'SpectralRiders',type:'magic',label:'R · cavaleiros espectrais',note:'150/250/350 + 100% AP; fear, slow e colisões não simulados.'}
