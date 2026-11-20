@@ -117,6 +117,16 @@ test('Hecarim W supports four separately timed ticks within one cooldown',()=>{
  const ap=statsFor(s.player,data).ap;assert.equal(result.player.composition.magic,240+.8*ap);
 });
 
+test('Heimerdinger Q beam and R+Q Apex turret use Summoner’s Rift values',()=>{
+ const beam=officialAdapterFor('Heimerdinger','HeimerdingerQ','TurretBeam','16.23.1');assert.ok(beam);
+ assert.equal(evaluateOfficialAdapter(beam,5,{ap:100}),175);
+ const shot=officialAdapterFor('Heimerdinger','HeimerdingerR','ApexTurretShot','16.23.1');assert.ok(shot);
+ assert.equal(evaluateOfficialAdapter(shot,3,{ap:100}),155);
+ const apex=officialAdapterFor('Heimerdinger','HeimerdingerR','ApexTurretBeam','16.23.1');assert.ok(apex);
+ assert.equal(evaluateOfficialAdapter(apex,3,{ap:100}),250);
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
 test('Gragas Q supports one-second fermentation and Heimerdinger R+W full swarm',()=>{
  const half=officialAdapterFor('Gragas','GragasQ','HalfFermentedDamage','16.23.1');assert.ok(half);
  assert.equal(evaluateOfficialAdapter(half,5,{ap:100}),400);
