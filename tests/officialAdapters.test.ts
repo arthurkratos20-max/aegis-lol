@@ -64,4 +64,13 @@ test('official adapter registry rejects stale, malformed, duplicate or untraceab
  assert.ok(validateOfficialDamageAdapters([{...valid,patch:'current'}]).some(e=>e.includes('patch version')));
 });
 
-test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=>{\n const f=fighter(data,'MasterYi');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;\n const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);\n const standard=nativeAction(f,data,0),maximum=nativeAction(f,data,1);\n assert.equal(standard.native?.calculation,'Damage');assert.equal(maximum.native?.calculation,'MaxSingleTargetDamage');\n assert.equal(nativeDamage(standard,f,data,actor,target),20+0.6*actor.ad);\n assert.equal(nativeDamage(maximum,f,data,actor,target),35+1.05*actor.ad);\n const coverage=championKitCoverage('MasterYi',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q']);assert.deepEqual(coverage.missing,['P','W','E','R']);\n assert.equal(nativeOptions.MasterYi[1].automatic,false);\n});\n
+test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=>{
+ const f=fighter(data,'MasterYi');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+ const standard=nativeAction(f,data,0),maximum=nativeAction(f,data,1);
+ assert.equal(standard.native?.calculation,'Damage');assert.equal(maximum.native?.calculation,'MaxSingleTargetDamage');
+ assert.equal(nativeDamage(standard,f,data,actor,target),20+0.6*actor.ad);
+ assert.equal(nativeDamage(maximum,f,data,actor,target),35+1.05*actor.ad);
+ const coverage=championKitCoverage('MasterYi',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q']);assert.deepEqual(coverage.missing,['P','W','E','R']);
+ assert.equal(nativeOptions.MasterYi[1].automatic,false);
+});
