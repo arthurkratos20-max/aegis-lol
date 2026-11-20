@@ -61,7 +61,7 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   if(ki?.extra.length||ki?.resetAttack||def?.id==='jinx-rocket'||ki?.rescheduleAttack){const future=queue.slice(cursor+1).sort((x,y)=>x.a.at-y.a.at||x.order-y.order);queue.splice(cursor+1,future.length,...future);}
 
   const beneficial=a.kind==='heal'||a.kind==='shield';const target=beneficial?side:other;
-  const base=bases[side].ad;let raw=ki&&ki.raw>0?ki.raw:a.native?nativeDamage(a,s[side],data,actor,st[target])*(ki?.damageMultiplier??1):ki?.raw??formulaDamage(a.formula,actor,base,st[target],hp[target]);const damageType=ki?.type??a.type;
+  const base=bases[side].ad;let raw=ki&&ki.raw>0?ki.raw:a.native?nativeDamage(a,s[side],data,actor,st[target])*(ki?.damageMultiplier??1):ki?.raw??formulaDamage(a.formula,actor,base,st[target],hp[target]);let spiritEchoRaw=0;if(s[side].champion==='Illaoi'&&kits[side].illaoiSpiritExpires>a.at&&kits[side].illaoiSpiritHP>0&&raw>0&&a.kind!=='shield'&&a.kind!=='heal'){const spiritDamage=Math.min(raw,kits[side].illaoiSpiritHP);spiritEchoRaw=spiritDamage*kits[side].illaoiEchoRatio;kits[side].illaoiSpiritHP=Math.max(0,kits[side].illaoiSpiritHP-spiritDamage);if(kits[side].illaoiSpiritHP<=0)kits[side].illaoiSpiritExpires=0;}const damageType=ki?.type??a.type;
   if(a.kind==='stasis'){stasis[side]=a.at+a.duration;record(side,a);continue;}
   if(a.kind==='heal'){const amount=Math.min(st[side].hp-hp[side],raw*a.hit*(1-s.conditions.grievous));hp[side]+=amount;results[side].healing+=amount;record(side,a,raw,0,0,0,`Cura útil ${amount.toFixed(1)}`);continue;}
   if(a.kind==='shield'){shields[side].push({amount:raw*a.hit*(1-s.conditions.shieldReduction),expires:a.at+a.duration});record(side,a,raw);continue;}
@@ -72,12 +72,12 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   const carve=cleaver[side].expires>a.at?.06*cleaver[side].stacks:0,combinedShred=1-(1-shred)*(1-carve);
   const targetStats=kitActorStats(s[other],st[other],bases[other],kits[other],a.at);const resistance=damageType==='physical'?combatResistance(targetStats.armor,actor.armorPenPercent,actor.armorPen,combinedShred):combatResistance(targetStats.mr,actor.magicPenPercent,actor.magicPen);
   const garenReduction=kits[other].garenDRExpires>a.at?kits[other].garenDR:0,gragasReduction=kits[other].gragasDRReadyAt<=a.at&&kits[other].gragasDRExpires>a.at?kits[other].gragasDR:0,damageReduction=1-(1-garenReduction)*(1-gragasReduction);
-  const post=damageType==='true'?raw:mitigate(raw,resistance)*(1-damageReduction);let remaining=post,absorbed=0;
+  const post=damageType==='true'?raw+spiritEchoRaw:(mitigate(raw,resistance)+mitigate(spiritEchoRaw,resistance))*(1-damageReduction);let remaining=post,absorbed=0;
   for(const sh of shields[other]){const take=Math.min(sh.amount,remaining);sh.amount-=take;remaining-=take;absorbed+=take;}results[other].shielding+=absorbed;
   const actual=Math.min(hp[other],remaining),overkill=Math.max(0,remaining-hp[other]);hp[other]=Math.max(0,hp[other]-actual);
   if(s[side].champion==='Hecarim'&&kits[side].hecarimWExpires>a.at&&actual>0){const heal=Math.min(st[side].hp-hp[side],actual*.25*(1-s.conditions.grievous));hp[side]+=heal;results[side].healing+=heal;}
   if(s[side].champion==='Gragas'&&a.key==='E'&&a.kind==='spell'&&a.hit===1&&actual>0)cooldowns[key]=a.at+actualCooldown*.6;
-  if(s[side].champion==='Gragas'&&a.key==='E'&&a.kind==='spell'&&a.hit===1&&hp[other]>0){const end=Math.min(s.duration,a.at+1);results[side].ccSeconds+=Math.max(0,end-Math.max(a.at,cc[other]));cc[other]=Math.max(cc[other],end);}results[side].damage+=actual;results[side].raw+=raw;results[side].composition[damageType]+=actual;
+  if(s[side].champion==='Gragas'&&a.key==='E'&&a.kind==='spell'&&a.hit===1&&hp[other]>0){const end=Math.min(s.duration,a.at+1);results[side].ccSeconds+=Math.max(0,end-Math.max(a.at,cc[other]));cc[other]=Math.max(cc[other],end);}results[side].damage+=actual;results[side].raw+=raw+spiritEchoRaw;results[side].composition[damageType]+=actual;
   const carveKey=`${side}:${entry.parentAction??a.id}`;
   if(data.version===EXACT_PATCH&&s[side].items.includes('3071')&&damageType==='physical'&&a.hit===1&&actual+absorbed>0&&!cleaverHits.has(carveKey)){cleaverHits.add(carveKey);cleaver[side].stacks=cleaver[side].expires>a.at?Math.min(5,cleaver[side].stacks+1):1;cleaver[side].expires=a.at+6;}
   if(hp[other]===0&&results[other].death===null)results[other].death=a.at;
