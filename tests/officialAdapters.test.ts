@@ -155,7 +155,7 @@ test('Graves True Grit, Gwen defensive/offensive states and Heimerdinger passive
  const graves=fighter(data,'Graves');graves.level=3;graves.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const gActor=statsFor(graves,data),gBase=statsFor({...graves,items:[],overrides:{},runes:{...graves.runes,shards:[]}},data),gTarget=statsFor(fighter(data,'Azir'),data),gState=kitState(graves);
  const e= nativeAction(graves,data,5),activated=kitImpact(e,graves,data,gActor,gBase,gTarget,gTarget.hp,gState);assert.ok(activated);assert.equal(gState.gravesTrueGritStacks,1);
- const defended=kitActorStats(graves,gActor,gBase,gState,1);assert.equal(defended.armor-gActor.armor,2);assert.equal(defended.mr-gActor.mr,1);
+ const defended=kitActorStats(graves,gActor,gBase,gState,1);assert.equal(defended.armor-gActor.armor,4);assert.equal(defended.mr-gActor.mr,2);
  const expired=kitActorStats(graves,gActor,gBase,gState,5);assert.equal(expired.armor,gActor.armor);
  const gwen=fighter(data,'Gwen');gwen.level=3;gwen.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const wActor=statsFor(gwen,data),wBase=statsFor({...gwen,items:[],overrides:{},runes:{...gwen.runes,shards:[]}},data),wTarget=statsFor(fighter(data,'Azir'),data),wState=kitState(gwen);
