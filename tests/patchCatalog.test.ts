@@ -25,8 +25,28 @@ test('mixed patches, incomplete details and invalid locale are rejected before p
  await assert.rejects(()=>fetchPatchCatalog('16.20.1','pt_BR',upstream('16.20.1',true)),/patches diferentes/);
  await assert.rejects(()=>fetchPatchCatalog('16.20.1','xx',upstream('16.20.1')),/inválido/);
  const broken=structuredClone(old);broken.champions.Ashe.spells.pop();assert.throws(()=>validatePatchCatalog(broken),/incompleto/);
- assert.equal(applyOfficialPatchCorrections({...old,version:'16.21.1'}).champions.Ashe.stats.attackdamageperlevel,0);
+ assert.equal(applyOfficialPatchCorrections({...old,version:'16.19.1'}).champions.Ashe.stats.attackdamageperlevel,0);
  assert.equal(comparePatch('16.20.1','16.19.1')>0,true);assert.equal(patchLabel('16.20.1'),'26.20');
+});
+test('official champion growth corrections accumulate only from their effective patch',()=>{
+ const before=applyOfficialPatchCorrections({...old,version:'16.19.1'});
+ assert.equal(before.champions.Ashe.stats.attackdamageperlevel,0);
+ assert.equal(before.champions.Lucian.stats.attackdamageperlevel,0);
+ assert.equal(before.champions.Jinx.stats.attackdamageperlevel,0);
+ const patch20=applyOfficialPatchCorrections({...old,version:'16.20.1'});
+ assert.equal(patch20.champions.Ashe.stats.attackdamageperlevel,3);
+ assert.equal(patch20.champions.Lucian.stats.attackdamageperlevel,2.9);
+ assert.equal(patch20.champions.Jinx.stats.attackdamageperlevel,0);
+ const latest=applyOfficialPatchCorrections({...old,version:'16.23.1'});
+ assert.equal(latest.champions.Ashe.stats.attackdamageperlevel,3);
+ assert.equal(latest.champions.Lucian.stats.attackdamageperlevel,2.9);
+ assert.equal(latest.champions.Jinx.stats.attackdamageperlevel,3);
+ assert.equal(latest.champions.Jinx.stats.hp,610);
+ assert.deepEqual(latest.statCorrections?.map(x=>`${x.champion}:${x.stat}`),['Ashe:attackdamageperlevel','Lucian:attackdamageperlevel','Jinx:attackdamageperlevel','Jinx:hp','Mel:hp','Mel:hpperlevel','Mel:mp','Mel:mpperlevel','Mel:armorperlevel','Mel:attackdamage','Mel:attackspeedperlevel','Thresh:attackdamage','Viktor:hpperlevel','Azir:attackrange']);
+ assert.equal(latest.champions.Mel.stats.hp,590);assert.equal(latest.champions.Mel.stats.hpperlevel,107);assert.equal(latest.champions.Mel.stats.mp,455);assert.equal(latest.champions.Mel.stats.mpperlevel,38);assert.equal(latest.champions.Mel.stats.armorperlevel,5.4);assert.equal(latest.champions.Mel.stats.attackdamage,52);assert.equal(latest.champions.Mel.stats.attackspeedperlevel,2.75);
+ assert.equal(latest.champions.Thresh.stats.attackdamage,54);assert.equal(latest.champions.Viktor.stats.hpperlevel,105);assert.equal(latest.champions.Azir.stats.attackrange,550);
+ const before2623=applyOfficialPatchCorrections({...old,version:'16.22.1'});assert.notEqual(before2623.champions.Azir.stats.attackrange,550);
+ const before2622=applyOfficialPatchCorrections({...old,version:'16.21.1'});assert.notEqual(before2622.champions.Mel.stats.hp,590);
 });
 test('new patch does not certify previous-patch skill samples',()=>{
  assert.equal(baseSkillPlan({...old,version:'16.20.1'},'Ashe','Bot').coverage,'estimated');
@@ -42,11 +62,24 @@ test('current shipped catalog matches confirmed 26.20 values and full detail cov
 test('browser falls back to current bundle when Riot unavailable, never to a missing static API',async()=>{
  const original=globalThis.fetch,urls:string[]=[];
  globalThis.fetch=async(input)=>{const url=String(input);urls.push(url);if(url.startsWith('https://'))throw Error('offline');if(url==='/data/mechanics.json')return Response.json({version:'16.19.1',champions:{}});return Response.json(current);};
- try{const r=await loadPatch('pt_BR');assert.equal(r.data.version,current.version);assert.equal(r.state.fallback,true);assert.equal(r.data.mechanics,undefined);assert.ok(!urls.some(u=>u.startsWith('/api/')));}finally{globalThis.fetch=original;}
+ try{const r=await loadPatch('pt_BR');assert.equal(r.data.version,current.version);assert.equal(r.state.fallback,true);assert.deepEqual(r.data.mechanics,{});assert.ok(r.state.warnings?.some(w=>w.includes('Mecânicas do patch')));assert.ok(!urls.some(u=>u.startsWith('/api/')));}finally{globalThis.fetch=original;}
 });
 
 test('newest valid fallback beats stale IndexedDB and refuses rollback',()=>{
  const newer={...old,version:'16.20.1'};
  assert.equal(newestCatalog(old,newer),newer);assert.equal(newestCatalog(newer,old),newer);
  assert.equal(newestCatalog(null,newer),newer);assert.equal(newestCatalog(old,null),old);
+});
+
+test('patch version comparison rejects malformed versions instead of returning NaN',()=>{
+ assert.equal(comparePatch('16.23.1','16.9.9')>0,true);
+ assert.throws(()=>comparePatch('16.23','16.9.9'),/Versão de patch inválida/);
+ assert.throws(()=>patchLabel('latest'),/Versão de patch inválida/);
+ assert.equal(patchLabel('16.23.1'),'26.23');
+});
+test('catalog validation rejects malformed item economics and rune trees',()=>{
+ const brokenItem=structuredClone(current);const first=Object.keys(brokenItem.items)[0];brokenItem.items[first].gold.total=NaN;
+ assert.throws(()=>validatePatchCatalog(brokenItem),/Item inválido/);
+ const brokenRune=structuredClone(current);brokenRune.runes[0].slots.pop();
+ assert.throws(()=>validatePatchCatalog(brokenRune),/Árvore de runas inválida/);
 });

@@ -1,35 +1,58 @@
 import type {Dataset} from './contracts.ts';
 export const RIOT_CDN='https://ddragon.leagueoflegends.com';
 export const PATCH_CHECK_INTERVAL=5*60*1000;
+function patchParts(version:string):number[]{if(!/^\d+\.\d+\.\d+$/.test(version))throw Error('Versão de patch inválida');return version.split('.').map(Number);}
 export function comparePatch(a:string,b:string):number{
- const x=a.split('.').map(Number),y=b.split('.').map(Number);
+ const x=patchParts(a),y=patchParts(b);
  for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]-y[i];return 0;
 }
 export function patchLabel(version:string):string{
- const [season,patch]=version.split('.').map(Number);
+ const [season,patch]=patchParts(version);
  return season>=15?`${season+10}.${patch}`:version;
 }
 export function validatePatchCatalog(d:Dataset,version=d.version,locale=d.locale):Dataset{
  if(!/^\d+\.\d+\.\d+$/.test(version)||d.version!==version||d.locale!==locale||!Object.keys(d.champions??{}).length||!Object.keys(d.items??{}).length||!Array.isArray(d.runes)||d.runes.length!==5)throw Error('Catálogo incompleto ou patch divergente');
  for(const [id,c] of Object.entries(d.champions)){
   if(c.id!==id||!c.stats||!['hp','attackdamage','armor','spellblock','attackspeed','attackrange'].every(k=>Number.isFinite(c.stats[k]))||c.spells?.length!==4||!c.skins?.length||!c.passive)throw Error(`Campeão incompleto: ${id}`);
-  for(const spell of c.spells)if(!Number.isFinite(spell.maxrank)||spell.maxrank<1||!spell.cooldown?.length||spell.cooldown.some(n=>!Number.isFinite(n)||n<0))throw Error(`Habilidade inválida: ${id}`);
+  for(const spell of c.spells)if(!spell.id||!Number.isFinite(spell.maxrank)||spell.maxrank<1||!Array.isArray(spell.cooldown)||!spell.cooldown.length||spell.cooldown.some(n=>!Number.isFinite(n)||n<0)||!Array.isArray(spell.cost)||spell.cost.some(n=>!Number.isFinite(n)||n<0)||!spell.image?.full)throw Error(`Habilidade inválida: ${id}`);
  }
+ for(const [id,item] of Object.entries(d.items)){const missing=[item.gold?.purchasable&&item.maps?.['11']&&!item.name?'name':null,!item.image?.full?'image':null,!item.gold?'gold':null,!Number.isFinite(item.gold?.total)?'gold.total':null,!Number.isFinite(item.gold?.sell)?'gold.sell':null,item.gold?.total<0?'gold.total<0':null,item.gold?.sell<0?'gold.sell<0':null,!item.maps?'maps':null,!Array.isArray(item.tags)?'tags':null,!item.stats?'stats':null].filter(Boolean);if(!id||missing.length)throw Error(`Item inválido: ${id} (${missing.join(', ')})`);}
+ for(const tree of d.runes)if(!Number.isFinite(tree.id)||!tree.name||!Array.isArray(tree.slots)||tree.slots.length!==4||tree.slots.some(slot=>!Array.isArray(slot.runes)||!slot.runes.length))throw Error(`Árvore de runas inválida: ${tree.id}`);
  return d;
 }
 export function newestCatalog(a:Dataset|null,b:Dataset|null):Dataset|null{
  return b&&(!a||comparePatch(b.version,a.version)>0)?b:a;
 }
-/** Patch-scoped corrections explicitly stated in official Riot notes, never inferred coefficients. */
+/** Patch-scoped corrections explicitly stated in official Riot notes, accumulated forward. */
 export function applyOfficialPatchCorrections(data:Dataset):Dataset{
- const corrections=data.version==='16.20.1'?[
-  {champion:'Ashe',stat:'attackdamageperlevel',value:3,source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-20-notes/'},
-  {champion:'Lucian',stat:'attackdamageperlevel',value:2.9,source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-20-notes/'}
- ]:[];
+ const sources={
+  patch2620:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-20-notes/',
+  patch2621:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-21-notes/',
+  patch2622:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-22-notes/',
+  patch2623:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/'
+ };
+ const ledger=[
+  {champion:'Ashe',stat:'attackdamageperlevel',value:3,since:'16.20.1',source:sources.patch2620},
+  {champion:'Lucian',stat:'attackdamageperlevel',value:2.9,since:'16.20.1',source:sources.patch2620},
+  {champion:'Jinx',stat:'attackdamageperlevel',value:3,since:'16.21.1',source:sources.patch2621},
+  {champion:'Jinx',stat:'hp',value:610,since:'16.21.1',source:sources.patch2621},
+  {champion:'Mel',stat:'hp',value:590,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'hpperlevel',value:107,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'mp',value:455,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'mpperlevel',value:38,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'armorperlevel',value:5.4,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'attackdamage',value:52,since:'16.22.1',source:sources.patch2622},
+  {champion:'Mel',stat:'attackspeedperlevel',value:2.75,since:'16.22.1',source:sources.patch2622},
+  {champion:'Thresh',stat:'attackdamage',value:54,since:'16.22.1',source:sources.patch2622},
+  {champion:'Viktor',stat:'hpperlevel',value:105,since:'16.22.1',source:sources.patch2622},
+  {champion:'Azir',stat:'attackrange',value:550,since:'16.23.1',source:sources.patch2623}
+ ];
+ const corrections=ledger.filter(fix=>comparePatch(data.version,fix.since)>=0);
  const champions={...data.champions};
  for(const fix of corrections)if(champions[fix.champion])champions[fix.champion]={...champions[fix.champion],stats:{...champions[fix.champion].stats,[fix.stat]:fix.value}};
  const missingGrowth=Object.values(champions).filter(c=>c.stats.attackdamageperlevel===0).length;
- return {...data,champions,statCorrections:corrections,catalogWarnings:missingGrowth>100?[`Data Dragon retorna crescimento de AD zero em ${missingGrowth} campeões. Apenas correções confirmadas nas notas deste patch são aplicadas; os demais escalamentos permanecem incompletos.`]:[]};
+ const catalogWarnings=missingGrowth>100?['Data Dragon retorna crescimento de AD zero em '+missingGrowth+' campeões. Apenas correções confirmadas nas notas deste patch são aplicadas; os demais escalamentos permanecem incompletos.']:[];
+ return {...data,champions,statCorrections:corrections,catalogWarnings};
 }
 export async function latestRiotPatch(fetcher:typeof fetch=fetch):Promise<string>{
  const r=await fetcher(`${RIOT_CDN}/api/versions.json`,{cache:'no-store',signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error(`Riot HTTP ${r.status}`);

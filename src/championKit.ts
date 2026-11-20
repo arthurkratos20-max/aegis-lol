@@ -2,17 +2,19 @@ import type {Dataset,Fighter,SkillKey,Stats} from './contracts.ts';
 import {EXACT_PATCH,exactEffectsFor,exactSource} from './exactKits.ts';
 import {nativeAction,nativeDamage,nativeOptions} from './native.ts';
 import {effectiveResistance,mitigate} from './model.ts';
+import {officialAdapterFor,officialDamageAdapters} from './officialAdapters.ts';
 export interface KitCoverage {champion:string;isExactFormula:boolean;status:'partial'|'missing';covered:SkillKey[];missing:('P'|SkillKey)[];source:string|null}
 /** Availability is not full validation: passives and stateful interactions remain separate. */
 export function championKitCoverage(champion:string,data:Dataset):KitCoverage {
  const mechanics=data.mechanics?.[champion];
  const exact=data.version===EXACT_PATCH?exactEffectsFor(champion):[];
- const covered=[...new Set((nativeOptions[champion]??[]).filter(o=>mechanics?.spells[o.spell]?.calculations[o.calculation]&&(!o.flatCalculation||mechanics.spells[o.spell].calculations[o.flatCalculation])).map(o=>o.key).concat(exact.filter(e=>e.key!=='P'&&e.key!=='AA').map(e=>e.key as SkillKey)))];
- return {champion,isExactFormula:false,status:covered.length?'partial':'missing',covered,missing:(['P','Q','W','E','R'] as const).filter(k=>k==='P'||!covered.includes(k)),source:exact.length?exactSource(champion).source:mechanics?.source??null};
+ const covered=[...new Set((nativeOptions[champion]??[]).filter(o=>(!!mechanics?.spells[o.spell]?.calculations[o.calculation]&&(!o.flatCalculation||!!mechanics.spells[o.spell].calculations[o.flatCalculation]))||!!officialAdapterFor(champion,o.spell,o.calculation,data.version)).map(o=>o.key).concat(exact.filter(e=>e.key!=='P'&&e.key!=='AA').map(e=>e.key as SkillKey)))];
+ const officialSource=officialDamageAdapters.find(a=>a.champion===champion&&a.patch===data.version)?.source??null;
+ return {champion,isExactFormula:false,status:covered.length?'partial':'missing',covered,missing:(['P','Q','W','E','R'] as const).filter(k=>k==='P'||!covered.includes(k)),source:exact.length?exactSource(champion).source:officialSource??mechanics?.source??null};
 }
 /** One legal isolated impact per supported skill. This is an index, never combo DPS. */
 export function kitImpactPotential(f:Fighter,data:Dataset,actor:Stats,target:Stats,distance=0):{damage:number;shield:number;covered:SkillKey[];omitted:number}|null {
- if(f.actions.length||!data.mechanics?.[f.champion])return null;
+ if(f.actions.length||(!(data.mechanics?.[f.champion])&&!officialDamageAdapters.some(a=>a.champion===f.champion&&a.patch===data.version)))return null;
  let damage=0,shield=0,resource=actor.mana*f.initialResource,omitted=0;const covered:SkillKey[]=[];
  for(const [index,opt] of (nativeOptions[f.champion]??[]).entries()){
   if(opt.automatic===false||covered.includes(opt.key)||!f.skills.slice(0,f.level).includes(opt.key))continue;

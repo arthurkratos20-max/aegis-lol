@@ -1,0 +1,289 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import type {Dataset,SkillKey} from '../src/contracts.ts';
+import {officialDamageAdapters,evaluateOfficialAdapter,officialAdapterFor,validateOfficialDamageAdapters} from '../src/officialAdapters.ts';
+import {nativeAction,nativeDamage,nativeOptions} from '../src/native.ts';
+import {championKitCoverage,kitImpactPotential} from '../src/championKit.ts';
+import {fighter,statsFor,initialScenario,attackAction} from '../src/model.ts';
+import {simulate} from '../src/engine.ts';
+import {kitActorStats,kitImpact,kitState} from '../src/kitCombat.ts';
+import {kitDeclarations} from '../src/kitDeclarations.ts';
+function gravesDeclarationHasPartialDamage(){return ['Q','W','R'].every(slot=>kitDeclarations.Graves.abilities[slot as keyof typeof kitDeclarations.Graves.abilities].damageModel==='partial');}
+
+
+const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
+
+test('Gragas Q standard Summoner\'s Rift minimum and fully fermented impacts are separate',()=>{
+ const q=officialAdapterFor('Gragas','GragasQ','Damage','16.23.1');assert.ok(q);assert.deepEqual(q.baseByRank,[80,120,160,200,240]);assert.equal(evaluateOfficialAdapter(q,5,{ap:100}),320);
+ const max=officialAdapterFor('Gragas','GragasQ','MaxFermentedDamage','16.23.1');assert.ok(max);assert.deepEqual(max.baseByRank,[120,180,240,300,360]);assert.equal(evaluateOfficialAdapter(max,5,{ap:100}),480);
+ const w=officialAdapterFor('Gragas','GragasW','EmpoweredAttack','16.23.1');assert.ok(w);assert.equal(evaluateOfficialAdapter(w,5,{ap:100,targetMaxHP:2000}),350);
+ const e=officialAdapterFor('Gragas','GragasE','Damage','16.23.1');assert.ok(e);assert.equal(evaluateOfficialAdapter(e,5,{ap:100}),320);
+ const r=officialAdapterFor('Gragas','GragasR','Damage','16.23.1');assert.ok(r);assert.equal(evaluateOfficialAdapter(r,3,{ap:100}),480);
+ const f=fighter(data,'Gragas');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);const minimum=nativeAction(f,data,0),fermented=nativeAction(f,data,1);
+ assert.equal(nativeDamage(minimum,f,data,actor,target),80+0.8*actor.ap);assert.equal(nativeDamage(fermented,f,data,actor,target),120+1.2*actor.ap);
+ const fW={...f,level:18,skills:['Q','W','E','W','W','R','W','Q','Q','W','R','E','E','E','E','R','Q','Q'] as SkillKey[]};const wAction=nativeAction(fW,data,2);assert.equal(nativeDamage(wAction,fW,data,actor,{...target,hp:2000}),140+0.7*actor.ap+140);
+ assert.equal(nativeOptions.Gragas[1].automatic,false);assert.equal(nativeOptions.Gragas[2].automatic,false);assert.equal(nativeOptions.Gragas.length,5);const coverage=championKitCoverage('Gragas',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','E','R']);assert.deepEqual(coverage.missing,['P']);assert.equal(coverage.isExactFormula,false);
+});
+
+test('Gragas Happy Hour heals on cast and respects its level-scaled static cooldown',()=>{
+ const s=initialScenario(data);s.player=fighter(data,'Gragas');s.player.level=1;s.player.overrides={hp:1000,mana:500};s.player.initialHP=.5;s.player.automaticAttacks=false;s.duration=20;s.player.actions=[nativeAction(s.player,data,0)];s.enemy.automaticAttacks=false;
+ const result=simulate(s,data);assert.equal(result.player.healing,55);assert.equal(result.player.hp,555);
+ const defense=initialScenario(data);defense.player=fighter(data,'Gragas');defense.player.level=2;defense.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];defense.player.overrides={hp:1000,mr:100,mana:500};defense.player.automaticAttacks=false;defense.duration=4;defense.player.actions=[nativeAction(defense.player,data,2)];defense.enemy=fighter(data,'Azir');defense.enemy.level=1;defense.enemy.overrides={hp:1000,ap:0,mr:0};defense.enemy.automaticAttacks=false;defense.enemy.actions=[{id:'incoming',at:1,kind:'spell',key:'Q',name:'Incoming',type:'magic',formula:{base:100,ad:0,bonusAD:0,ap:0,ownMaxHP:0,targetMaxHP:0,targetCurrentHP:0,targetMissingHP:0},cooldown:0,cost:0,cast:0,duration:0,hit:1,onHit:false,custom:true,coverage:'testing'}];assert.equal(simulate(defense,data).player.hp,955);
+ const empowered=initialScenario(data);empowered.player=fighter(data,'Gragas');empowered.player.level=2;empowered.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];empowered.player.overrides={hp:1000,mana:500};empowered.player.automaticAttacks=false;empowered.duration=3;empowered.player.actions=[nativeAction(empowered.player,data,2),attackAction(1)];empowered.enemy=fighter(data,'Azir');empowered.enemy.overrides={hp:1000,armor:0,mr:0};empowered.enemy.automaticAttacks=false;const combo=simulate(empowered,data);assert.equal(combo.player.composition.magic,90);
+ const mid=initialScenario(data);mid.player=fighter(data,'Gragas');mid.player.level=6;mid.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];mid.player.overrides={hp:1000,mana:500};mid.player.initialHP=.5;mid.player.automaticAttacks=false;mid.duration=20;const q=nativeAction(mid.player,data,0);const wAction=nativeAction(mid.player,data,2);mid.player.actions=[q,{...wAction,at:9}];mid.enemy.automaticAttacks=false;assert.equal(simulate(mid,data).player.healing,55);
+});
+
+test('Bard Q official patch adapter matches Riot 26.23 rank table and AP ratio',()=>{
+ const adapter=officialAdapterFor('Bard','BardQ','Damage','16.23.1');
+ assert.ok(adapter);assert.deepEqual(adapter.baseByRank,[80,125,170,215,260]);assert.deepEqual(adapter.apRatioByRank,[1,1,1,1,1]);
+ assert.equal(evaluateOfficialAdapter(adapter,1,{ap:0}),80);
+ assert.equal(evaluateOfficialAdapter(adapter,3,{ap:100}),270);
+ assert.equal(evaluateOfficialAdapter(adapter,5,{ap:250}),510);
+ assert.equal(officialAdapterFor('Bard','BardQ','Damage','16.22.1'),undefined);
+ assert.throws(()=>evaluateOfficialAdapter(adapter,6,{ap:100}),/Rank/);
+ const yi=officialAdapterFor('MasterYi','MasterYiQ','Damage','16.23.1');assert.ok(yi);assert.equal(evaluateOfficialAdapter(yi,5,{ap:0,ad:200}),220);
+ const yiMax=officialAdapterFor('MasterYi','MasterYiQ','MaxSingleTargetDamage','16.23.1');assert.ok(yiMax);assert.equal(evaluateOfficialAdapter(yiMax,5,{ap:0,ad:200}),385);
+ const ezW=officialAdapterFor('Ezreal','EzrealW','Damage','16.23.1');assert.ok(ezW);assert.equal(evaluateOfficialAdapter(ezW,5,{ap:100,bonusAD:100}),515);
+ const ezR=officialAdapterFor('Ezreal','EzrealR','Damage','16.23.1');assert.ok(ezR);assert.equal(evaluateOfficialAdapter(ezR,3,{ap:100,bonusAD:100}),1080);
+});
+
+test('Bard Q is executable as a patch-matched isolated magic impact without stale mechanics',()=>{
+ assert.equal(data.version,'16.23.1');
+ const f=fighter(data,'Bard');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;f.initialResource=1;
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+ const action=nativeAction(f,data,0);
+ assert.equal(action.native?.spell,'BardQ');assert.equal(action.type,'magic');
+ assert.equal(nativeDamage(action,f,data,actor,target),80+actor.ap);
+ const result=kitImpactPotential(f,data,actor,target);
+ assert.ok(result);assert.deepEqual(result.covered,['Q']);assert.equal(result.shield,0);
+ assert.equal(championKitCoverage('Bard',data).status,'partial');
+ assert.deepEqual(championKitCoverage('Bard',data).covered,['Q']);
+ assert.deepEqual(championKitCoverage('Bard',data).missing,['P','W','E','R']);
+ assert.equal(championKitCoverage('Bard',data).isExactFormula,false);
+});
+
+test('Ezreal exposes only the two patch 26.23 impacts with confirmed damage rows',()=>{
+ const coverage=championKitCoverage('Ezreal',data);
+ assert.equal(coverage.status,'partial');
+ assert.equal(coverage.isExactFormula,false);
+ assert.deepEqual([...coverage.covered].sort(),['R','W']);
+ assert.deepEqual(coverage.missing,['P','Q','E']);
+});
+ 
+test('Bard adapter metadata remains source-scoped and does not certify a full kit',()=>{
+ const a=officialDamageAdapters.find(x=>x.champion==='Bard');
+ assert.ok(a?.source.includes('leagueoflegends.com'));
+ assert.equal(nativeOptions.Bard.length,1);
+ assert.equal(nativeOptions.Ezreal.find(o=>o.key==='R')?.note.includes('patch 26.23'),true);
+ assert.match(nativeOptions.Bard[0].note,/colisão, segundo alvo, atordoamento e passiva não simulados/);
+});
+
+test('official adapter registry rejects stale, malformed, duplicate or untraceable rows',()=>{
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+ const valid=officialDamageAdapters.find(a=>a.sourceType==='riot');
+ assert.ok(valid);
+ assert.ok(validateOfficialDamageAdapters([{...valid,source:'https://example.com/fake'}]).some(e=>e.includes('official Riot')));
+ assert.ok(validateOfficialDamageAdapters([{...valid,baseByRank:[80]}]).some(e=>e.includes('five finite')));
+ assert.ok(validateOfficialDamageAdapters([valid,valid]).some(e=>e.includes('duplicate')));
+ assert.ok(validateOfficialDamageAdapters([{...valid,patch:'current'}]).some(e=>e.includes('patch version')));
+});
+
+test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=>{
+ const f=fighter(data,'MasterYi');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+ const standard=nativeAction(f,data,0),maximum=nativeAction(f,data,1);
+ assert.equal(standard.native?.calculation,'Damage');assert.equal(maximum.native?.calculation,'MaxSingleTargetDamage');
+ assert.equal(nativeDamage(standard,f,data,actor,target),20+0.6*actor.ad);
+ assert.equal(nativeDamage(maximum,f,data,actor,target),35+1.05*actor.ad);
+ const coverage=championKitCoverage('MasterYi',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q']);assert.deepEqual(coverage.missing,['P','W','E','R']);
+ assert.equal(nativeOptions.MasterYi[1].automatic,false);
+});
+
+
+test('Illaoi W prepares and consumes its bonus on the next basic attack',()=>{
+ const f=fighter(data,'Illaoi');f.level=18;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data),state=kitState(f);
+ const activate=nativeOptions.Illaoi.findIndex(x=>x.spell==='IllaoiW'&&x.calculation==='Activate');assert.ok(activate>=0);
+ const prepared=kitImpact(nativeAction(f,data,activate),f,data,actor,base,target,target.hp,state);assert.ok(prepared?.passive);assert.equal(state.illaoiWExpires,6);
+ const hit=kitImpact(attackAction(1),f,data,actor,base,target,target.hp,state);assert.ok(hit);assert.equal(hit.extra[0].name,'W · Harsh Lesson (bônus)');assert.equal(state.illaoiWExpires,0);
+});
+
+test('Illaoi spirit health is reduced by damage after the spirit resistance check',()=>{
+ const f=fighter(data,'Illaoi');f.level=1;f.skills=['E','Q','W','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1),attackAction(2),attackAction(3)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:200,armor:100,mr:0};s.enemy.automaticAttacks=false;s.duration=5;
+ const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,3);assert.equal(hits[0].raw,133);assert.equal(hits[1].raw,133);assert.equal(hits[2].raw,133);
+});
+
+test('Hecarim W supports four separately timed ticks within one cooldown',()=>{
+ const s=initialScenario(data);s.player=fighter(data,'Hecarim');s.player.level=18;s.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const index=nativeOptions.Hecarim.findIndex(x=>x.calculation==='SingleTick');assert.ok(index>=0);
+ s.player.actions=[0,1,2,3].map(at=>({...nativeAction(s.player,data,index),at}));s.player.automaticAttacks=false;
+ s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:5000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=5;
+ const result=simulate(s,data);const ticks=result.events.filter(e=>e.source==='W · um tick (25% do total)');assert.equal(ticks.length,4);
+ const ap=statsFor(s.player,data).ap;assert.equal(result.player.composition.magic,240+.8*ap);
+});
+
+test('Heimerdinger Q beam and R+Q Apex turret use Summoner’s Rift values',()=>{
+ const beam=officialAdapterFor('Heimerdinger','HeimerdingerQ','TurretBeam','16.23.1');assert.ok(beam);
+ assert.equal(evaluateOfficialAdapter(beam,5,{ap:100}),175);
+ const shot=officialAdapterFor('Heimerdinger','HeimerdingerR','ApexTurretShot','16.23.1');assert.ok(shot);
+ assert.equal(evaluateOfficialAdapter(shot,3,{ap:100}),155);
+ const apex=officialAdapterFor('Heimerdinger','HeimerdingerR','ApexTurretBeam','16.23.1');assert.ok(apex);
+ assert.equal(evaluateOfficialAdapter(apex,3,{ap:100}),250);
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+test('Gragas Q supports one-second fermentation and Heimerdinger R+W full swarm',()=>{
+ const half=officialAdapterFor('Gragas','GragasQ','HalfFermentedDamage','16.23.1');assert.ok(half);
+ assert.equal(evaluateOfficialAdapter(half,5,{ap:100}),400);
+ const swarm=officialAdapterFor('Heimerdinger','HeimerdingerR','RocketSwarm','16.23.1');assert.ok(swarm);
+ assert.equal(evaluateOfficialAdapter(swarm,3,{ap:100}),1075);
+ assert.ok(nativeOptions.Gragas.some(x=>x.calculation==='HalfFermentedDamage'&&x.automatic===false));
+ assert.ok(nativeOptions.Heimerdinger.some(x=>x.calculation==='RocketSwarm'&&x.automatic===false));
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+test('Gwen Q center converts half of the six-snip aggregate to true damage',()=>{
+ const adapter=officialAdapterFor('Gwen','GwenQ','MaximumSnipsCenter','16.23.1');assert.ok(adapter);
+ assert.equal(evaluateOfficialAdapter(adapter,5,{ap:100}),350);
+ const s=initialScenario(data);s.player=fighter(data,'Gwen');s.player.level=18;s.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ s.player.actions=[nativeAction(s.player,data,nativeOptions.Gwen.findIndex(x=>x.calculation==='MaximumSnipsCenter'))];s.player.automaticAttacks=false;
+ s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:5000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=2;
+ const ap=statsFor(s.player,data).ap,expected=290+.6*ap,passive=5000*(.01+.006*ap/100)*6;const result=simulate(s,data);assert.equal(result.player.composition.magic,expected/2+passive);assert.equal(result.player.composition.true,expected/2);
+});
+
+test('Heimerdinger W full five-rocket salvo is separate from the isolated first rocket',()=>{
+ const salvo=officialAdapterFor('Heimerdinger','HeimerdingerW','FullSalvo','16.23.1');assert.ok(salvo);
+ assert.deepEqual(salvo.baseByRank,[90,135,180,225,270]);assert.equal(evaluateOfficialAdapter(salvo,5,{ap:100}),373);
+ const f=fighter(data,'Heimerdinger');f.level=18;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+ const index=nativeOptions.Heimerdinger.findIndex(x=>x.calculation==='FullSalvo');assert.ok(index>=0);
+ const action=nativeAction(f,data,index);assert.equal(action.native?.calculation,'FullSalvo');assert.equal(nativeDamage(action,f,data,actor,target),270+1.03*actor.ap);
+ assert.equal(nativeOptions.Heimerdinger[index].automatic,false);assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceable impacts',()=>{
+ const get=(champion:string,spell:string,calculation:string)=>{const a=officialAdapterFor(champion,spell,calculation,'16.23.1');assert.ok(a,champion+' '+spell);return a;};
+ assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MinimumSnips'),5,{ap:100}),226);
+ assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MaximumSnips'),5,{ap:100}),350);
+ assert.equal(evaluateOfficialAdapter(get('Gwen','GwenR','FirstNeedle'),3,{ap:100}),105);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimW','TotalDamage'),5,{ap:100}),320);
+ assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerQ','TurretShot'),5,{ap:100}),58);
+ assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),205);
+ assert.equal(Math.abs(evaluateOfficialAdapter(get('Illaoi','IllaoiW','BonusMaxHealthDamage'),5,{ap:0,ad:200,targetMaxHP:2000})-240)<1e-9,true);
+ assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiR','Damage'),3,{ap:0,bonusAD:100}),400);
+ for(const champion of ['Gwen','Hecarim','Heimerdinger','Illaoi']){
+  const coverage=championKitCoverage(champion,data);assert.equal(coverage.status,'partial');assert.equal(coverage.isExactFormula,false);
+  assert.ok(nativeOptions[champion].length>0);
+ }
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+
+
+test('Gwen E empowered hit and R recasts are separate modern Summoner’s Rift variants',()=>{
+ const get=(calculation:string)=>{const a=officialAdapterFor('Gwen',calculation==='EmpoweredAttack'?'GwenE':'GwenR',calculation,'16.23.1');assert.ok(a);return a;};
+ assert.equal(evaluateOfficialAdapter(get('EmpoweredAttack'),5,{ap:100}),35);
+ assert.equal(evaluateOfficialAdapter(get('SecondCast'),3,{ap:100,targetMaxHP:2000}),285+30+0.048*2000);
+ assert.equal(evaluateOfficialAdapter(get('ThirdCast'),3,{ap:100,targetMaxHP:2000}),475+50+0.08*2000);
+ assert.equal(nativeOptions.Gwen.filter(x=>x.calculation==='SecondCast')[0].automatic,false);
+ assert.ok(nativeOptions.Gwen.some(x=>x.key==='W'&&x.calculation==='Activate'));
+ assert.equal(nativeOptions.Gwen.filter(x=>x.calculation==='ThirdCast')[0].automatic,false);
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade use base SR values',()=>{
+ const get=(champion:string,spell:string,calculation:string)=>{const a=officialAdapterFor(champion,spell,calculation,'16.23.1');assert.ok(a,champion+' '+spell+'/'+calculation);return a;};
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),255);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimE','MinimumDamage'),5,{ap:0,bonusAD:100}),140);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimE','MaximumDamage'),5,{ap:0,bonusAD:100}),280);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimR','SpectralRiders'),3,{ap:100}),450);
+ assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),205);
+ assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerE','Impact'),5,{ap:100}),280);
+ assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerR','UpgradedGrenade'),3,{ap:100}),360);
+ assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiQ','TentacleStrike'),5,{ap:100,ad:200,level:18}),(200.12+220+40)*1.3);
+ const illaoi=nativeOptions.Illaoi.find(x=>x.calculation==='TentacleStrike');assert.ok(illaoi);
+ assert.ok(nativeOptions.Illaoi.some(x=>x.key==='E'&&x.calculation==='Activate'));
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+
+
+
+test('Graves True Grit, Gwen defensive/offensive states and Heimerdinger passive are applied in base SR stats',()=>{
+ const graves=fighter(data,'Graves');graves.level=3;graves.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const gActor=statsFor(graves,data),gBase=statsFor({...graves,items:[],overrides:{},runes:{...graves.runes,shards:[]}},data),gTarget=statsFor(fighter(data,'Azir'),data),gState=kitState(graves);
+ const e= nativeAction(graves,data,5),activated=kitImpact(e,graves,data,gActor,gBase,gTarget,gTarget.hp,gState);assert.ok(activated);assert.equal(gState.gravesTrueGritStacks,1);
+ const defended=kitActorStats(graves,gActor,gBase,gState,1);assert.equal(defended.armor-gActor.armor,4);assert.equal(defended.mr-gActor.mr,2);
+ const refreshed=kitImpact(attackAction(2),graves,data,gActor,gBase,gTarget,gTarget.hp,gState);assert.ok(refreshed);assert.equal(gState.gravesTrueGritExpires,6);const expired=kitActorStats(graves,gActor,gBase,gState,7);assert.equal(expired.armor,gActor.armor);
+ const rankFive={...graves,skills:['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[]};rankFive.level=18;const rankFiveState=kitState(rankFive);rankFiveState.gravesTrueGritStacks=8;rankFiveState.gravesTrueGritExpires=10;const rankFiveStats=statsFor(rankFive,data);const maxGrit=kitActorStats(rankFive,rankFiveStats,statsFor({...rankFive,items:[],overrides:{},runes:{...rankFive.runes,shards:[]}},data),rankFiveState,1);assert.equal(maxGrit.armor-rankFiveStats.armor,128);assert.equal(maxGrit.mr-rankFiveStats.mr,64);
+ const gwen=fighter(data,'Gwen');gwen.level=3;gwen.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const wActor=statsFor(gwen,data),wBase=statsFor({...gwen,items:[],overrides:{},runes:{...gwen.runes,shards:[]}},data),wTarget=statsFor(fighter(data,'Azir'),data),wState=kitState(gwen);
+ const wIndex=nativeOptions.Gwen.findIndex(x=>x.spell==='GwenW'&&x.calculation==='Activate');assert.ok(wIndex>=0);const w=kitImpact(nativeAction(gwen,data,wIndex),gwen,data,wActor,wBase,wTarget,wTarget.hp,wState);assert.ok(w?.passive);
+ const mist=kitActorStats(gwen,wActor,wBase,wState,1);assert.ok(mist.armor>wActor.armor&&mist.mr>wActor.mr);
+ const eState=kitImpact(nativeAction(gwen,data,3),gwen,data,mist,wBase,wTarget,wTarget.hp,wState);assert.ok(eState?.resetAttack);
+ const empowered=kitActorStats(gwen,wActor,wBase,wState,2);assert.ok(empowered.as>mist.as);
+ const empoweredHit=kitImpact(attackAction(2),gwen,data,empowered,wBase,wTarget,wTarget.hp,wState);assert.ok(empoweredHit);assert.deepEqual(empoweredHit.extra.map(x=>x.name),['P · A Thousand Cuts','E · ataque fortalecido']);
+ const heimer=fighter(data,'Heimerdinger');const hActor=statsFor(heimer,data),hBase=statsFor({...heimer,items:[],overrides:{},runes:{...heimer.runes,shards:[]}},data),hState=kitState(heimer);heimer.stacks['heimer-turret-nearby']=1;
+ const nearby=kitActorStats(heimer,hActor,hBase,hState,0);assert.ok(Math.abs(nearby.move-hActor.move*1.2)<1e-8);
+ const hecarim=fighter(data,'Hecarim');hecarim.level=18;const hca=statsFor(hecarim,data),hcb=statsFor({...hecarim,items:[],overrides:{},runes:{...hecarim.runes,shards:[]}},data),hcState=kitState(hecarim);
+ const warpath=kitActorStats(hecarim,{...hca,move:hca.move+100},hcb,hcState,0);assert.ok(Math.abs(warpath.ad-hca.ad-24)<1e-8);
+});
+
+test('Hecarim Rampage consumes active stacks for damage amplification and cooldown refund',()=>{
+ const f=fighter(data,'Hecarim');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data),state=kitState(f);
+ const first=nativeAction(f,data,0),second=nativeAction(f,data,0);const a=kitImpact(first,f,data,actor,base,target,target.hp,state);const b=kitImpact({...second,at:1},f,data,actor,base,target,target.hp,state);
+ assert.ok(a);assert.ok(b);assert.equal(a.damageMultiplier,1);assert.equal(b.damageMultiplier,1.03);assert.equal(b.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[9,10]);
+ const decay=kitImpact({...nativeAction(f,data,0),at:9.5},f,data,actor,base,target,target.hp,state);assert.ok(decay);assert.equal(decay.damageMultiplier,1.04);assert.equal(decay.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[17.5,18.5]);
+});
+
+test('Illaoi Test of Spirit echoes pre-mitigation damage during its seven-second tether',()=>{
+ const f=fighter(data,'Illaoi');f.level=1;f.skills=['E','Q','W','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
+ const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:1000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=3;
+ const result=simulate(s,data);const attack=result.events.find(e=>e.source==='Ataque básico');assert.ok(attack);assert.ok(attack.raw>100);assert.ok(result.player.damage>100);
+});
+
+test('Graves conservative basic attack baseline uses current first-pellet level scaling',()=>{
+ const f=fighter(data,'Graves');f.level=18;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data);
+ const impact=kitImpact(attackAction(0),f,data,actor,base,target,target.hp,kitState(f));assert.ok(impact);
+ assert.equal(impact.raw,actor.ad*1.1);
+});
+
+test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
+ const initial=officialAdapterFor('Graves','GravesQ','InitialHit','16.23.1');assert.ok(initial);
+ assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),215);
+ const det=officialAdapterFor('Graves','GravesQ','Detonation','16.23.1');assert.ok(det);
+ assert.deepEqual(det.bonusADRatioByRank,[0.55,0.7,0.85,1,1.15]);assert.equal(evaluateOfficialAdapter(det,5,{ap:0,bonusAD:100}),375);
+ const smoke=officialAdapterFor('Graves','GravesW','Impact','16.23.1');assert.ok(smoke);assert.equal(evaluateOfficialAdapter(smoke,5,{ap:100}),320);
+ const direct=officialAdapterFor('Graves','GravesR','DirectHit','16.23.1');assert.ok(direct);assert.equal(evaluateOfficialAdapter(direct,3,{ap:0,bonusAD:100}),725);
+ const cone=officialAdapterFor('Graves','GravesR','ConeExplosion','16.23.1');assert.ok(cone);assert.equal(evaluateOfficialAdapter(cone,3,{ap:0,bonusAD:100}),560);
+ const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','R','E']);assert.deepEqual(coverage.missing,['P']);
+ assert.equal(nativeOptions.Graves.length,6);assert.equal(nativeOptions.Graves[1].automatic,false);assert.equal(nativeOptions.Graves[4].automatic,false);
+ assert.equal(kitDeclarations.Graves.abilities.Q.name,'End of the Line');assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
+
+test('every declared impact in batch 02 resolves against the 16.23.1 Summoner\'s Rift adapters',()=>{
+ const champions=['Gragas','Graves','Gwen','Hecarim','Heimerdinger','Illaoi'];
+ const ranks:SkillKey[]=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'];
+ for(const champion of champions){
+  const f=fighter(data,champion);f.level=18;f.skills=[...ranks];f.actions=[];f.automaticAttacks=false;
+  const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+  assert.ok(nativeOptions[champion]?.length,champion+' must expose explicit native options');
+  for(const [index,opt] of nativeOptions[champion].entries()){
+   const adapter=officialAdapterFor(champion,opt.spell,opt.calculation,data.version);
+   assert.ok(adapter,champion+' '+opt.spell+'/'+opt.calculation+' must resolve to a patch-matched adapter');
+   const action=nativeAction(f,data,index);
+   const value=nativeDamage(action,f,data,actor,target);
+   assert.ok(Number.isFinite(value)&&value>=0,champion+' '+opt.label+' must evaluate to finite non-negative damage');
+  }
+  const declaration=kitDeclarations[champion];
+  assert.deepEqual(Object.keys(declaration.abilities).sort(),['E','P','Q','R','W']);
+  assert.ok(Object.values(declaration.abilities).every(x=>x.damageModel==='partial'),champion+' must not be falsely certified complete');
+ }
+});

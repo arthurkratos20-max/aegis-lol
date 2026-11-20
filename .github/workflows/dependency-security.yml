@@ -1,0 +1,54 @@
+name: Dependency security refresh
+
+on:
+  push:
+    branches:
+      - 'aegis/**'
+    paths:
+      - 'package.json'
+      - '.github/workflows/dependency-security.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aegis-dependency-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Resolve patched Next.js and update lockfile
+        run: |
+          npm install next@16.4.6 --save-exact
+          npm audit fix
+      - name: Require no high or critical advisories
+        run: npm audit --audit-level=high
+      - name: Validate the updated dependency tree
+        run: |
+          npm test
+          npm run typecheck
+          npm run build
+      - name: Commit reproducible dependency lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add package.json package-lock.json
+            git commit -m "fix(deps): update Next.js and remediate npm advisories"
+            git reset --hard HEAD
+            git clean -fd
+            git fetch origin "${{ github.ref_name }}"
+            git rebase "origin/${{ github.ref_name }}"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi

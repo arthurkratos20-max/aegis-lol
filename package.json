@@ -14,14 +14,18 @@
     "pretest": "node scripts/prepare-image-assets.mjs",
     "sync:kits": "node --experimental-strip-types scripts/sync-kits.mjs",
     "audit:kits": "node --experimental-strip-types scripts/audit-kits.mjs",
-    "preingest": "node --experimental-strip-types scripts/prepare-catalog.mjs"
+    "preingest": "node --experimental-strip-types scripts/prepare-catalog.mjs",
+    "audit:coverage": "node --experimental-strip-types scripts/audit-kit-coverage.mjs",
+    "ingest:meraki": "node scripts/ingest-meraki-candidates.mjs",
+    "extract:meraki-review": "node scripts/extract-meraki-formula-review.mjs",
+    "audit:meraki": "node scripts/audit-meraki-candidates.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
     "html-to-image": "^1.11.13",
     "lucide-react": "0.468.0",
     "lz-string": "^1.5.0",
-    "next": "16.3.8",
+    "next": "16.4.6",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4"
