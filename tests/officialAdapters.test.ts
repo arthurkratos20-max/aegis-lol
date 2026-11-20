@@ -106,10 +106,10 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MinimumSnips'),5,{ap:100}),226);
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MaximumSnips'),5,{ap:100}),350);
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenR','FirstNeedle'),3,{ap:100}),80);
- assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),275);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimW','TotalDamage'),5,{ap:100}),320);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerQ','TurretShot'),5,{ap:100}),58);
- assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),195);
+ assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),205);
  assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiW','BonusMaxHealthDamage'),5,{ap:0,ad:200,targetMaxHP:2000}),240);
  assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiR','Damage'),3,{ap:0,bonusAD:100}),400);
  for(const champion of ['Gwen','Hecarim','Heimerdinger','Illaoi']){
@@ -120,6 +120,17 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
 });
 
 
+
+test('Gwen E empowered hit and R recasts are separate modern Summoner’s Rift variants',()=>{
+ const get=(calculation:string)=>{const a=officialAdapterFor('Gwen',calculation==='EmpoweredAttack'?'GwenE':'GwenR',calculation,'16.23.1');assert.ok(a);return a;};
+ assert.equal(evaluateOfficialAdapter(get('EmpoweredAttack'),5,{ap:100}),35);
+ assert.equal(evaluateOfficialAdapter(get('SecondCast'),3,{ap:100,targetMaxHP:2000}),90+30+0.048*2000);
+ assert.equal(evaluateOfficialAdapter(get('ThirdCast'),3,{ap:100,targetMaxHP:2000}),150+50+0.08*2000);
+ assert.equal(nativeOptions.Gwen.filter(x=>x.calculation==='SecondCast')[0].automatic,false);
+ assert.equal(nativeOptions.Gwen.filter(x=>x.calculation==='ThirdCast')[0].automatic,false);
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
 test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade use base SR values',()=>{
  const get=(champion:string,spell:string,calculation:string)=>{const a=officialAdapterFor(champion,spell,calculation,'16.23.1');assert.ok(a,champion+' '+spell+'/'+calculation);return a;};
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
@@ -129,7 +140,7 @@ test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade us
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),205);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerE','Impact'),5,{ap:100}),280);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerR','UpgradedGrenade'),3,{ap:100}),360);
- assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiQ','TentacleStrike'),5,{ap:100,ad:200,level:18}),200.12+220+40*1.3);
+ assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiQ','TentacleStrike'),5,{ap:100,ad:200,level:18}),(200.12+220+40)*1.3);
  const illaoi=nativeOptions.Illaoi.find(x=>x.calculation==='TentacleStrike');assert.ok(illaoi);
  assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
