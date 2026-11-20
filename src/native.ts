@@ -47,6 +47,7 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  Gwen:[
   {key:'Q',spell:'GwenQ',calculation:'MinimumSnips',type:'magic',label:'Q · mínimo (sem Snippy)',note:'70/99/128/157/186 + 40% AP; dano mágico agregado externo. Centro verdadeiro, passiva e área não simulados.'},
   {key:'Q',spell:'GwenQ',calculation:'MaximumSnips',type:'magic',automatic:false,label:'Q · máximo (4 stacks Snippy)',note:'110/155/200/245/290 + 60% AP; variante manual com seis cortes. Centro verdadeiro, passiva e área não simulados.'},
+  {key:'Q',spell:'GwenQ',calculation:'MaximumSnipsCenter',type:'magic',automatic:false,label:'Q · máximo no centro (50% verdadeiro)',note:'Seis cortes no centro: 50% do dano agregado convertido em verdadeiro e 50% mágico. Variante manual; não inclui os procs de A Thousand Cuts por corte nem a geometria.'},
   {key:'W',spell:'GwenW',calculation:'Activate',type:'magic',label:'W · ativar Hallowed Mist',note:'Concede 4s de 22/24/26/28/30 + 7% AP de armadura e resistência mágica; imunidade a alvos fora da névoa não simulada.'},
   {key:'E',spell:'GwenE',calculation:'Activate',type:'magic',label:'E · ativar Skip n Slash',note:'Ativa 4s de velocidade de ataque e ataques fortalecidos; dash e reembolso de cooldown pendentes.'},
   {key:'E',spell:'GwenE',calculation:'EmpoweredAttack',type:'magic',automatic:false,label:'E · ataque fortalecido',note:'15 + 20% AP em um ataque fortalecido; velocidade de ataque e reembolso não simulados.'},
