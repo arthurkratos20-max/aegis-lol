@@ -49,15 +49,21 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
   {key:'R',spell:'GwenR',calculation:'FirstNeedle',type:'magic',label:'R · primeiro agulhão',note:'30/50/70 + 10% AP por agulha no primeiro lançamento; recasts e passiva não simulados.'}
  ],
  Hecarim:[
-  {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 95% DdA adicional; sem stacks, área ou sequência de recasts.'},
-  {key:'W',spell:'HecarimW',calculation:'TotalDamage',type:'magic',label:'W · quatro ticks',note:'80/120/160/200/240 + 80% AP em 4s; sem ticks, área, resistências bônus ou cura.'}
+  {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 90% DdA adicional; sem stacks, área ou sequência de recasts.'},
+  {key:'W',spell:'HecarimW',calculation:'TotalDamage',type:'magic',label:'W · quatro ticks',note:'80/120/160/200/240 + 80% AP em 4s; sem ticks, área, resistências bônus ou cura.'},
+  {key:'E',spell:'HecarimE',calculation:'MinimumDamage',type:'physical',automatic:false,label:'E · dano mínimo',note:'30/45/60/75/90 + 50% DdA adicional; variante manual de carga mínima.'},
+  {key:'E',spell:'HecarimE',calculation:'MaximumDamage',type:'physical',automatic:false,label:'E · dano máximo',note:'60/90/120/150/180 + 100% DdA adicional; variante manual de carga máxima.'},
+  {key:'R',spell:'HecarimR',calculation:'SpectralRiders',type:'magic',label:'R · cavaleiros espectrais',note:'150/250/350 + 100% AP; fear, slow e colisões não simulados.'}
  ],
  Heimerdinger:[
   {key:'Q',spell:'HeimerdingerQ',calculation:'TurretShot',type:'magic',label:'Q · um tiro de torreta',note:'7/11/15/19/23 + 35% AP por tiro; sem cadência, alvo, duração ou raio carregado.'},
-  {key:'W',spell:'HeimerdingerW',calculation:'FirstRocket',type:'magic',label:'W · primeiro foguete',note:'50/75/100/125/150 + 45% AP; apenas um foguete, sem convergência ou dano reduzido dos seguintes.'}
+  {key:'W',spell:'HeimerdingerW',calculation:'FirstRocket',type:'magic',label:'W · primeiro foguete',note:'50/75/100/125/150 + 55% AP; apenas um foguete, sem convergência ou dano reduzido dos seguintes.'},
+  {key:'E',spell:'HeimerdingerE',calculation:'Impact',type:'magic',label:'E · impacto da granada',note:'60/100/140/180/220 + 60% AP; stun central e slow não simulados.'},
+  {key:'R',spell:'HeimerdingerR',calculation:'UpgradedGrenade',type:'magic',automatic:false,label:'R+E · uma explosão aprimorada',note:'100/200/300 + 60% AP por explosão; três ricochetes e limites por campeão não simulados.'}
  ],
  Illaoi:[
   {key:'W',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',type:'physical',label:'W · bônus de vida máxima',note:'3/3,5/4/4,5/5% da vida máxima + 0,035% por ponto de AD total; ataque básico e tentáculos não incluídos.'},
+  {key:'Q',spell:'IllaoiQ',calculation:'TentacleStrike',type:'physical',label:'Q · golpe de tentáculo',note:'9–200,12 por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q; um golpe isolado.'},
   {key:'R',spell:'IllaoiR',calculation:'Damage',type:'physical',label:'R · impacto inicial',note:'150/250/350 + 50% DdA adicional; sem área, tentáculos invocados ou golpes subsequentes.'}
  ]
 };
@@ -66,5 +72,5 @@ export function nativeAction(f:Fighter,data:Dataset,index:number):Action{
  return {id:crypto.randomUUID(),at:0,kind:opt.kind??'spell',key:opt.key,name:opt.label,type:opt.type,formula:{...EMPTY_FORMULA},cooldown:uiSpell.cooldown[rank-1]??0,cost:uiSpell.cost[rank-1]??0,cast:f.champion==='Gragas'&&opt.key==='W'?0.75:0,duration:opt.kind==='shield'?1.5:0,hit:1,onHit:f.champion==='Ezreal'&&opt.key==='Q',custom:false,coverage:'testing',cooldownReduction:f.champion==='Ezreal'&&opt.key==='Q'?1.5:undefined,native:{spell:opt.spell,calculation:opt.calculation,targetHP:opt.targetHP,flatCalculation:opt.flatCalculation}};
 }
 export function nativeDamage(a:Action,f:Fighter,data:Dataset,actor:Stats,target:Stats):number{
- if(!a.native)return 0;const rank=f.skills.slice(0,f.level).filter(k=>k===a.key).length;if(!rank)throw Error('Native skill rank is zero');const official=officialAdapterFor(f.champion,a.native.spell,a.native.calculation,data.version);if(official){const baseStats=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data);return evaluateOfficialAdapter(official,rank,{ap:actor.ap,bonusAD:Math.max(0,actor.ad-baseStats.ad),ad:actor.ad,targetMaxHP:target.hp})*(a.native.multiplier??1);}const spell=data.mechanics?.[f.champion]?.spells[a.native.spell];if(!spell)throw Error('Missing native snapshot');const base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data);const calc=spell.calculations[a.native.calculation];if(!calc)throw Error('Calculation missing');let damage=calculateNative(calc,spell,rank,f.level,actor,base);if(a.native.targetHP)damage*=target.hp;if(a.native.flatCalculation)damage+=calculateNative(spell.calculations[a.native.flatCalculation],spell,rank,f.level,actor,base);return damage*(a.native.multiplier??1);
+ if(!a.native)return 0;const rank=f.skills.slice(0,f.level).filter(k=>k===a.key).length;if(!rank)throw Error('Native skill rank is zero');const official=officialAdapterFor(f.champion,a.native.spell,a.native.calculation,data.version);if(official){const baseStats=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data);return evaluateOfficialAdapter(official,rank,{ap:actor.ap,bonusAD:Math.max(0,actor.ad-baseStats.ad),ad:actor.ad,targetMaxHP:target.hp,level:f.level})*(a.native.multiplier??1);}const spell=data.mechanics?.[f.champion]?.spells[a.native.spell];if(!spell)throw Error('Missing native snapshot');const base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data);const calc=spell.calculations[a.native.calculation];if(!calc)throw Error('Calculation missing');let damage=calculateNative(calc,spell,rank,f.level,actor,base);if(a.native.targetHP)damage*=target.hp;if(a.native.flatCalculation)damage+=calculateNative(spell.calculations[a.native.flatCalculation],spell,rank,f.level,actor,base);return damage*(a.native.multiplier??1);
 }
