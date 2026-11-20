@@ -5,9 +5,9 @@ import {kitDeclarations,validateKitDeclarations} from '../src/kitDeclarations.ts
 test('second batch declares all five slots for all six champions without false implementation claims',()=>{
  assert.deepEqual(Object.keys(kitDeclarations).sort(),['Gragas','Graves','Gwen','Hecarim','Heimerdinger','Illaoi']);
  assert.deepEqual(validateKitDeclarations(),[]);
- for(const kit of Object.values(kitDeclarations)){
+ for(const [champion,kit] of Object.entries(kitDeclarations)){
   assert.deepEqual(Object.keys(kit.abilities).sort(),['E','P','Q','R','W']);
-  for(const ability of Object.values(kit.abilities))assert.equal(ability.damageModel,'pending');
+  for(const ability of Object.values(kit.abilities))assert.equal(ability.damageModel,champion==='Gragas'?'partial':'pending');
  }
 });
 
