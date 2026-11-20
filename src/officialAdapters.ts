@@ -109,6 +109,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · dano mínimo externo (2 cortes + corte final, sem stacks Snippy); variante mágica agregada. Conversão do centro para dano verdadeiro, passiva por vida máxima e geometria não incluídas.'
  },
  {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenQ',calculation:'MaximumSnipsCenter',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[110,155,200,245,290],apRatioByRank:[0.6,0.6,0.6,0.6,0.6],
+  note:'Q · seis cortes no centro: metade do dano agregado é convertida em dano verdadeiro. A parcela da passiva A Thousand Cuts é aplicada separadamente por corte no jogo e permanece fora deste agregado.'
+ },
+ {
   champion:'Gwen',patch:'16.23.1',spell:'GwenQ',calculation:'MaximumSnips',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
   damageType:'magic',baseByRank:[110,155,200,245,290],apRatioByRank:[0.6,0.6,0.6,0.6,0.6],
   note:'Q · dano máximo externo com quatro stacks Snippy (6 cortes); variante mágica agregada. Conversão do centro para dano verdadeiro, passiva por vida máxima e geometria não incluídas.'
