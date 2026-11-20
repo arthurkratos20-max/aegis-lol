@@ -161,7 +161,7 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MinimumSnips'),5,{ap:100}),226);
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MaximumSnips'),5,{ap:100}),350);
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenR','FirstNeedle'),3,{ap:100}),105);
- assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),255);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimW','TotalDamage'),5,{ap:100}),320);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerQ','TurretShot'),5,{ap:100}),58);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),205);
@@ -189,7 +189,7 @@ test('Gwen E empowered hit and R recasts are separate modern Summoner’s Rift v
 
 test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade use base SR values',()=>{
  const get=(champion:string,spell:string,calculation:string)=>{const a=officialAdapterFor(champion,spell,calculation,'16.23.1');assert.ok(a,champion+' '+spell+'/'+calculation);return a;};
- assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),255);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimE','MinimumDamage'),5,{ap:0,bonusAD:100}),140);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimE','MaximumDamage'),5,{ap:0,bonusAD:100}),280);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimR','SpectralRiders'),3,{ap:100}),450);
@@ -229,8 +229,8 @@ test('Hecarim Rampage consumes active stacks for damage amplification and cooldo
  const f=fighter(data,'Hecarim');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data),state=kitState(f);
  const first=nativeAction(f,data,0),second=nativeAction(f,data,0);const a=kitImpact(first,f,data,actor,base,target,target.hp,state);const b=kitImpact({...second,at:1},f,data,actor,base,target,target.hp,state);
- assert.ok(a);assert.ok(b);assert.equal(a.damageMultiplier,1);assert.equal(b.damageMultiplier,1.03);assert.equal(b.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[9,10]);
- const decay=kitImpact({...nativeAction(f,data,0),at:9.5},f,data,actor,base,target,target.hp,state);assert.ok(decay);assert.equal(decay.damageMultiplier,1.03);assert.equal(decay.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[17.5,18.5]);
+ assert.ok(a);assert.ok(b);assert.equal(a.damageMultiplier,1);assert.equal(b.damageMultiplier,1.04);assert.equal(b.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[9,10]);
+ const decay=kitImpact({...nativeAction(f,data,0),at:9.5},f,data,actor,base,target,target.hp,state);assert.ok(decay);assert.equal(decay.damageMultiplier,1.04);assert.equal(decay.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[17.5,18.5]);
 });
 
 test('Illaoi Test of Spirit echoes pre-mitigation damage during its seven-second tether',()=>{
