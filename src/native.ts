@@ -50,7 +50,7 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
   {key:'W',spell:'GwenW',calculation:'Activate',type:'magic',label:'W · ativar Hallowed Mist',note:'Concede 4s de 22/24/26/28/30 + 7% AP de armadura e resistência mágica; imunidade a alvos fora da névoa não simulada.'},
   {key:'E',spell:'GwenE',calculation:'Activate',type:'magic',label:'E · ativar Skip n Slash',note:'Ativa 4s de velocidade de ataque e ataques fortalecidos; dash e reembolso de cooldown pendentes.'},
   {key:'E',spell:'GwenE',calculation:'EmpoweredAttack',type:'magic',automatic:false,label:'E · ataque fortalecido',note:'15 + 20% AP em um ataque fortalecido; velocidade de ataque e reembolso não simulados.'},
-  {key:'R',spell:'GwenR',calculation:'FirstNeedle',type:'magic',label:'R · primeiro agulhão',note:'30/50/70 + 10% AP por agulha no primeiro lançamento; recasts e passiva não simulados.'},
+  {key:'R',spell:'GwenR',calculation:'FirstNeedle',type:'magic',label:'R · primeiro agulhão',note:'35/65/95 + 10% AP e parcela da passiva por vida máxima no primeiro lançamento; recasts, slow e geometria não simulados.'},
   {key:'R',spell:'GwenR',calculation:'SecondCast',type:'magic',automatic:false,label:'R · segundo lançamento (3 agulhas)',note:'Dano agregado das três agulhas; variante manual, não soma automaticamente ao primeiro lançamento.'},
   {key:'R',spell:'GwenR',calculation:'ThirdCast',type:'magic',automatic:false,label:'R · terceiro lançamento (5 agulhas)',note:'Dano agregado das cinco agulhas; variante manual, não soma automaticamente aos lançamentos anteriores.'}
  ],
