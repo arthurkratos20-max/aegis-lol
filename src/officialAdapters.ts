@@ -134,6 +134,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · um disparo básico de uma torreta H-28G. Não simula instalação, alvo prioritário, cadência, duração, cargas nem raio carregado.'
  },
  {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerW',calculation:'FullSalvo',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[90,135,180,225,270],apRatioByRank:[1.03,1.03,1.03,1.03,1.03],
+  note:'W · salva completa de cinco foguetes contra um único campeão: primeiro foguete + quatro subsequentes com dano reduzido. Não modela distribuição/convergência, múltiplos alvos ou acertos em minions.'
+ },
+ {
   champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerW',calculation:'FirstRocket',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
   damageType:'magic',baseByRank:[50,75,100,125,150],apRatioByRank:[0.55,0.55,0.55,0.55,0.55],
   note:'W · primeiro foguete da salva: 50/75/100/125/150 + 55% AP (patch 26.3+). Foguetes subsequentes, convergência, distribuição, redução por acertos repetidos e carga de torretas não simulados.'
