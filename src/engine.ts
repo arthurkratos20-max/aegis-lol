@@ -71,10 +71,12 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   const shred=shredBefore?exactValue('Garen','GarenE','ShredAmount',skillRank(s[side],'E')):0;
   const carve=cleaver[side].expires>a.at?.06*cleaver[side].stacks:0,combinedShred=1-(1-shred)*(1-carve);
   const resistance=damageType==='physical'?combatResistance(st[other].armor,actor.armorPenPercent,actor.armorPen,combinedShred):combatResistance(st[other].mr,actor.magicPenPercent,actor.magicPen);
-  const damageReduction=kits[other].garenDRExpires>a.at?kits[other].garenDR:0;
+  const garenReduction=kits[other].garenDRExpires>a.at?kits[other].garenDR:0,gragasReduction=kits[other].gragasDRReadyAt<=a.at&&kits[other].gragasDRExpires>a.at?kits[other].gragasDR:0,damageReduction=1-(1-garenReduction)*(1-gragasReduction);
   const post=damageType==='true'?raw:mitigate(raw,resistance)*(1-damageReduction);let remaining=post,absorbed=0;
   for(const sh of shields[other]){const take=Math.min(sh.amount,remaining);sh.amount-=take;remaining-=take;absorbed+=take;}results[other].shielding+=absorbed;
-  const actual=Math.min(hp[other],remaining),overkill=Math.max(0,remaining-hp[other]);hp[other]=Math.max(0,hp[other]-actual);results[side].damage+=actual;results[side].raw+=raw;results[side].composition[damageType]+=actual;
+  const actual=Math.min(hp[other],remaining),overkill=Math.max(0,remaining-hp[other]);hp[other]=Math.max(0,hp[other]-actual);
+  if(s[side].champion==='Gragas'&&a.key==='E'&&a.kind==='spell'&&a.hit===1&&actual>0)cooldowns[key]=a.at+actualCooldown*.6;
+  if(s[side].champion==='Gragas'&&a.key==='E'&&a.kind==='spell'&&a.hit===1&&hp[other]>0){const end=Math.min(s.duration,a.at+1);results[side].ccSeconds+=Math.max(0,end-Math.max(a.at,cc[other]));cc[other]=Math.max(cc[other],end);}results[side].damage+=actual;results[side].raw+=raw;results[side].composition[damageType]+=actual;
   const carveKey=`${side}:${entry.parentAction??a.id}`;
   if(data.version===EXACT_PATCH&&s[side].items.includes('3071')&&damageType==='physical'&&a.hit===1&&actual+absorbed>0&&!cleaverHits.has(carveKey)){cleaverHits.add(carveKey);cleaver[side].stacks=cleaver[side].expires>a.at?Math.min(5,cleaver[side].stacks+1):1;cleaver[side].expires=a.at+6;}
   if(hp[other]===0&&results[other].death===null)results[other].death=a.at;
