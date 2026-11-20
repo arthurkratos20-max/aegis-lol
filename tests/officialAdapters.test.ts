@@ -102,6 +102,16 @@ test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=
 });
 
 
+test('Heimerdinger W full five-rocket salvo is separate from the isolated first rocket',()=>{
+ const salvo=officialAdapterFor('Heimerdinger','HeimerdingerW','FullSalvo','16.23.1');assert.ok(salvo);
+ assert.deepEqual(salvo.baseByRank,[90,135,180,225,270]);assert.equal(evaluateOfficialAdapter(salvo,5,{ap:100}),373);
+ const f=fighter(data,'Heimerdinger');f.level=18;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+ const index=nativeOptions.Heimerdinger.findIndex(x=>x.calculation==='FullSalvo');assert.ok(index>=0);
+ const action=nativeAction(f,data,index);assert.equal(action.native?.calculation,'FullSalvo');assert.equal(nativeDamage(action,f,data,actor,target),270+1.03*actor.ap);
+ assert.equal(nativeOptions.Heimerdinger[index].automatic,false);assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
 test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceable impacts',()=>{
  const get=(champion:string,spell:string,calculation:string)=>{const a=officialAdapterFor(champion,spell,calculation,'16.23.1');assert.ok(a,champion+' '+spell);return a;};
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MinimumSnips'),5,{ap:100}),226);
