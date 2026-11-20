@@ -7,7 +7,7 @@ export interface KitPart {raw:number;type:DamageType;name:string}
 export interface KitImpact {raw:number;type:DamageType;extra:KitPart[];damageMultiplier?:number;cooldownReduction?:number;cancel?:string;resetAttack?:boolean;deferCooldown?:boolean;consumedQCooldown?:number;healMissing?:number;passive?:boolean;rescheduleAttack?:boolean}
 export function kitActorStats(f:Fighter,actor:Stats,base:Stats,state:KitState,at:number):Stats {
  if(!state.active)return actor;let x=actor;
- if(f.champion==='Graves'&&state.gravesTrueGritExpires>at){const armor=[2,5,8,11,14][Math.max(0,skillRank(f,'E')-1)]*state.gravesTrueGritStacks;x={...x,armor:x.armor+armor,mr:x.mr+armor*.5};}
+ if(f.champion==='Graves'&&state.gravesTrueGritExpires>at){const armor=[4,7,10,13,16][Math.max(0,skillRank(f,'E')-1)]*state.gravesTrueGritStacks;x={...x,armor:x.armor+armor,mr:x.mr+armor*.5};}
  if(f.champion==='Heimerdinger'&&(f.stacks['heimer-turret-nearby']??0)>0)x={...x,move:x.move*1.2};
  if(f.champion==='Gwen'&&state.gwenWExpires>at){const rank=skillRank(f,'W'),resist=[22,24,26,28,30][Math.max(0,rank-1)]+actor.ap*.07;x={...x,armor:x.armor+resist,mr:x.mr+resist};}
  if(f.champion==='Hecarim'&&state.hecarimWExpires>at){const rank=skillRank(f,'W');const resist=[5,10,15,20,25][Math.max(0,rank-1)];x={...x,armor:x.armor+resist,mr:x.mr+resist};}
