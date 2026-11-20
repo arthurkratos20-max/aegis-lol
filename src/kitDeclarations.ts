@@ -27,11 +27,11 @@ export const kitDeclarations:Record<string,KitDeclaration>={
   R:{name:'Explosive Cask',role:'projétil em área que causa dano mágico e deslocamento',damageModel:'partial',notes:'Dano-base e escalamento AP implementados; trajetória, área, knockback e colisão com terreno pendentes.'}
  }),
  Graves:declare('Graves','https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-19-notes/',{
-  P:{name:'True Grit',role:'ganha armadura e resistência mágica progressivamente enquanto permanece em combate',damageModel:'pending',notes:'Passiva da versão pré-rework do Classic; frequência, escala por nível e limite de stacks ainda não foram validados para o snapshot de 2015.'},
-  Q:{name:'Buckshot',role:'dispara três projéteis em cone; projéteis adicionais causam dano reduzido',damageModel:'partial',notes:'Dano do primeiro projétil e máximo dos três projéteis implementados com valores do kit pré-rework 2015. Ângulo, colisões, distância e distribuição por alvo pendentes.'},
-  W:{name:'Smoke Screen',role:'granada que causa dano mágico, lentidão e obscurece a visão na área',damageModel:'partial',notes:'Dano do impacto inicial implementado. Área, slow, nearsight e duração da nuvem pendentes.'},
-  E:{name:'Quickdraw',role:'dash que concede velocidade de ataque temporária; ataques reduzem seu cooldown',damageModel:'pending',notes:'Ação sem dano direto; falta simular velocidade de ataque, dash e redução de cooldown por ataques.'},
-  R:{name:'Collateral Damage',role:'projétil explosivo com impacto direto e explosão em cone',damageModel:'partial',notes:'Impacto direto e cone secundário implementados como impactos separados. Recuo, trajetória, área e seleção de alvos pendentes.'}
+  P:{name:'New Destiny',role:'ataques de espingarda com múltiplos projéteis, munição e recarga',damageModel:'pending',notes:'A passiva afeta o modelo de ataques básicos: projéteis, recarga, crítico e colisão. Ainda não integrada ao ciclo de DPS.'},
+  Q:{name:'End of the Line',role:'projétil explosivo com impacto inicial e detonação após 1s ou colisão com terreno',damageModel:'partial',notes:'Impacto inicial e detonação com tabelas separadas do Summoner’s Rift implementados. Trajetória, colisão com terreno, área e combinação temporal dos impactos pendentes.'},
+  W:{name:'Smoke Screen',role:'nuvem que reduz visão; impacto inicial causa dano mágico e slow',damageModel:'partial',notes:'Dano mágico do impacto inicial implementado. Nuvem de 4s, slow e bloqueio de visão pendentes.'},
+  E:{name:'Quickdraw',role:'dash que recarrega um cartucho e concede stacks de armadura e resistência mágica',damageModel:'pending',notes:'Falta integrar recarga de munição, stacks defensivos, duração e redução de cooldown por projéteis de ataques básicos.'},
+  R:{name:'Collateral Damage',role:'projétil que causa dano ao primeiro alvo e explode em cone, recuando Graves',damageModel:'partial',notes:'Impacto direto e explosão em cone implementados como impactos separados com valores do Summoner’s Rift. Recuo, trajetória, área e seleção de alvos pendentes.'}
  }),
  Gwen:declare('Gwen','https://wiki.leagueoflegends.com/en-us/Gwen',{
   P:{name:'A Thousand Cuts',role:'dano mágico adicional em ataques/habilidades e cura contra campeões',damageModel:'pending',notes:'Escala com vida máxima do alvo/AP e possui limite contra monstros.'},
