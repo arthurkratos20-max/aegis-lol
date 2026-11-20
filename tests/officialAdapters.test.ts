@@ -143,6 +143,7 @@ test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade us
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerR','UpgradedGrenade'),3,{ap:100}),360);
  assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiQ','TentacleStrike'),5,{ap:100,ad:200,level:18}),(200.12+220+40)*1.3);
  const illaoi=nativeOptions.Illaoi.find(x=>x.calculation==='TentacleStrike');assert.ok(illaoi);
+ assert.ok(nativeOptions.Illaoi.some(x=>x.key==='E'&&x.calculation==='Activate'));
  assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
 
