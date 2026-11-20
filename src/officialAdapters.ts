@@ -38,6 +38,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · dano máximo após fermentação completa (150% do mínimo) no Summoner’s Rift. Variante manual; não modela temporização, slow, área ou redução contra tropas.'
  },
  {
+  champion:'Gragas',patch:'16.23.1',spell:'GragasQ',calculation:'HalfFermentedDamage',source:'https://wiki.leagueoflegends.com/en-us/Gragas',sourceType:'wiki',
+  damageType:'magic',baseByRank:[100,150,200,250,300],apRatioByRank:[1,1,1,1,1],
+  note:'Q · barril após 1 segundo de fermentação (125% do dano mínimo). A fermentação ocorre durante os primeiros 2s; esta é uma variante temporal manual, sem slow, área ou redução contra tropas.'
+ },
+ {
   champion:'Gragas',patch:'16.23.1',spell:'GragasW',calculation:'EmpoweredAttack',source:'https://wiki.leagueoflegends.com/en-us/Gragas',sourceType:'wiki',
   damageType:'magic',baseByRank:[20,50,80,110,140],apRatioByRank:[0.7,0.7,0.7,0.7,0.7],targetMaxHPRatio:0.07,
   note:'W · dano mágico adicional do próximo ataque após canalizar: base + 7% da vida máxima individual do alvo + 70% AP. Não inclui ataque físico, crítico, área, redução contra estruturas nem limite de monstros; ação manual.'
@@ -137,6 +142,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'TotalDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
   damageType:'magic',baseByRank:[80,120,160,200,240],apRatioByRank:[0.8,0.8,0.8,0.8,0.8],
   note:'W · soma dos quatro ticks em um alvo durante 4s. Não simula ticks por segundo, área, resistências bônus nem cura baseada no dano causado na zona.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerR',calculation:'RocketSwarm',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[503,697.5,892],apRatioByRank:[1.83,1.83,1.83],
+  note:'R+W · quatro ondas de cinco foguetes contra um único campeão: dano agregado 503/697,5/892 + 183% AP. Distribuição geométrica e múltiplos alvos não simulados; variante manual.'
  },
  {
   champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerQ',calculation:'TurretShot',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
