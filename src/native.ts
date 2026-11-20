@@ -37,11 +37,11 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  Bard:[{key:'Q',spell:'BardQ',calculation:'Damage',type:'magic',label:'Q · Prisão Cósmica (um impacto)',note:'Fórmula oficial 26.23. Requer acerto confirmado; colisão, segundo alvo, atordoamento e passiva não simulados.'}],
  MasterYi:[{key:'Q',spell:'MasterYiQ',calculation:'Damage',type:'physical',label:'Q · dano padrão (um alvo)',note:'Fórmula oficial 26.23: 20/40/60/80/100 + 60% AD total. Não simula crítico, múltiplos acertos nem efeitos ao contato.'},{key:'Q',spell:'MasterYiQ',calculation:'MaxSingleTargetDamage',type:'physical',automatic:false,label:'Q · máximo em um único alvo',note:'Fórmula oficial 26.23: 35/70/105/140/175 + 105% AD total. Variante manual; crítico adicional, efeitos ao contato e distribuição de alvos não simulados.'}],
  Graves:[
-  {key:'Q',spell:'GravesQ',calculation:'OnePellet',type:'physical',label:'Q · Buckshot (1 projétil)',note:'Classic 2015: 60/90/120/150/180 + 75% DdA adicional; um projétil apenas.'},
-  {key:'Q',spell:'GravesQ',calculation:'ThreePellets',type:'physical',automatic:false,label:'Q · Buckshot (3 projéteis)',note:'Classic 2015: 120/180/240/300/360 + 150% DdA adicional; máximo com três projéteis no mesmo alvo.'},
-  {key:'W',spell:'GravesW',calculation:'Impact',type:'magic',label:'W · Smoke Screen (impacto)',note:'Classic 2015: 60/110/160/210/260 + 60% AP; sem zona/slow/nearsight.'},
-  {key:'R',spell:'GravesR',calculation:'DirectHit',type:'physical',label:'R · Collateral Damage (impacto)',note:'Classic 2015: 250/400/550 + 150% DdA adicional; cone separado.'},
-  {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · Collateral Damage (cone)',note:'Classic 2015: 200/320/440 + 120% DdA adicional; variante separada, exige alvo secundário.'}
+  {key:'Q',spell:'GravesQ',calculation:'InitialHit',type:'physical',label:'Q · impacto inicial',note:'Summoner’s Rift: 50/75/100/125/150 + 55% DdA adicional.'},
+  {key:'Q',spell:'GravesQ',calculation:'Detonation',type:'physical',automatic:false,label:'Q · detonação',note:'Summoner’s Rift: 80/125/170/215/260 + 45/60/75/90/105% DdA adicional; não soma automaticamente ao impacto.'},
+  {key:'W',spell:'GravesW',calculation:'Impact',type:'magic',label:'W · impacto inicial',note:'Summoner’s Rift: 60/110/160/210/260 + 60% AP; nuvem/slow/nearsight pendentes.'},
+  {key:'R',spell:'GravesR',calculation:'DirectHit',type:'physical',label:'R · impacto direto',note:'Summoner’s Rift: 275/425/575 + 150% DdA adicional.'},
+  {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · explosão em cone',note:'Summoner’s Rift: 200/320/440 + 120% DdA adicional; variante separada.'}
  ],
  Gwen:[
   {key:'Q',spell:'GwenQ',calculation:'MinimumSnips',type:'magic',label:'Q · mínimo (sem Snippy)',note:'70/99/128/157/186 + 40% AP; dano mágico agregado externo. Centro verdadeiro, passiva e área não simulados.'},
