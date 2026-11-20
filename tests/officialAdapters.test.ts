@@ -34,6 +34,14 @@ test('Bard Q is executable as a patch-matched isolated magic impact without stal
  assert.equal(championKitCoverage('Bard',data).isExactFormula,false);
 });
 
+test('Ezreal exposes only the two patch 26.23 impacts with confirmed damage rows',()=>{
+ const coverage=championKitCoverage('Ezreal',data);
+ assert.equal(coverage.status,'partial');
+ assert.equal(coverage.isExactFormula,false);
+ assert.deepEqual([...coverage.covered].sort(),['R','W']);
+ assert.deepEqual(coverage.missing,['P','Q','E']);
+});
+ 
 test('Bard adapter metadata remains source-scoped and does not certify a full kit',()=>{
  const a=officialDamageAdapters.find(x=>x.champion==='Bard');
  assert.ok(a?.source.includes('leagueoflegends.com'));
