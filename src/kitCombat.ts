@@ -1,7 +1,8 @@
 import type {Action,Dataset,DamageType,Fighter,Stats} from './contracts.ts';
 import {EXACT_PATCH,exactEffect,exactRaw,exactCalculation,exactValue,skillRank} from './exactKits.ts';
-export interface KitState {active:boolean;minigun:boolean;minigunStacks:number;minigunExpires:number;shenCharges:number;shenExpires:number;shenEffect:string;vayneStacks:number;vayneExpires:number;vayneQExpires:number;vayneQCooldown:number;luxMarkExpires:number;asheStacks:number;asheStackExpires:number;asheFrostExpires:number;asheQExpires:number;bleedStacks:number;bleedExpires:number;noxianExpires:number;garenTicks:number;garenWindow:number;armorShredExpires:number;garenDRExpires:number;garenDR:number;wallExpires:number;gragasPassiveReadyAt:number}
-export const kitState=(f:Fighter):KitState=>({active:f.actions.some(a=>exactEffect(a.kitEffect)?.champion===f.champion&&!a.custom),minigun:false,minigunStacks:0,minigunExpires:0,shenCharges:0,shenExpires:0,shenEffect:'shen-q',vayneStacks:0,vayneExpires:0,vayneQExpires:0,vayneQCooldown:0,luxMarkExpires:0,asheStacks:0,asheStackExpires:0,asheFrostExpires:0,asheQExpires:0,bleedStacks:0,bleedExpires:0,noxianExpires:0,garenTicks:0,garenWindow:0,armorShredExpires:0,garenDRExpires:0,garenDR:0,wallExpires:0,gragasPassiveReadyAt:0});
+import {officialAdapterFor,evaluateOfficialAdapter} from './officialAdapters.ts';
+export interface KitState {active:boolean;minigun:boolean;minigunStacks:number;minigunExpires:number;shenCharges:number;shenExpires:number;shenEffect:string;vayneStacks:number;vayneExpires:number;vayneQExpires:number;vayneQCooldown:number;luxMarkExpires:number;asheStacks:number;asheStackExpires:number;asheFrostExpires:number;asheQExpires:number;bleedStacks:number;bleedExpires:number;noxianExpires:number;garenTicks:number;garenWindow:number;armorShredExpires:number;garenDRExpires:number;garenDR:number;wallExpires:number;gragasPassiveReadyAt:number;gragasWReadyAt:number;gragasWExpires:number;gragasDRReadyAt:number;gragasDRExpires:number;gragasDR:number}
+export const kitState=(f:Fighter):KitState=>({active:f.champion==='Gragas'||f.actions.some(a=>exactEffect(a.kitEffect)?.champion===f.champion&&!a.custom),minigun:false,minigunStacks:0,minigunExpires:0,shenCharges:0,shenExpires:0,shenEffect:'shen-q',vayneStacks:0,vayneExpires:0,vayneQExpires:0,vayneQCooldown:0,luxMarkExpires:0,asheStacks:0,asheStackExpires:0,asheFrostExpires:0,asheQExpires:0,bleedStacks:0,bleedExpires:0,noxianExpires:0,garenTicks:0,garenWindow:0,armorShredExpires:0,garenDRExpires:0,garenDR:0,wallExpires:0,gragasPassiveReadyAt:0,gragasWReadyAt:0,gragasWExpires:0,gragasDRReadyAt:0,gragasDRExpires:0,gragasDR:0});
 export interface KitPart {raw:number;type:DamageType;name:string}
 export interface KitImpact {raw:number;type:DamageType;extra:KitPart[];cancel?:string;resetAttack?:boolean;deferCooldown?:boolean;consumedQCooldown?:number;healMissing?:number;passive?:boolean;rescheduleAttack?:boolean}
 export function kitActorStats(f:Fighter,actor:Stats,base:Stats,state:KitState,at:number):Stats {
@@ -19,6 +20,12 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
  if(!state.active||a.custom&&!a.kitEffect)return null;
  const e=exactEffect(a.kitEffect);if(a.kitEffect&&(!e||e.champion!==f.champion||a.key!==e.key||a.kind!==(e.id==='lux-w'||e.mode==='shield'?'shield':'spell')||a.type!==e.type||data.version!==EXACT_PATCH||a.custom))return {raw:0,type:a.type,extra:[],cancel:'Efeito incompatível, customizado ou snapshot não validado'};
  const at=a.at,hit=a.hit===1,extra:KitPart[]=[],impact:KitImpact={raw:0,type:a.type,extra};
+ if(f.champion==='Gragas'&&a.key==='W'&&a.kind==='spell'&&a.native?.spell==='GragasW'){
+  const rank=skillRank(f,'W');if(!rank)return {...impact,cancel:'W requer nível de habilidade'};
+  const reduction=[10,14,18,22,26][rank-1]/100+actor.ap*0.0004;
+  state.gragasWReadyAt=at+0.75;state.gragasWExpires=at+5.75;state.gragasDRReadyAt=at+0.75;state.gragasDRExpires=at+3.25;state.gragasDR=reduction;
+  impact.passive=true;return impact;
+ }
  if(e?.mode==='passive'){if(e.id==='jinx-minigun')state.minigun=true;impact.passive=true;return impact;}
  if(e?.mode==='secondary'&&state.wallExpires<=at)return {...impact,cancel:'Parede requer impacto inicial de E recente'};
  if(e?.mode==='buff'){
@@ -35,6 +42,7 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
  if(e)impact.raw=exactRaw(e.id,f,actor,base,target,currentHP,state.bleedExpires>at?state.bleedStacks:0);else if(!attack)return null;
  if(attack){
   if(!e)impact.raw=actor.ad*crit;
+  if(f.champion==='Gragas'&&hit&&state.gragasWReadyAt<=at&&state.gragasWExpires>at){const adapter=officialAdapterFor('Gragas','GragasW','EmpoweredAttack',data.version);if(adapter)extra.push({raw:evaluateOfficialAdapter(adapter,skillRank(f,'W'),{ap:actor.ap,targetMaxHP:target.hp}),type:'magic',name:'W · bônus do ataque fortalecido'});state.gragasWExpires=0;state.gragasWReadyAt=0;}
   if(e?.id==='jinx-rocket'){impact.raw*=crit;state.minigun=false;state.minigunStacks=0;}
   if(f.champion==='Jinx'&&state.minigun&&hit){state.minigunStacks=state.minigunExpires>at?Math.min(3,state.minigunStacks+1):1;state.minigunExpires=at+2.5;impact.rescheduleAttack=true;}
   if(e?.id==='malphite-w'){extra.push({raw:impact.raw,type:'magic',name:'W · bônus mágico'});impact.raw=actor.ad*crit;impact.type='physical';}
