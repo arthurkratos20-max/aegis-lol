@@ -37,8 +37,8 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  Bard:[{key:'Q',spell:'BardQ',calculation:'Damage',type:'magic',label:'Q · Prisão Cósmica (um impacto)',note:'Fórmula oficial 26.23. Requer acerto confirmado; colisão, segundo alvo, atordoamento e passiva não simulados.'}],
  MasterYi:[{key:'Q',spell:'MasterYiQ',calculation:'Damage',type:'physical',label:'Q · dano padrão (um alvo)',note:'Fórmula oficial 26.23: 20/40/60/80/100 + 60% AD total. Não simula crítico, múltiplos acertos nem efeitos ao contato.'},{key:'Q',spell:'MasterYiQ',calculation:'MaxSingleTargetDamage',type:'physical',automatic:false,label:'Q · máximo em um único alvo',note:'Fórmula oficial 26.23: 35/70/105/140/175 + 105% AD total. Variante manual; crítico adicional, efeitos ao contato e distribuição de alvos não simulados.'}],
  Graves:[
-  {key:'Q',spell:'GravesQ',calculation:'InitialHit',type:'physical',label:'Q · impacto inicial',note:'Summoner’s Rift: 50/75/100/125/150 + 55% DdA adicional.'},
-  {key:'Q',spell:'GravesQ',calculation:'Detonation',type:'physical',automatic:false,label:'Q · detonação',note:'Summoner’s Rift: 80/125/170/215/260 + 45/60/75/90/105% DdA adicional; não soma automaticamente ao impacto.'},
+  {key:'Q',spell:'GravesQ',calculation:'InitialHit',type:'physical',label:'Q · impacto inicial',note:'Summoner’s Rift: 50/75/100/125/150 + 65% DdA adicional.'},
+  {key:'Q',spell:'GravesQ',calculation:'Detonation',type:'physical',automatic:false,label:'Q · detonação',note:'Summoner’s Rift: 80/125/170/215/260 + 55/70/85/100/115% DdA adicional; não soma automaticamente ao impacto.'},
   {key:'W',spell:'GravesW',calculation:'Impact',type:'magic',label:'W · impacto inicial',note:'Summoner’s Rift: 60/110/160/210/260 + 60% AP; nuvem/slow/nearsight pendentes.'},
   {key:'R',spell:'GravesR',calculation:'DirectHit',type:'physical',label:'R · impacto direto',note:'Summoner’s Rift: 275/425/575 + 150% DdA adicional.'},
   {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · explosão em cone',note:'Summoner’s Rift: 200/320/440 + 120% DdA adicional; variante separada.'}
@@ -49,7 +49,7 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
   {key:'R',spell:'GwenR',calculation:'FirstNeedle',type:'magic',label:'R · primeiro agulhão',note:'30/50/70 + 10% AP por agulha no primeiro lançamento; recasts e passiva não simulados.'}
  ],
  Hecarim:[
-  {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 90% DdA adicional; sem stacks, área ou sequência de recasts.'},
+  {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 95% DdA adicional; sem stacks, área ou sequência de recasts.'},
   {key:'W',spell:'HecarimW',calculation:'TotalDamage',type:'magic',label:'W · quatro ticks',note:'80/120/160/200/240 + 80% AP em 4s; sem ticks, área, resistências bônus ou cura.'}
  ],
  Heimerdinger:[
