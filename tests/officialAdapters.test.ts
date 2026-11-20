@@ -108,6 +108,15 @@ test('Illaoi spirit health is reduced by damage after the spirit resistance chec
  const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,3);assert.equal(hits[0].raw,125);assert.equal(hits[1].raw,125);assert.equal(hits[2].raw,125);
 });
 
+test('Gwen Q center converts half of the six-snip aggregate to true damage',()=>{
+ const adapter=officialAdapterFor('Gwen','GwenQ','MaximumSnipsCenter','16.23.1');assert.ok(adapter);
+ assert.equal(evaluateOfficialAdapter(adapter,5,{ap:100}),350);
+ const s=initialScenario(data);s.player=fighter(data,'Gwen');s.player.level=18;s.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ s.player.actions=[nativeAction(s.player,data,nativeOptions.Gwen.findIndex(x=>x.calculation==='MaximumSnipsCenter'))];s.player.automaticAttacks=false;
+ s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:5000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=2;
+ const result=simulate(s,data);assert.equal(result.player.composition.magic,175);assert.equal(result.player.composition.true,175);
+});
+
 test('Heimerdinger W full five-rocket salvo is separate from the isolated first rocket',()=>{
  const salvo=officialAdapterFor('Heimerdinger','HeimerdingerW','FullSalvo','16.23.1');assert.ok(salvo);
  assert.deepEqual(salvo.baseByRank,[90,135,180,225,270]);assert.equal(evaluateOfficialAdapter(salvo,5,{ap:100}),373);
