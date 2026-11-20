@@ -121,7 +121,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimQ',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
   damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.9,0.9,0.9,0.9,0.9],
-  note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 90% DdA adicional. Não inclui stacks de amplificação/redução de recarga, área nem sequência de recasts.'
+  note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 90% DdA adicional. O motor aplica stacks, amplificação e redução de recarga com expiração escalonada; área e dano reduzido contra tropas não incluídos neste impacto isolado.'
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'TotalDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
