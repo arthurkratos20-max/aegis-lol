@@ -102,6 +102,14 @@ test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=
 });
 
 
+test('Illaoi W prepares and consumes its bonus on the next basic attack',()=>{
+ const f=fighter(data,'Illaoi');f.level=18;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data),state=kitState(f);
+ const activate=nativeOptions.Illaoi.findIndex(x=>x.spell==='IllaoiW'&&x.calculation==='Activate');assert.ok(activate>=0);
+ const prepared=kitImpact(nativeAction(f,data,activate),f,data,actor,base,target,target.hp,state);assert.ok(prepared?.passive);assert.equal(state.illaoiWExpires,6);
+ const hit=kitImpact(attackAction(1),f,data,actor,base,target,target.hp,state);assert.ok(hit);assert.equal(hit.extra[0].name,'W · Harsh Lesson (bônus)');assert.equal(state.illaoiWExpires,0);
+});
+
 test('Illaoi spirit health is reduced by damage after the spirit resistance check',()=>{
  const f=fighter(data,'Illaoi');f.level=1;f.skills=['E','Q','W','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1),attackAction(2),attackAction(3)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:200,armor:100,mr:0};s.enemy.automaticAttacks=false;s.duration=5;
