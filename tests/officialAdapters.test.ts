@@ -114,7 +114,7 @@ test('Gwen Q center converts half of the six-snip aggregate to true damage',()=>
  const s=initialScenario(data);s.player=fighter(data,'Gwen');s.player.level=18;s.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  s.player.actions=[nativeAction(s.player,data,nativeOptions.Gwen.findIndex(x=>x.calculation==='MaximumSnipsCenter'))];s.player.automaticAttacks=false;
  s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:5000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=2;
- const result=simulate(s,data);assert.equal(result.player.composition.magic,175);assert.equal(result.player.composition.true,175);
+ const expected=290+.6*statsFor(s.player,data).ap;const result=simulate(s,data);assert.equal(result.player.composition.magic,expected/2);assert.equal(result.player.composition.true,expected/2);
 });
 
 test('Heimerdinger W full five-rocket salvo is separate from the isolated first rocket',()=>{
