@@ -19,6 +19,16 @@ export interface OfficialDamageAdapter {
 }
 export const officialDamageAdapters:OfficialDamageAdapter[]=[
  {
+  champion:'Gragas',patch:'16.23.1',spell:'GragasQ',calculation:'Damage',source:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-17-notes/',
+  damageType:'magic',baseByRank:[75,125,175,225,275],apRatioByRank:[0.9,0.9,0.9,0.9,0.9],
+  note:'Q · explosão mínima, cask detonated immediately after arrival. Riot 26.17; does not model fermentation, 150% maximum charge, slow, area, or minion reduction.'
+ },
+ {
+  champion:'Gragas',patch:'16.23.1',spell:'GragasQ',calculation:'MaxFermentedDamage',source:'https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-17-notes/',
+  damageType:'magic',baseByRank:[112.5,187.5,262.5,337.5,412.5],apRatioByRank:[1.35,1.35,1.35,1.35,1.35],
+  note:'Q · explosão máxima após fermentação completa (150% do dano inicial). Variante manual; não modela temporização, slow, área ou redução contra tropas.'
+ },
+ {
   champion:'Bard',patch:'16.23.1',spell:'BardQ',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
   damageType:'magic',baseByRank:[80,125,170,215,260],apRatioByRank:[1,1,1,1,1],
   note:'Q · um impacto confirmado. Fórmula oficial do patch 26.23; colisão, atordoamento, acerto em segundo alvo e passiva não simulados.'
