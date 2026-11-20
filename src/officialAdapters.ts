@@ -245,6 +245,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · um golpe de tentáculo: 9–200,12 por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q. Não simula múltiplos tentáculos nem cura passiva.'
  },
  {
+  champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
+  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
+  note:'W · ativação de Harsh Lesson: prepara o próximo ataque básico fortalecido por até 6s; dano bônus é calculado no ataque que consumir a preparação.'
+ },
+ {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
   damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],targetMaxHPRatioByRank:[0.03,0.035,0.04,0.045,0.05],targetMaxHPADRatio:0.00035,minimumDamageByRank:[20,30,40,50,60],
   note:'W · bônus físico do ataque fortalecido: 3/3,5/4/4,5/5% da vida máxima + 3,5% por 100 AD, com mínimo 20/30/40/50/60. Limite de 300 contra não campeões, ataque básico e golpes de tentáculo não incluídos.'
