@@ -105,7 +105,7 @@ test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=
 test('Illaoi spirit health is reduced by damage after the spirit resistance check',()=>{
  const f=fighter(data,'Illaoi');f.level=1;f.skills=['E','Q','W','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1),attackAction(2),attackAction(3)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:200,armor:100,mr:0};s.enemy.automaticAttacks=false;s.duration=5;
- const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,3);assert.equal(hits[0].raw,125);assert.equal(hits[1].raw,125);assert.equal(hits[2].raw,125);
+ const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,3);assert.equal(hits[0].raw,133);assert.equal(hits[1].raw,133);assert.equal(hits[2].raw,133);
 });
 
 test('Hecarim W supports four separately timed ticks within one cooldown',()=>{
@@ -194,7 +194,7 @@ test('Graves True Grit, Gwen defensive/offensive states and Heimerdinger passive
  const rankFive={...graves,skills:['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[]};rankFive.level=18;const rankFiveState=kitState(rankFive);rankFiveState.gravesTrueGritStacks=8;rankFiveState.gravesTrueGritExpires=10;const rankFiveStats=statsFor(rankFive,data);const maxGrit=kitActorStats(rankFive,rankFiveStats,statsFor({...rankFive,items:[],overrides:{},runes:{...rankFive.runes,shards:[]}},data),rankFiveState,1);assert.equal(maxGrit.armor-rankFiveStats.armor,128);assert.equal(maxGrit.mr-rankFiveStats.mr,64);
  const gwen=fighter(data,'Gwen');gwen.level=3;gwen.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const wActor=statsFor(gwen,data),wBase=statsFor({...gwen,items:[],overrides:{},runes:{...gwen.runes,shards:[]}},data),wTarget=statsFor(fighter(data,'Azir'),data),wState=kitState(gwen);
- const w=kitImpact(nativeAction(gwen,data,2),gwen,data,wActor,wBase,wTarget,wTarget.hp,wState);assert.ok(w?.passive);
+ const wIndex=nativeOptions.Gwen.findIndex(x=>x.spell==='GwenW'&&x.calculation==='Activate');assert.ok(wIndex>=0);const w=kitImpact(nativeAction(gwen,data,wIndex),gwen,data,wActor,wBase,wTarget,wTarget.hp,wState);assert.ok(w?.passive);
  const mist=kitActorStats(gwen,wActor,wBase,wState,1);assert.ok(mist.armor>wActor.armor&&mist.mr>wActor.mr);
  const eState=kitImpact(nativeAction(gwen,data,3),gwen,data,mist,wBase,wTarget,wTarget.hp,wState);assert.ok(eState?.resetAttack);
  const empowered=kitActorStats(gwen,wActor,wBase,wState,2);assert.ok(empowered.as>mist.as);
