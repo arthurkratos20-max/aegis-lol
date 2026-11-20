@@ -119,23 +119,15 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
  assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
 
-test('Graves Classic 2015 Q W and R use pre-rework formulas, not modern SR mechanics',()=>{
- const one=officialAdapterFor('Graves','GravesQ','OnePellet','16.23.1');assert.ok(one);
- const three=officialAdapterFor('Graves','GravesQ','ThreePellets','16.23.1');assert.ok(three);
- assert.equal(evaluateOfficialAdapter(one,5,{ap:0,bonusAD:100}),255);
- assert.equal(evaluateOfficialAdapter(three,5,{ap:0,bonusAD:100}),510);
- const smoke=officialAdapterFor('Graves','GravesW','Impact','16.23.1');assert.ok(smoke);
- assert.equal(evaluateOfficialAdapter(smoke,5,{ap:100}),320);
- const direct=officialAdapterFor('Graves','GravesR','DirectHit','16.23.1');assert.ok(direct);
- assert.equal(evaluateOfficialAdapter(direct,3,{ap:0,bonusAD:100}),700);
- const cone=officialAdapterFor('Graves','GravesR','ConeExplosion','16.23.1');assert.ok(cone);
- assert.equal(evaluateOfficialAdapter(cone,3,{ap:0,bonusAD:100}),560);
- const f=fighter(data,'Graves');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
- const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
- assert.equal(nativeDamage(nativeAction(f,data,0),f,data,actor,target),60+0.75*actor.bonusAD);
- assert.equal(nativeDamage(nativeAction(f,data,1),f,data,actor,target),120+1.5*actor.bonusAD);
+test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
+ const initial=officialAdapterFor('Graves','GravesQ','InitialHit','16.23.1');assert.ok(initial);
+ assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),205);
+ const det=officialAdapterFor('Graves','GravesQ','Detonation','16.23.1');assert.ok(det);
+ assert.deepEqual(det.bonusADRatioByRank,[0.45,0.6,0.75,0.9,1.05]);assert.equal(evaluateOfficialAdapter(det,5,{ap:0,bonusAD:100}),365);
+ const smoke=officialAdapterFor('Graves','GravesW','Impact','16.23.1');assert.ok(smoke);assert.equal(evaluateOfficialAdapter(smoke,5,{ap:100}),320);
+ const direct=officialAdapterFor('Graves','GravesR','DirectHit','16.23.1');assert.ok(direct);assert.equal(evaluateOfficialAdapter(direct,3,{ap:0,bonusAD:100}),725);
+ const cone=officialAdapterFor('Graves','GravesR','ConeExplosion','16.23.1');assert.ok(cone);assert.equal(evaluateOfficialAdapter(cone,3,{ap:0,bonusAD:100}),560);
  const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','R']);assert.deepEqual(coverage.missing,['P','E']);
  assert.equal(nativeOptions.Graves.length,5);assert.equal(nativeOptions.Graves[1].automatic,false);assert.equal(nativeOptions.Graves[4].automatic,false);
- assert.equal(gravesDeclarationHasPartialDamage(),true);assert.equal(kitDeclarations.Graves.abilities.Q.name,'Buckshot');
- assert.deepEqual(validateOfficialDamageAdapters(),[]);
+ assert.equal(kitDeclarations.Graves.abilities.Q.name,'End of the Line');assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
