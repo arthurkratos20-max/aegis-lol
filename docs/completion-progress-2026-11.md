@@ -20,7 +20,7 @@
 - `src/exactKits.ts`/snapshot de efeitos: certificado somente para 16.20.1.
 - `validatedPatch`: null.
 - Esses snapshots incompatíveis não são combinados; os efeitos antigos ficam desativados no catálogo 16.23.1.
-- **Após o adapter oficial do Bardo Q: 1 kit parcial ativo (somente Q), 172 sem adapters e 0 kits completos validados no patch 16.23.1.** Os seis pilotos manuais são templates vazios, não seis kits funcionais no patch atual. A documentação anterior que indicava seis parciais/167 ausentes foi corrigida.
+- **Após os adapters oficiais de Bardo Q e Ezreal W/R: 2 kits parciais ativos, 171 sem adapters e 0 kits completos validados no patch 16.23.1.** Os seis pilotos manuais são templates vazios, não seis kits funcionais no patch atual. A documentação anterior que indicava seis parciais/167 ausentes foi corrigida.
 - Modo estrito permanece bloqueado. Build heurístico e ações manuais não equivalem à validação completa de dano por campeão.
 
 ## Validação mais recente
@@ -35,7 +35,7 @@
 
 ## Pendências de implementação
 
-1. Continuar adapters oficiais isolados patch-scoped (começando por buffs/nerfs numéricos do 26.23), mantendo em paralelo a busca por fonte atual para passivas e interações complexas; Meraki disponível está defasado (25.15).
+1. Continuar adapters oficiais isolados patch-scoped (priorizando buffs/nerfs numéricos do 26.23), mantendo em paralelo a busca por fonte atual para passivas e interações complexas; Meraki disponível está defasado (25.15).
 2. Atualizar `mechanics.json` e implementar adapters P/Q/W/E/R, passivas e condições para os 173 campeões, com fixtures independentes por patch.
 3. Integrar passivas de itens/runas, procs, grupos únicos, cura, escudos, recursos, DoT, recasts, pets, projéteis e geometria.
 4. Validar combos, DPS/TTK/EHP e o otimizador. A enumeração exata atual prova ótimo apenas dentro do conjunto finito testado; não prova ótimo global do catálogo.
