@@ -146,7 +146,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  {
   champion:'Graves',patch:'16.23.1',spell:'GravesE',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
   damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
-  note:'E · Quickdraw: ação sem dano que concede um stack de True Grit por 4s. O modelo de ataque básico usa apenas o primeiro projétil como baseline conservador; munição/recarga e pellets adicionais não simulados.'
+  note:'E · Quickdraw: ação sem dano que concede um stack de True Grit por 4s; armadura por stack 4/7/10/13/16 (patch 25.21+) e MR equivalente a 50% da armadura bônus. O modelo de ataque básico usa apenas o primeiro projétil como baseline conservador; munição/recarga e pellets adicionais não simulados.'
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenE',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
