@@ -106,7 +106,7 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MinimumSnips'),5,{ap:100}),226);
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenQ','MaximumSnips'),5,{ap:100}),350);
  assert.equal(evaluateOfficialAdapter(get('Gwen','GwenR','FirstNeedle'),3,{ap:100}),80);
- assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),275);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimW','TotalDamage'),5,{ap:100}),320);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerQ','TurretShot'),5,{ap:100}),58);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),195);
@@ -121,9 +121,9 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
 
 test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
  const initial=officialAdapterFor('Graves','GravesQ','InitialHit','16.23.1');assert.ok(initial);
- assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),205);
+ assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),215);
  const det=officialAdapterFor('Graves','GravesQ','Detonation','16.23.1');assert.ok(det);
- assert.deepEqual(det.bonusADRatioByRank,[0.45,0.6,0.75,0.9,1.05]);assert.equal(evaluateOfficialAdapter(det,5,{ap:0,bonusAD:100}),365);
+ assert.deepEqual(det.bonusADRatioByRank,[0.55,0.7,0.85,1,1.15]);assert.equal(evaluateOfficialAdapter(det,5,{ap:0,bonusAD:100}),375);
  const smoke=officialAdapterFor('Graves','GravesW','Impact','16.23.1');assert.ok(smoke);assert.equal(evaluateOfficialAdapter(smoke,5,{ap:100}),320);
  const direct=officialAdapterFor('Graves','GravesR','DirectHit','16.23.1');assert.ok(direct);assert.equal(evaluateOfficialAdapter(direct,3,{ap:0,bonusAD:100}),725);
  const cone=officialAdapterFor('Graves','GravesR','ConeExplosion','16.23.1');assert.ok(cone);assert.equal(evaluateOfficialAdapter(cone,3,{ap:0,bonusAD:100}),560);
