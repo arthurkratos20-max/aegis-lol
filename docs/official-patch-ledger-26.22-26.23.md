@@ -50,6 +50,7 @@ Fonte: https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends
 
 - **Azir:** alcance de ataque base 525 → 550. Correção registrada no ledger de atributos a partir de 16.23.1. A nota esclarece que isso não aumenta o alcance dos soldados.
 - **Bardo, Q:** dano por rank 80/125/170/215/260 + 100% AP. Adapter patch-scoped em `src/officialAdapters.ts`, executável apenas em 16.23.1. Representa um impacto mágico, não o kit inteiro; colisão, segundo alvo, atordoamento e passiva continuam fora do cálculo.\n- **Ezreal, W:** 80/135/190/245/300 + 115% de DdA adicional + 100% AP. Adapter representa somente a detonação da marca em campeão; a aplicação e procs não são simulados.\n- **Ezreal, R:** 350/600/850 + 110% de DdA adicional + 120% AP contra campeão. Adapter não simula colisões, trajetória ou redução por unidades atravessadas.
+- **Master Yi, Q:** dano padrão 20/40/60/80/100 + 60% AD total; máximo contra um único alvo 35/70/105/140/175 + 105% AD total. Ambos os casos implementados como impactos isolados no Aegis, com variante máxima manual e sem crítico adicional/multi-alvo.
 - **Ezreal, W/R; Galio, W; Gnar, Q; K'Sante, W; LeBlanc, Q; Master Yi, Q; Mel, Q/W; Syndra, E; Vel'Koz, R; Vi, E; Annie, R:** valores foram transcritos nas notas oficiais e permanecem pendentes de adapters específicos e fixtures para condições, alvos e recasts.
 
 As alterações de ARAM: Mayhem, ARAM e Arena (incluindo variantes de habilidades e itens desses modos) **não devem ser aplicadas ao motor de Summoner's Rift**. O catálogo de Summoner's Rift permanece ancorado em Data Dragon 16.23.1.
@@ -64,4 +65,4 @@ As alterações de ARAM: Mayhem, ARAM e Arena (incluindo variantes de habilidade
 
 ## Estado de cobertura
 
-As correções e o adapter isolado de Bardo alteram a cobertura para **2/173 kits parciais, 171 sem adapter e 0 kits completos** no patch 26.23. As coberturas parciais representam somente impactos isolados: Bardo Q e Ezreal W/R. Não equivalem a combos, passivas ou kits completos. O catálogo está atualizado; o motor de habilidades ainda requer trabalho por campeão.
+As correções e o adapter isolado de Bardo alteram a cobertura para **3/173 kits parciais, 170 sem adapter e 0 kits completos** no patch 26.23. As coberturas parciais representam somente impactos isolados: Bardo Q e Ezreal W/R. Não equivalem a combos, passivas ou kits completos. O catálogo está atualizado; o motor de habilidades ainda requer trabalho por campeão.
