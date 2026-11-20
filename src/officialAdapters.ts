@@ -194,6 +194,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'R+E · CH-3X Lightning Grenade: uma explosão de 100/200/300 + 60% AP. Três ricochetes e limites de dano por campeão não simulados; variante manual.'
  },
  {
+  champion:'Illaoi',patch:'16.23.1',spell:'IllaoiE',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
+  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
+  note:'E · Test of Spirit: ação sem dano que cria espírito por 7s e ecoa 25/30/35/40/45% (+8% por 100 AD) do dano pré-mitigação recebido, limitado pela vida restante do espírito.'
+ },
+ {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiQ',calculation:'TentacleStrike',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
   damageType:'physical',baseByRank:[9,9,9,9,9],baseByLevel:[9,20.24,31.47,42.71,53.95,65.18,76.42,87.65,98.89,110.13,121.36,132.6,143.84,155.07,166.31,177.55,188.78,200.12],
   apRatioByRank:[0.4,0.4,0.4,0.4,0.4],adRatioByRank:[1.1,1.1,1.1,1.1,1.1],damageAmpByRank:[0.1,0.15,0.2,0.25,0.3],
