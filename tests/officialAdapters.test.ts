@@ -153,7 +153,7 @@ test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
  const smoke=officialAdapterFor('Graves','GravesW','Impact','16.23.1');assert.ok(smoke);assert.equal(evaluateOfficialAdapter(smoke,5,{ap:100}),320);
  const direct=officialAdapterFor('Graves','GravesR','DirectHit','16.23.1');assert.ok(direct);assert.equal(evaluateOfficialAdapter(direct,3,{ap:0,bonusAD:100}),725);
  const cone=officialAdapterFor('Graves','GravesR','ConeExplosion','16.23.1');assert.ok(cone);assert.equal(evaluateOfficialAdapter(cone,3,{ap:0,bonusAD:100}),560);
- const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','R']);assert.deepEqual(coverage.missing,['P','E']);
- assert.equal(nativeOptions.Graves.length,5);assert.equal(nativeOptions.Graves[1].automatic,false);assert.equal(nativeOptions.Graves[4].automatic,false);
+ const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','R','E']);assert.deepEqual(coverage.missing,['P']);
+ assert.equal(nativeOptions.Graves.length,6);assert.equal(nativeOptions.Graves[1].automatic,false);assert.equal(nativeOptions.Graves[4].automatic,false);
  assert.equal(kitDeclarations.Graves.abilities.Q.name,'End of the Line');assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
