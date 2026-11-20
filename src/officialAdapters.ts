@@ -56,7 +56,8 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   if(!['physical','magic','true'].includes(row.damageType))errors.push(`${prefix}: invalid damage type`);
   if(!Array.isArray(row.baseByRank)||![3,5].includes(row.baseByRank.length)||row.baseByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: baseByRank must contain five finite nonnegative ranks`);
   if(!Array.isArray(row.apRatioByRank)||row.apRatioByRank.length!==row.baseByRank?.length||row.apRatioByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: apRatioByRank must contain five finite nonnegative ranks`);
-  if(row.bonusADRatioByRank&&(!Array.isArray(row.bonusADRatioByRank)||row.bonusADRatioByRank.length!==row.baseByRank?.length||row.bonusADRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: bonusADRatioByRank must match the rank table`);\n  if(!row.note.trim())errors.push(`${prefix}: scope note required`);
+  if(row.bonusADRatioByRank&&(!Array.isArray(row.bonusADRatioByRank)||row.bonusADRatioByRank.length!==row.baseByRank?.length||row.bonusADRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: bonusADRatioByRank must match the rank table`);
+  if(!row.note.trim())errors.push(`${prefix}: scope note required`);
   const key=`${row.patch}|${row.champion}|${row.spell}|${row.calculation}`;
   if(seen.has(key))errors.push(`${prefix}: duplicate patch/champion/spell/calculation`);
   seen.add(key);
