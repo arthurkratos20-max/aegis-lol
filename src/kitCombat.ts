@@ -33,8 +33,8 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
   state.gwenEExpires=at+4;impact.resetAttack=true;return impact;
  }
  if(f.champion==='Illaoi'&&a.native?.spell==='IllaoiE'&&a.native.calculation==='Activate'){
-  const rank=skillRank(f,'E'),baseRatio=[.25,.3,.35,.4,.45][rank-1],bonusAD=Math.max(0,actor.ad-base.ad);
-  state.illaoiSpiritExpires=at+7;state.illaoiSpiritHP=target.hp;state.illaoiEchoRatio=Math.min(1,baseRatio+.08*actor.ad/100);impact.passive=true;return impact;
+  const rank=skillRank(f,'E'),baseRatio=[.25,.3,.35,.4,.45][rank-1];
+  state.illaoiSpiritExpires=at+7;state.illaoiSpiritHP=currentHP;state.illaoiEchoRatio=Math.min(1,baseRatio+.08*actor.ad/100);impact.passive=true;return impact;
  }
  if(f.champion==='Gwen'&&a.native?.spell==='GwenW'&&a.native.calculation==='Activate'){state.gwenWExpires=at+4;impact.passive=true;return impact;}
  if(f.champion==='Hecarim'&&a.native?.spell==='HecarimW')state.hecarimWExpires=at+4;
