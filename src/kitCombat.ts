@@ -69,7 +69,7 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
  if(e?.id==='garen-w'){state.garenDRExpires=at+exactValue('Garen','GarenW','DRDuration',skillRank(f,'W'));state.garenDR=exactValue('Garen','GarenW','DRPercent',skillRank(f,'W'));}
  if(e)impact.raw=exactRaw(e.id,f,actor,base,target,currentHP,state.bleedExpires>at?state.bleedStacks:0);else if(!attack&&!(f.champion==='Gwen'&&(a.native?.spell==='GwenR'||a.native?.calculation==='EmpoweredAttack'||a.native?.calculation==='MaximumSnipsCenter')||f.champion==='Hecarim'&&a.native?.spell==='HecarimQ'))return null;
  if(attack){
-  if(!e)impact.raw=f.champion==='Graves'?actor.ad*crit*(.7+.3*(f.level-1)/17):actor.ad*crit;
+  if(!e)impact.raw=f.champion==='Graves'?actor.ad*crit*(.75+.35*(f.level-1)/17):actor.ad*crit;
   if(f.champion==='Gragas'&&hit&&state.gragasWReadyAt<=at&&state.gragasWExpires>at){const adapter=officialAdapterFor('Gragas','GragasW','EmpoweredAttack',data.version);if(adapter)extra.push({raw:evaluateOfficialAdapter(adapter,skillRank(f,'W'),{ap:actor.ap,targetMaxHP:target.hp}),type:'magic',name:'W · bônus do ataque fortalecido'});state.gragasWExpires=0;state.gragasWReadyAt=0;}
   if(e?.id==='jinx-rocket'){impact.raw*=crit;state.minigun=false;state.minigunStacks=0;}
   if(f.champion==='Gwen'&&hit){extra.push({raw:target.hp*(.01+.006*actor.ap/100),type:'magic',name:'P · A Thousand Cuts'});if(state.gwenEExpires>at)extra.push({raw:15+.2*actor.ap,type:'magic',name:'E · ataque fortalecido'});}
