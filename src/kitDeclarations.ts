@@ -42,21 +42,21 @@ export const kitDeclarations:Record<string,KitDeclaration>={
  }),
  Hecarim:declare('Hecarim','https://wiki.leagueoflegends.com/en-us/Hecarim',{
   P:{name:'Warpath',role:'converte velocidade de movimento adicional em dano de ataque',damageModel:'pending',notes:'Conversão dependente do nível e fontes elegíveis de velocidade.'},
-  Q:{name:'Rampage',role:'dano físico em área com stacks que amplificam dano e reduzem recarga',damageModel:'partial',notes:'Impacto-base (60/90/120/150/180 + 95% DdA adicional) implementado. Stacks, expiração, redução de recarga, área e dano contra tropas pendentes.'},
+  Q:{name:'Rampage',role:'dano físico em área com stacks que amplificam dano e reduzem recarga',damageModel:'partial',notes:'Impacto-base (60/90/120/150/180 + 90% DdA adicional) implementado. Stacks, expiração, redução de recarga, área e dano contra tropas pendentes.'},
   W:{name:'Spirit of Dread',role:'dano mágico periódico em área e cura baseada no dano sofrido pelos inimigos',damageModel:'partial',notes:'Dano total dos quatro ticks por rank implementado. Ticks, área, resistências bônus e cura por dano de aliados/inimigos pendentes.'},
-  E:{name:'Devastating Charge',role:'velocidade crescente e próximo ataque com dano físico e knockback',damageModel:'pending',notes:'Dano escala com distância percorrida; duração e distância alteram resultado.'},
-  R:{name:'Onslaught of Shadows',role:'investida com cavaleiros espectrais, dano mágico e medo ao final',damageModel:'pending',notes:'Múltiplos impactos e medo dependem da posição/direção e distância.'}
+  E:{name:'Devastating Charge',role:'velocidade crescente e próximo ataque com dano físico e knockback',damageModel:'partial',notes:'Variantes de dano mínimo e máximo por distância implementadas; velocidade crescente, knockback e escolha automática pela distância percorrida pendentes.'},
+  R:{name:'Onslaught of Shadows',role:'investida com cavaleiros espectrais, dano mágico e medo ao final',damageModel:'partial',notes:'Dano dos cavaleiros espectrais implementado; trajetória, múltiplos alvos e fear dependem da geometria e distância.'}
  }),
  Heimerdinger:declare('Heimerdinger','https://www.leagueoflegends.com/en-us/champions/heimerdinger/',{
   P:{name:'Hextech Affinity',role:'velocidade de movimento perto de torres aliadas e torretas próprias',damageModel:'pending',notes:'Aura de proximidade; não causa dano.'},
   Q:{name:'H-28G Evolution Turret',role:'instala torreta com disparos básicos e raio carregado',damageModel:'partial',notes:'Dano de um disparo básico isolado implementado. Pet persistente, alvo prioritário, cargas, recarga, cadência e laser em ciclos pendentes.'},
-  W:{name:'Hextech Micro-Rockets',role:'salva de foguetes com distribuição e convergência',damageModel:'partial',notes:'Dano de um foguete inicial isolado implementado. Distribuição, convergência, foguetes subsequentes e redução por acertos repetidos pendentes.'},
-  E:{name:'CH-2 Electron Storm Grenade',role:'granada em área com dano, stun no centro e slow na borda',damageModel:'pending',notes:'Separar centro/borda, ricochete e área de explosão.'},
-  R:{name:'UPGRADE!!!',role:'fortalece a próxima habilidade básica: torreta, foguetes ou granada',damageModel:'pending',notes:'Três variantes distintas; R não deve ser contado como impacto independente.'}
+  W:{name:'Hextech Micro-Rockets',role:'salva de foguetes com distribuição e convergência',damageModel:'partial',notes:'Dano do primeiro foguete 50/75/100/125/150 + 55% AP implementado. Distribuição, convergência, foguetes subsequentes e redução por acertos repetidos pendentes.'},
+  E:{name:'CH-2 Electron Storm Grenade',role:'granada em área com dano, stun no centro e slow na borda',damageModel:'partial',notes:'Dano 60/100/140/180/220 + 60% AP implementado; área central, stun, slow e recarga de raios pendentes.'},
+  R:{name:'UPGRADE!!!',role:'fortalece a próxima habilidade básica: torreta, foguetes ou granada',damageModel:'partial',notes:'Variante R+E com dano de uma explosão 100/200/300 + 60% AP implementada. R+Q e R+W, ricochetes e regra de uma única aplicação por campeão pendentes.'}
  }),
  Illaoi:declare('Illaoi','https://wiki.leagueoflegends.com/en-us/Illaoi',{
   P:{name:'Prophet of an Elder God',role:'gera tentáculos que atacam periodicamente e curam Illaoi',damageModel:'pending',notes:'Spawn, cooldown, alvos e redução por múltiplos tentáculos.'},
-  Q:{name:'Tentacle Smash',role:'passiva amplifica tentáculos; ativa golpeia em linha/área',damageModel:'pending',notes:'O dano real inclui tentáculo convocado; não duplicar amplificação e impacto.'},
+  Q:{name:'Tentacle Smash',role:'passiva amplifica tentáculos; ativa golpeia em linha/área',damageModel:'partial',notes:'Um golpe de tentáculo por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q. Múltiplos tentáculos e cura passiva não simulados.'},
   W:{name:'Harsh Lesson',role:'ataque fortalecido com avanço e comando para tentáculos golpearem',damageModel:'partial',notes:'Bônus físico baseado na vida máxima do alvo, com escala por rank e AD total, implementado. Dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo pendentes.'},
   E:{name:'Test of Spirit',role:'projétil que extrai espírito; dano ao espírito é parcialmente replicado no campeão',damageModel:'pending',notes:'Vínculo, duração, transferência de dano, vessel e tentáculos convocados.'},
   R:{name:'Leap of Faith',role:'dano físico em área e invocação de tentáculos por campeão atingido',damageModel:'partial',notes:'Impacto físico inicial e razão de DdA adicional implementados. Área, número de campeões atingidos, tentáculos invocados e ataques subsequentes pendentes.'}
