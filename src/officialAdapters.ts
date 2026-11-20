@@ -76,13 +76,13 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
 
  {
   champion:'Graves',patch:'16.23.1',spell:'GravesQ',calculation:'InitialHit',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
-  damageType:'physical',baseByRank:[50,75,100,125,150],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.55,0.55,0.55,0.55,0.55],
-  note:'Summoner’s Rift · Q End of the Line: impacto inicial 50/75/100/125/150 + 55% DdA adicional. Separado da detonação; trajetória/terreno não simulados.'
+  damageType:'physical',baseByRank:[50,75,100,125,150],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.65,0.65,0.65,0.65,0.65],
+  note:'Summoner’s Rift · Q End of the Line: impacto inicial 50/75/100/125/150 + 65% DdA adicional (patch 25.20+). Separado da detonação; trajetória/terreno não simulados.'
  },
  {
   champion:'Graves',patch:'16.23.1',spell:'GravesQ',calculation:'Detonation',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
-  damageType:'physical',baseByRank:[80,125,170,215,260],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.45,0.6,0.75,0.9,1.05],
-  note:'Summoner’s Rift · Q End of the Line: detonação 80/125/170/215/260 + 45/60/75/90/105% DdA adicional. Não soma automaticamente impacto inicial; geometria e colisão com terreno pendentes.'
+  damageType:'physical',baseByRank:[80,125,170,215,260],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.55,0.7,0.85,1,1.15],
+  note:'Summoner’s Rift · Q End of the Line: detonação 80/125/170/215/260 + 55/70/85/100/115% DdA adicional (patch 25.20+). Não soma automaticamente impacto inicial; geometria e colisão com terreno pendentes.'
  },
  {
   champion:'Graves',patch:'16.23.1',spell:'GravesW',calculation:'Impact',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
@@ -116,8 +116,8 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimQ',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
-  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.9,0.9,0.9,0.9,0.9],
-  note:'Q · um impacto físico de Rampage. Não inclui stacks de amplificação/redução de recarga, área, dano reduzido a tropas nem sequência de recasts.'
+  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.95,0.95,0.95,0.95,0.95],
+  note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 95% DdA adicional. Não inclui stacks de amplificação/redução de recarga, área nem sequência de recasts.'
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'TotalDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
