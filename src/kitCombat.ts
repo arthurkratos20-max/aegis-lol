@@ -25,10 +25,10 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
  const e=exactEffect(a.kitEffect);if(a.kitEffect&&(!e||e.champion!==f.champion||a.key!==e.key||a.kind!==(e.id==='lux-w'||e.mode==='shield'?'shield':'spell')||a.type!==e.type||data.version!==EXACT_PATCH||a.custom))return {raw:0,type:a.type,extra:[],cancel:'Efeito incompatível, customizado ou snapshot não validado'};
  const at=a.at,hit=a.hit===1,extra:KitPart[]=[],impact:KitImpact={raw:0,type:a.type,extra};
  if(f.champion==='Graves'&&a.native?.spell==='GravesE'&&a.native.calculation==='Activate'){
-  state.gravesTrueGritStacks=Math.min(8,state.gravesTrueGritStacks+1);state.gravesTrueGritExpires=at+4;impact.passive=true;return impact;
+  state.gravesTrueGritStacks=Math.min(8,state.gravesTrueGritStacks+1);state.gravesTrueGritExpires=at+4;impact.resetAttack=true;return impact;
  }
  if(f.champion==='Gwen'&&a.native?.spell==='GwenE'&&a.native.calculation==='Activate'){
-  state.gwenEExpires=at+4;impact.passive=true;return impact;
+  state.gwenEExpires=at+4;impact.resetAttack=true;return impact;
  }
  if(f.champion==='Hecarim'&&a.native?.spell==='HecarimW')state.hecarimWExpires=at+4;
  if(f.champion==='Hecarim'&&a.native?.spell==='HecarimQ'&&a.native.calculation==='Damage'){
@@ -58,7 +58,7 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
  }
  const attack=a.kind==='attack'||e?.mode==='attack',crit=1+Math.max(0,Math.min(1,actor.crit))*(actor.critMultiplier-1);
  if(e?.id==='garen-w'){state.garenDRExpires=at+exactValue('Garen','GarenW','DRDuration',skillRank(f,'W'));state.garenDR=exactValue('Garen','GarenW','DRPercent',skillRank(f,'W'));}
- if(e)impact.raw=exactRaw(e.id,f,actor,base,target,currentHP,state.bleedExpires>at?state.bleedStacks:0);else if(!attack)return null;
+ if(e)impact.raw=exactRaw(e.id,f,actor,base,target,currentHP,state.bleedExpires>at?state.bleedStacks:0);else if(!attack&&!(f.champion==='Gwen'&&(a.native?.spell==='GwenR'||a.native?.calculation==='EmpoweredAttack')))return null;
  if(attack){
   if(!e)impact.raw=f.champion==='Graves'?actor.ad*crit*(.7+.3*(f.level-1)/17):actor.ad*crit;
   if(f.champion==='Gragas'&&hit&&state.gragasWReadyAt<=at&&state.gragasWExpires>at){const adapter=officialAdapterFor('Gragas','GragasW','EmpoweredAttack',data.version);if(adapter)extra.push({raw:evaluateOfficialAdapter(adapter,skillRank(f,'W'),{ap:actor.ap,targetMaxHP:target.hp}),type:'magic',name:'W · bônus do ataque fortalecido'});state.gragasWExpires=0;state.gragasWReadyAt=0;}
@@ -76,7 +76,7 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
    if(hit){state.asheStacks=state.asheStackExpires>at?Math.min(4,state.asheStacks+1):1;state.asheStackExpires=at+4;state.asheFrostExpires=at+2;}
   }
  }
- if(hit&&f.champion==='Gwen'&&a.native?.spell==='GwenR')extra.push({raw:target.hp*(.01+.006*actor.ap/100),type:'magic',name:'P · A Thousand Cuts (agulha)'});
+ if(hit&&f.champion==='Gwen'&&a.native?.calculation==='EmpoweredAttack')extra.push({raw:target.hp*(.01+.006*actor.ap/100),type:'magic',name:'P · A Thousand Cuts'});
  if(hit&&f.champion==='Vayne'&&(attack||e?.id==='vayne-e')&&skillRank(f,'W')){
   state.vayneStacks=state.vayneExpires>at?state.vayneStacks+1:1;state.vayneExpires=at+3.5;
   if(state.vayneStacks>=3){extra.push({raw:exactRaw('vayne-w',f,actor,base,target,currentHP),type:'true',name:'W · terceiro acúmulo'});state.vayneStacks=0;}
