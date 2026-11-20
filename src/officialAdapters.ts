@@ -154,6 +154,21 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · um disparo básico de uma torreta H-28G. Não simula instalação, alvo prioritário, cadência, duração, cargas nem raio carregado.'
  },
  {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerQ',calculation:'TurretBeam',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[40,60,80,100,120],apRatioByRank:[0.55,0.55,0.55,0.55,0.55],
+  note:'Q · raio carregado de uma torreta H-28G: 40/60/80/100/120 + 55% AP. Uma descarga isolada; não simula carga/cadência, direção, alvos atingidos ou torretas persistentes.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerR',calculation:'ApexTurretShot',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[80,100,120],apRatioByRank:[0.35,0.35,0.35],
+  note:'R+Q · um ataque básico da torreta H-28Q Apex: 80/100/120 + 35% AP. Variante manual isolada, sem duração, cadência, alvos ou área.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerR',calculation:'ApexTurretBeam',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[100,140,180],apRatioByRank:[0.7,0.7,0.7],
+  note:'R+Q · um raio carregado da torreta H-28Q Apex: 100/140/180 + 70% AP. Variante manual isolada; não simula carga, cadência, linha de acerto nem duração da torreta.'
+ },
+ {
   champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerW',calculation:'FullSalvo',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
   damageType:'magic',baseByRank:[90,135,180,225,270],apRatioByRank:[1.03,1.03,1.03,1.03,1.03],
   note:'W · salva completa de cinco foguetes contra um único campeão: primeiro foguete + quatro subsequentes com dano reduzido. Não modela distribuição/convergência, múltiplos alvos ou acertos em minions.'
