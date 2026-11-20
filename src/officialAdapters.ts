@@ -20,6 +20,10 @@ export interface OfficialDamageAdapter {
  targetMaxHPRatioByRank?:number[];
  targetMaxHPBonusADRatio?:number;
  targetMaxHPADRatio?:number;
+ targetMaxHPRatioPer100AP?:number;
+ minimumDamageByRank?:number[];
+ damageAmpByRank?:number[];
+ baseByLevel?:number[];
  note:string;
 }
 export const officialDamageAdapters:OfficialDamageAdapter[]=[
@@ -116,7 +120,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimQ',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
-  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.95,0.95,0.95,0.95,0.95],
+  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.9,0.9,0.9,0.9,0.9],
   note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 95% DdA adicional. Não inclui stacks de amplificação/redução de recarga, área nem sequência de recasts.'
  },
  {
@@ -131,8 +135,39 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerW',calculation:'FirstRocket',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
-  damageType:'magic',baseByRank:[50,75,100,125,150],apRatioByRank:[0.45,0.45,0.45,0.45,0.45],
-  note:'W · primeiro foguete da salva, um impacto. Foguetes subsequentes, convergência, distribuição, redução de dano por acertos repetidos e carga de torretas não simulados.'
+  damageType:'magic',baseByRank:[50,75,100,125,150],apRatioByRank:[0.55,0.55,0.55,0.55,0.55],
+  note:'W · primeiro foguete da salva: 50/75/100/125/150 + 55% AP (patch 26.3+). Foguetes subsequentes, convergência, distribuição, redução por acertos repetidos e carga de torretas não simulados.'
+ },
+ {
+  champion:'Hecarim',patch:'16.23.1',spell:'HecarimE',calculation:'MinimumDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
+  damageType:'physical',baseByRank:[30,45,60,75,90],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.5,0.5,0.5,0.5,0.5],
+  note:'E · Devastating Charge: dano mínimo do ataque fortalecido 30/45/60/75/90 + 50% DdA adicional; distância percorrida não modelada.'
+ },
+ {
+  champion:'Hecarim',patch:'16.23.1',spell:'HecarimE',calculation:'MaximumDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
+  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[1,1,1,1,1],
+  note:'E · Devastating Charge: dano máximo após carga completa 60/90/120/150/180 + 100% DdA adicional; variante manual, depende da distância percorrida.'
+ },
+ {
+  champion:'Hecarim',patch:'16.23.1',spell:'HecarimR',calculation:'SpectralRiders',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
+  damageType:'magic',baseByRank:[150,250,350],apRatioByRank:[1,1,1],
+  note:'R · Onslaught of Shadows: dano mágico dos cavaleiros espectrais 150/250/350 + 100% AP. Não inclui fear/slow nem geometria de colisão.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerE',calculation:'Impact',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[60,100,140,180,220],apRatioByRank:[0.6,0.6,0.6,0.6,0.6],
+  note:'E · CH-2 Electron Storm Grenade: 60/100/140/180/220 + 60% AP; slow, stun central e recarga dos raios das torretas não simulados.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerR',calculation:'UpgradedGrenade',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[100,200,300],apRatioByRank:[0.6,0.6,0.6],
+  note:'R+E · CH-3X Lightning Grenade: uma explosão de 100/200/300 + 60% AP. Três ricochetes e limites de dano por campeão não simulados; variante manual.'
+ },
+ {
+  champion:'Illaoi',patch:'16.23.1',spell:'IllaoiQ',calculation:'TentacleStrike',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
+  damageType:'physical',baseByRank:[9,9,9,9,9],baseByLevel:[9,20.24,31.47,42.71,53.95,65.18,76.42,87.65,98.89,110.13,121.36,132.6,143.84,155.07,166.31,177.55,188.78,200.12],
+  apRatioByRank:[0.4,0.4,0.4,0.4,0.4],adRatioByRank:[1.1,1.1,1.1,1.1,1.1],damageAmpByRank:[0.1,0.15,0.2,0.25,0.3],
+  note:'Q · um golpe de tentáculo: 9–200,12 por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q. Não simula múltiplos tentáculos nem cura passiva.'
  },
  {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
@@ -149,11 +184,11 @@ export function officialAdapterFor(champion:string,spell:string,calculation:stri
  const validation=validateOfficialDamageAdapters();if(validation.length)throw Error(`Official adapter registry invalid: ${validation.join('; ')}`);
  return officialDamageAdapters.find(a=>a.champion===champion&&a.spell===spell&&a.calculation===calculation&&a.patch===patch);
 }
-export function evaluateOfficialAdapter(adapter:OfficialDamageAdapter,rank:number,stats:Pick<Stats,'ap'> & {bonusAD?:number;ad?:number;targetMaxHP?:number}):number{
+export function evaluateOfficialAdapter(adapter:OfficialDamageAdapter,rank:number,stats:Pick<Stats,'ap'> & {bonusAD?:number;ad?:number;targetMaxHP?:number;level?:number}):number{
  if(!Number.isInteger(rank)||rank<1||rank>adapter.baseByRank.length)throw Error('Rank fora da tabela oficial');
  const base=adapter.baseByRank[rank-1],ratio=adapter.apRatioByRank[rank-1],bonusRatio=adapter.bonusADRatioByRank?.[rank-1]??0,adRatio=adapter.adRatioByRank?.[rank-1]??0,bonusAD=stats.bonusAD??0,ad=stats.ad??0,targetMaxHP=stats.targetMaxHP??0;
  if(!Number.isFinite(base)||!Number.isFinite(ratio)||!Number.isFinite(bonusRatio)||!Number.isFinite(adRatio)||!Number.isFinite(stats.ap)||!Number.isFinite(bonusAD)||!Number.isFinite(ad)||!Number.isFinite(targetMaxHP)||targetMaxHP<0)throw Error('Dados da fórmula oficial inválidos');
- return base+ratio*stats.ap+bonusRatio*bonusAD+adRatio*ad+(adapter.targetMaxHPRatio??adapter.targetMaxHPRatioByRank?.[rank-1]??0)*targetMaxHP+(adapter.targetMaxHPBonusADRatio??0)*bonusAD*targetMaxHP+(adapter.targetMaxHPADRatio??0)*ad*targetMaxHP;
+ const level=stats.level??1;if(adapter.baseByLevel&&(!Number.isInteger(level)||level<1||level>18||adapter.baseByLevel.length!==18))throw Error('Tabela de nível inválida');const levelBase=adapter.baseByLevel?.[level-1]??base;const hpRatio=(adapter.targetMaxHPRatio??adapter.targetMaxHPRatioByRank?.[rank-1]??0)+(adapter.targetMaxHPRatioPer100AP??0)*stats.ap/100;const result=levelBase+ratio*stats.ap+bonusRatio*bonusAD+adRatio*ad+hpRatio*targetMaxHP+(adapter.targetMaxHPBonusADRatio??0)*bonusAD*targetMaxHP+(adapter.targetMaxHPADRatio??0)*ad*targetMaxHP;const minimum=adapter.minimumDamageByRank?.[rank-1]??0;return Math.max(minimum,result)*(1+(adapter.damageAmpByRank?.[rank-1]??0));
 }
 
 /** Registry gate: invalid or ambiguous official rows must never enter runtime. */
@@ -176,6 +211,10 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   if(row.targetMaxHPRatioByRank&&(!Array.isArray(row.targetMaxHPRatioByRank)||row.targetMaxHPRatioByRank.length!==row.baseByRank?.length||row.targetMaxHPRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: targetMaxHPRatioByRank must match the rank table`);
   if(row.targetMaxHPBonusADRatio!==undefined&&(!Number.isFinite(row.targetMaxHPBonusADRatio)||row.targetMaxHPBonusADRatio<0))errors.push(`${prefix}: targetMaxHPBonusADRatio must be finite and nonnegative`);
   if(row.targetMaxHPADRatio!==undefined&&(!Number.isFinite(row.targetMaxHPADRatio)||row.targetMaxHPADRatio<0))errors.push(`${prefix}: targetMaxHPADRatio must be finite and nonnegative`);
+  if(row.targetMaxHPRatioPer100AP!==undefined&&(!Number.isFinite(row.targetMaxHPRatioPer100AP)||row.targetMaxHPRatioPer100AP<0))errors.push(`${prefix}: targetMaxHPRatioPer100AP must be finite and nonnegative`);
+  if(row.minimumDamageByRank&&(!Array.isArray(row.minimumDamageByRank)||row.minimumDamageByRank.length!==row.baseByRank?.length||row.minimumDamageByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: minimumDamageByRank must match the rank table`);
+  if(row.damageAmpByRank&&(!Array.isArray(row.damageAmpByRank)||row.damageAmpByRank.length!==row.baseByRank?.length||row.damageAmpByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: damageAmpByRank must match the rank table`);
+  if(row.baseByLevel&&(!Array.isArray(row.baseByLevel)||row.baseByLevel.length!==18||row.baseByLevel.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: baseByLevel must contain 18 finite nonnegative levels`);
   if(!row.note?.trim())errors.push(`${prefix}: scope note required`);
   const key=`${row.patch}|${row.champion}|${row.spell}|${row.calculation}`;
   if(seen.has(key))errors.push(`${prefix}: duplicate patch/champion/spell/calculation`);
