@@ -72,7 +72,7 @@ export function validateKitDeclarations(declarations:Record<string,KitDeclaratio
   for(const slot of slots){
    const ability=kit.abilities[slot];
    if(!ability?.name?.trim()||!ability.role?.trim())errors.push(`${key} ${slot}: name/role missing`);
-   if(!['pending','partial','implemented'].includes(ability.damageModel))errors.push(`${key} ${slot}: invalid damage model status`);
+   if(ability&&!['pending','partial','implemented'].includes(ability.damageModel))errors.push(`${key} ${slot}: invalid damage model status`);
   }
  }
  return errors;
