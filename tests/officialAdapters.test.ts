@@ -133,7 +133,7 @@ test('Graves Classic 2015 Q W and R use pre-rework formulas, not modern SR mecha
  const f=fighter(data,'Graves');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
  const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
  assert.equal(nativeDamage(nativeAction(f,data,0),f,data,actor,target),60+0.75*actor.bonusAD);
- assert.equal(nativeDamage(nativeAction(f,data,1),f,data,actor,target),60+0.75*actor.bonusAD);
+ assert.equal(nativeDamage(nativeAction(f,data,1),f,data,actor,target),120+1.5*actor.bonusAD);
  const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','R']);assert.deepEqual(coverage.missing,['P','E']);
  assert.equal(nativeOptions.Graves.length,5);assert.equal(nativeOptions.Graves[1].automatic,false);assert.equal(nativeOptions.Graves[4].automatic,false);
  assert.equal(gravesDeclarationHasPartialDamage(),true);assert.equal(kitDeclarations.Graves.abilities.Q.name,'Buckshot');
