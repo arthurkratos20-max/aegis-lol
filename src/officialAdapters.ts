@@ -161,12 +161,12 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'SecondCast',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
   damageType:'magic',baseByRank:[105,195,285],apRatioByRank:[0.3,0.3,0.3],targetMaxHPRatioByRank:[0.03,0.03,0.03],targetMaxHPRatioPer100AP:0.018,
-  note:'R · segundo lançamento: três agulhas, dano agregado 90/150/210 + 30% AP + 3% (+1,8% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
+  note:'R · segundo lançamento: três agulhas, dano agregado 105/195/285 + 30% AP + 3% (+1,8% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
  },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'ThirdCast',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
   damageType:'magic',baseByRank:[175,325,475],apRatioByRank:[0.5,0.5,0.5],targetMaxHPRatioByRank:[0.05,0.05,0.05],targetMaxHPRatioPer100AP:0.03,
-  note:'R · terceiro lançamento: cinco agulhas, dano agregado 150/250/350 + 50% AP + 5% (+3% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
+  note:'R · terceiro lançamento: cinco agulhas, dano agregado 175/325/475 + 50% AP + 5% (+3% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
  },
  {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimE',calculation:'MinimumDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
