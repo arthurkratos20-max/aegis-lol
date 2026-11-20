@@ -147,6 +147,13 @@ test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade us
  assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
 
+
+test('Illaoi Test of Spirit echoes pre-mitigation damage during its seven-second tether',()=>{
+ const f=fighter(data,'Illaoi');f.level=1;f.skills=['E','Q','W','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
+ const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:1000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=3;
+ const result=simulate(s,data);const attack=result.events.find(e=>e.source==='Ataque básico');assert.ok(attack);assert.ok(attack.raw>100);assert.ok(result.player.damage>100);
+});
+
 test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
  const initial=officialAdapterFor('Graves','GravesQ','InitialHit','16.23.1');assert.ok(initial);
  assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),215);
