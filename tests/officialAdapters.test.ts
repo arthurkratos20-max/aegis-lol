@@ -7,7 +7,7 @@ import {nativeAction,nativeDamage,nativeOptions} from '../src/native.ts';
 import {championKitCoverage,kitImpactPotential} from '../src/championKit.ts';
 import {fighter,statsFor,initialScenario,attackAction} from '../src/model.ts';
 import {simulate} from '../src/engine.ts';
-import {kitImpact,kitState} from '../src/kitCombat.ts';
+import {kitActorStats,kitImpact,kitState} from '../src/kitCombat.ts';
 import {kitDeclarations} from '../src/kitDeclarations.ts';
 function gravesDeclarationHasPartialDamage(){return ['Q','W','R'].every(slot=>kitDeclarations.Graves.abilities[slot as keyof typeof kitDeclarations.Graves.abilities].damageModel==='partial');}
 
@@ -149,6 +149,26 @@ test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade us
 });
 
 
+
+
+test('Graves True Grit, Gwen defensive/offensive states and Heimerdinger passive are applied in base SR stats',()=>{
+ const graves=fighter(data,'Graves');graves.level=3;graves.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const gActor=statsFor(graves,data),gBase=statsFor({...graves,items:[],overrides:{},runes:{...graves.runes,shards:[]}},data),gTarget=statsFor(fighter(data,'Azir'),data),gState=kitState(graves);
+ const e= nativeAction(graves,data,5),activated=kitImpact(e,graves,data,gActor,gBase,gTarget,gTarget.hp,gState);assert.ok(activated);assert.equal(gState.gravesTrueGritStacks,1);
+ const defended=kitActorStats(graves,gActor,gBase,gState,1);assert.equal(defended.armor-gActor.armor,2);assert.equal(defended.mr-gActor.mr,1);
+ const expired=kitActorStats(graves,gActor,gBase,gState,5);assert.equal(expired.armor,gActor.armor);
+ const gwen=fighter(data,'Gwen');gwen.level=3;gwen.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const wActor=statsFor(gwen,data),wBase=statsFor({...gwen,items:[],overrides:{},runes:{...gwen.runes,shards:[]}},data),wTarget=statsFor(fighter(data,'Azir'),data),wState=kitState(gwen);
+ const w=kitImpact(nativeAction(gwen,data,2),gwen,data,wActor,wBase,wTarget,wTarget.hp,wState);assert.ok(w?.passive);
+ const mist=kitActorStats(gwen,wActor,wBase,wState,1);assert.ok(mist.armor>wActor.armor&&mist.mr>wActor.mr);
+ const eState=kitImpact(nativeAction(gwen,data,3),gwen,data,mist,wBase,wTarget,wTarget.hp,wState);assert.ok(eState?.resetAttack);
+ const empowered=kitActorStats(gwen,wActor,wBase,wState,2);assert.ok(empowered.as>mist.as);
+ const empoweredHit=kitImpact(attackAction(2),gwen,data,empowered,wBase,wTarget,wTarget.hp,wState);assert.ok(empoweredHit);assert.deepEqual(empoweredHit.extra.map(x=>x.name),['P · A Thousand Cuts','E · ataque fortalecido']);
+ const heimer=fighter(data,'Heimerdinger');const hActor=statsFor(heimer,data),hBase=statsFor({...heimer,items:[],overrides:{},runes:{...heimer.runes,shards:[]}},data),hState=kitState(heimer);heimer.stacks['heimer-turret-nearby']=1;
+ const nearby=kitActorStats(heimer,hActor,hBase,hState,0);assert.ok(Math.abs(nearby.move-hActor.move*1.2)<1e-8);
+ const hecarim=fighter(data,'Hecarim');hecarim.level=18;const hca=statsFor(hecarim,data),hcb=statsFor({...hecarim,items:[],overrides:{},runes:{...hecarim.runes,shards:[]}},data),hcState=kitState(hecarim);
+ const warpath=kitActorStats(hecarim,{...hca,move:hca.move+100},hcb,hcState,0);assert.ok(Math.abs(warpath.ad-hca.ad-24)<1e-8);
+});
 
 test('Hecarim Rampage consumes active stacks for damage amplification and cooldown refund',()=>{
  const f=fighter(data,'Hecarim');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
