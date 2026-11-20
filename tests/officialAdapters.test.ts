@@ -78,7 +78,7 @@ test('Bard adapter metadata remains source-scoped and does not certify a full ki
 
 test('official adapter registry rejects stale, malformed, duplicate or untraceable rows',()=>{
  assert.deepEqual(validateOfficialDamageAdapters(),[]);
- const valid=officialDamageAdapters[0];
+ const valid=officialDamageAdapters.find(a=>a.sourceType==='riot');
  assert.ok(valid);
  assert.ok(validateOfficialDamageAdapters([{...valid,source:'https://example.com/fake'}]).some(e=>e.includes('official Riot')));
  assert.ok(validateOfficialDamageAdapters([{...valid,baseByRank:[80]}]).some(e=>e.includes('five finite')));
