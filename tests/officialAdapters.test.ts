@@ -17,6 +17,8 @@ test('Bard Q official patch adapter matches Riot 26.23 rank table and AP ratio',
  assert.equal(evaluateOfficialAdapter(adapter,5,{ap:250}),510);
  assert.equal(officialAdapterFor('Bard','BardQ','Damage','16.22.1'),undefined);
  assert.throws(()=>evaluateOfficialAdapter(adapter,6,{ap:100}),/Rank/);
+ const yi=officialAdapterFor('MasterYi','MasterYiQ','Damage','16.23.1');assert.ok(yi);assert.equal(evaluateOfficialAdapter(yi,5,{ap:0,ad:200}),220);
+ const yiMax=officialAdapterFor('MasterYi','MasterYiQ','MaxSingleTargetDamage','16.23.1');assert.ok(yiMax);assert.equal(evaluateOfficialAdapter(yiMax,5,{ap:0,ad:200}),385);
  const ezW=officialAdapterFor('Ezreal','EzrealW','Damage','16.23.1');assert.ok(ezW);assert.equal(evaluateOfficialAdapter(ezW,5,{ap:100,bonusAD:100}),515);
  const ezR=officialAdapterFor('Ezreal','EzrealR','Damage','16.23.1');assert.ok(ezR);assert.equal(evaluateOfficialAdapter(ezR,3,{ap:100,bonusAD:100}),1080);
 });
@@ -61,3 +63,5 @@ test('official adapter registry rejects stale, malformed, duplicate or untraceab
  assert.ok(validateOfficialDamageAdapters([valid,valid]).some(e=>e.includes('duplicate')));
  assert.ok(validateOfficialDamageAdapters([{...valid,patch:'current'}]).some(e=>e.includes('patch version')));
 });
+
+test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=>{\n const f=fighter(data,'MasterYi');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;\n const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);\n const standard=nativeAction(f,data,0),maximum=nativeAction(f,data,1);\n assert.equal(standard.native?.calculation,'Damage');assert.equal(maximum.native?.calculation,'MaxSingleTargetDamage');\n assert.equal(nativeDamage(standard,f,data,actor,target),20+0.6*actor.ad);\n assert.equal(nativeDamage(maximum,f,data,actor,target),35+1.05*actor.ad);\n const coverage=championKitCoverage('MasterYi',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q']);assert.deepEqual(coverage.missing,['P','W','E','R']);\n assert.equal(nativeOptions.MasterYi[1].automatic,false);\n});\n
