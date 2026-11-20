@@ -10,6 +10,7 @@ export interface OfficialDamageAdapter {
  spell:string;
  calculation:string;
  source:string;
+ sourceType?:'riot'|'wiki';
  damageType:'physical'|'magic'|'true';
  baseByRank:number[];
  apRatioByRank:number[];
@@ -30,17 +31,17 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · explosão máxima após fermentação completa (150% do dano inicial). Variante manual; não modela temporização, slow, área ou redução contra tropas.'
  },
  {
-  champion:'Gragas',patch:'16.23.1',spell:'GragasW',calculation:'EmpoweredAttack',source:'https://wiki.leagueoflegends.com/en-us/Gragas',
+  champion:'Gragas',patch:'16.23.1',spell:'GragasW',calculation:'EmpoweredAttack',source:'https://wiki.leagueoflegends.com/en-us/Gragas',sourceType:'wiki',
   damageType:'magic',baseByRank:[20,50,80,110,140],apRatioByRank:[0.7,0.7,0.7,0.7,0.7],targetMaxHPRatio:0.07,
   note:'W · dano mágico adicional do próximo ataque após canalizar: base + 7% da vida máxima individual do alvo + 70% AP. Não inclui ataque físico, crítico, área, redução contra estruturas nem limite de monstros; ação manual.'
  },
  {
-  champion:'Gragas',patch:'16.23.1',spell:'GragasE',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Gragas',
+  champion:'Gragas',patch:'16.23.1',spell:'GragasE',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Gragas',sourceType:'wiki',
   damageType:'magic',baseByRank:[80,125,170,215,260],apRatioByRank:[0.6,0.6,0.6,0.6,0.6],
   note:'E · impacto mágico isolado. Não simula dash, stun, colisão/área nem redução de 40% no cooldown ao acertar.'
  },
  {
-  champion:'Gragas',patch:'16.23.1',spell:'GragasR',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Gragas',
+  champion:'Gragas',patch:'16.23.1',spell:'GragasR',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Gragas',sourceType:'wiki',
   damageType:'magic',baseByRank:[200,300,400],apRatioByRank:[0.8,0.8,0.8],
   note:'R · impacto mágico isolado. Não simula deslocamento, geometria, terreno, múltiplos alvos nem controle de grupo.'
  },
@@ -89,7 +90,9 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   const prefix=`adapter[${index}]`;
   if(!row.champion?.trim()||!row.spell?.trim()||!row.calculation?.trim())errors.push(`${prefix}: champion/spell/calculation required`);
   if(!/^\d+\.\d+\.\d+$/.test(row.patch))errors.push(`${prefix}: invalid patch version`);
-  if(!/^https:\/\/(www\.)?leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: source must be an official Riot League URL`);
+  if((row.sourceType??'riot')==='riot'&&!/^https:\/\/(www\.)?leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: Riot source must be an official League URL`);
+  else if(row.sourceType==='wiki'&&!/^https:\/\/wiki\.leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: wiki source must be League of Legends Wiki`);
+  else if(row.sourceType!==undefined&&!['riot','wiki'].includes(row.sourceType))errors.push(`${prefix}: invalid source type`);
   if(!['physical','magic','true'].includes(row.damageType))errors.push(`${prefix}: invalid damage type`);
   if(!Array.isArray(row.baseByRank)||![3,5].includes(row.baseByRank.length)||row.baseByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: baseByRank must contain three or five finite nonnegative ranks`);
   if(!Array.isArray(row.apRatioByRank)||row.apRatioByRank.length!==row.baseByRank?.length||row.apRatioByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: apRatioByRank must match baseByRank`);
