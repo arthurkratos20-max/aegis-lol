@@ -139,6 +139,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'W · primeiro foguete da salva: 50/75/100/125/150 + 55% AP (patch 26.3+). Foguetes subsequentes, convergência, distribuição, redução por acertos repetidos e carga de torretas não simulados.'
  },
  {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenW',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
+  note:'W · Hallowed Mist: ação sem dano que concede 4s de armadura e resistência mágica bônus de 22/24/26/28/30 + 7% AP. Untargetability espacial não simulada.'
+ },
+ {
   champion:'Graves',patch:'16.23.1',spell:'GravesE',calculation:'Activate',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
   damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],
   note:'E · Quickdraw: ação sem dano que concede um stack de True Grit por 4s. O modelo de ataque básico usa apenas o primeiro projétil como baseline conservador; munição/recarga e pellets adicionais não simulados.'
