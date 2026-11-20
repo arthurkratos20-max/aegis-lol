@@ -110,7 +110,7 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimW','TotalDamage'),5,{ap:100}),320);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerQ','TurretShot'),5,{ap:100}),58);
  assert.equal(evaluateOfficialAdapter(get('Heimerdinger','HeimerdingerW','FirstRocket'),5,{ap:100}),195);
- assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiW','BonusMaxHealthDamage'),5,{ap:0,bonusAD:100,targetMaxHP:2000}),170);
+ assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiW','BonusMaxHealthDamage'),5,{ap:0,ad:200,targetMaxHP:2000}),240);
  assert.equal(evaluateOfficialAdapter(get('Illaoi','IllaoiR','Damage'),3,{ap:0,bonusAD:100}),400);
  for(const champion of ['Gwen','Hecarim','Heimerdinger','Illaoi']){
   const coverage=championKitCoverage(champion,data);assert.equal(coverage.status,'partial');assert.equal(coverage.isExactFormula,false);
@@ -120,6 +120,6 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
 });
 
 test('Graves Classic remains pending rather than borrowing modern Summoner’s Rift formulas',()=>{
- const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'none');assert.deepEqual(coverage.covered,[]);
+ const coverage=championKitCoverage('Graves',data);assert.equal(coverage.status,'missing');assert.deepEqual(coverage.covered,[]);
  assert.equal(kitDeclarationsPlaceholder(),true);
 });
