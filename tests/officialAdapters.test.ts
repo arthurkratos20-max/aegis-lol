@@ -16,7 +16,7 @@ test('Bard Q official patch adapter matches Riot 26.23 rank table and AP ratio',
  assert.equal(evaluateOfficialAdapter(adapter,3,{ap:100}),270);
  assert.equal(evaluateOfficialAdapter(adapter,5,{ap:250}),510);
  assert.equal(officialAdapterFor('Bard','BardQ','Damage','16.22.1'),undefined);
- assert.throws(()=>evaluateOfficialAdapter(adapter,6,{ap:100}),/Rank/);
+ assert.throws(()=>evaluateOfficialAdapter(adapter,6,{ap:100}),/Rank/);\n const ezW=officialAdapterFor('Ezreal','EzrealW','Damage','16.23.1');assert.ok(ezW);assert.equal(evaluateOfficialAdapter(ezW,5,{ap:100,bonusAD:100}),525);\n const ezR=officialAdapterFor('Ezreal','EzrealR','Damage','16.23.1');assert.ok(ezR);assert.equal(evaluateOfficialAdapter(ezR,3,{ap:100,bonusAD:100}),1080);
 });
 
 test('Bard Q is executable as a patch-matched isolated magic impact without stale mechanics',()=>{
@@ -37,7 +37,7 @@ test('Bard Q is executable as a patch-matched isolated magic impact without stal
 test('Bard adapter metadata remains source-scoped and does not certify a full kit',()=>{
  const a=officialDamageAdapters.find(x=>x.champion==='Bard');
  assert.ok(a?.source.includes('leagueoflegends.com'));
- assert.equal(nativeOptions.Bard.length,1);
+ assert.equal(nativeOptions.Bard.length,1);\n assert.equal(nativeOptions.Ezreal.find(o=>o.key==='R')?.note.includes('patch 26.23'),true);
  assert.match(nativeOptions.Bard[0].note,/colisão, segundo alvo, atordoamento e passiva não simulados/);
 });
 
