@@ -70,6 +70,52 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   damageType:'magic',baseByRank:[350,600,850],apRatioByRank:[1.2,1.2,1.2],bonusADRatioByRank:[1.1,1.1,1.1],
   note:'R · dano contra campeão após a redução por alvos não campeões; colisões, redução por unidades atravessadas e trajetória não simuladas.'
  }
+
+ {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenQ',calculation:'MinimumSnips',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[70,99,128,157,186],apRatioByRank:[0.4,0.4,0.4,0.4,0.4],
+  note:'Q · dano mínimo externo (2 cortes + corte final, sem stacks Snippy); variante mágica agregada. Conversão do centro para dano verdadeiro, passiva por vida máxima e geometria não incluídas.'
+ },
+ {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenQ',calculation:'MaximumSnips',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[110,155,200,245,290],apRatioByRank:[0.6,0.6,0.6,0.6,0.6],
+  note:'Q · dano máximo externo com quatro stacks Snippy (6 cortes); variante mágica agregada. Conversão do centro para dano verdadeiro, passiva por vida máxima e geometria não incluídas.'
+ },
+ {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'FirstNeedle',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[30,50,70],apRatioByRank:[0.1,0.1,0.1],
+  note:'R · um único agulhão do primeiro lançamento. Não inclui recasts, quantidade crescente de agulhas, passiva, slow ou acertos múltiplos.'
+ },
+ {
+  champion:'Hecarim',patch:'16.23.1',spell:'HecarimQ',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
+  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.9,0.9,0.9,0.9,0.9],
+  note:'Q · um impacto físico de Rampage. Não inclui stacks de amplificação/redução de recarga, área, dano reduzido a tropas nem sequência de recasts.'
+ },
+ {
+  champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'TotalDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
+  damageType:'magic',baseByRank:[80,120,160,200,240],apRatioByRank:[0.8,0.8,0.8,0.8,0.8],
+  note:'W · soma dos quatro ticks em um alvo durante 4s. Não simula ticks por segundo, área, resistências bônus nem cura baseada no dano causado na zona.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerQ',calculation:'TurretShot',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[7,11,15,19,23],apRatioByRank:[0.35,0.35,0.35,0.35,0.35],
+  note:'Q · um disparo básico de uma torreta H-28G. Não simula instalação, alvo prioritário, cadência, duração, cargas nem raio carregado.'
+ },
+ {
+  champion:'Heimerdinger',patch:'16.23.1',spell:'HeimerdingerW',calculation:'FirstRocket',source:'https://wiki.leagueoflegends.com/en-us/Heimerdinger',sourceType:'wiki',
+  damageType:'magic',baseByRank:[50,75,100,125,150],apRatioByRank:[0.45,0.45,0.45,0.45,0.45],
+  note:'W · primeiro foguete da salva, um impacto. Foguetes subsequentes, convergência, distribuição, redução de dano por acertos repetidos e carga de torretas não simulados.'
+ },
+ {
+  champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
+  damageType:'physical',baseByRank:[3,3.5,4,4.5,5],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.035,0.035,0.035,0.035,0.035],targetMaxHPRatio:0.0,
+  note:'W · bônus físico do ataque fortalecido: 3/3,5/4/4,5/5% da vida máxima + 3,5% por 100 AD. O dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo não incluídos.'
+ },
+ {
+  champion:'Illaoi',patch:'16.23.1',spell:'IllaoiR',calculation:'Damage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
+  damageType:'physical',baseByRank:[150,250,350],apRatioByRank:[0,0,0],bonusADRatioByRank:[0.5,0.5,0.5],
+  note:'R · impacto físico inicial em um alvo: 150/250/350 + 50% DdA adicional. Não inclui área, número de campeões atingidos, tentáculos invocados ou golpes subsequentes.'
+ },
 ];
 export function officialAdapterFor(champion:string,spell:string,calculation:string,patch:string):OfficialDamageAdapter|undefined{
  const validation=validateOfficialDamageAdapters();if(validation.length)throw Error(`Official adapter registry invalid: ${validation.join('; ')}`);
