@@ -15,7 +15,7 @@ A camada 2 não implica a camada 3. Um impacto isolado não é um combo, não re
 
 ## Adaptadores ativos
 
-O registro `src/officialAdapters.ts` contém adaptadores isolados vinculados a 16.23.1. O lote 02 adiciona Gragas, Graves, Gwen, Hecarim, Heimerdinger e Illaoi, além dos adaptadores anteriores de Bardo, Ezreal e Master Yi. Alguns impactos são apenas variantes manuais; os efeitos espaciais e sequenciais permanecem incompletos.
+O registro `src/officialAdapters.ts` contém adaptadores isolados vinculados a 16.23.1. O lote 02 adiciona Gragas, Graves, Gwen, Hecarim, Heimerdinger e Illaoi, além dos adaptadores anteriores de Bardo, Ezreal e Master Yi. Graves True Grit usa os valores por stack atualizados no patch 25.21 (4/7/10/13/16 de armadura por rank e 50% desse valor como MR). Alguns impactos são apenas variantes manuais; os efeitos espaciais e sequenciais permanecem incompletos.
 
 O relatório gerado por `npm run audit:coverage` é a fonte de contagem dos campeões e impactos no commit executado. Não reutilizar relatórios antigos de 16.19.1 como se fossem a auditoria do catálogo 16.23.1.
 
