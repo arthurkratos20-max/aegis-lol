@@ -90,7 +90,7 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   const prefix=`adapter[${index}]`;
   if(!row.champion?.trim()||!row.spell?.trim()||!row.calculation?.trim())errors.push(`${prefix}: champion/spell/calculation required`);
   if(!/^\d+\.\d+\.\d+$/.test(row.patch))errors.push(`${prefix}: invalid patch version`);
-  if((row.sourceType??'riot')==='riot'&&!/^https:\/\/(www\.)?leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: Riot source must be an official League URL`);
+  if((row.sourceType??'riot')==='riot'&&!/^https:\/\/(www\.)?leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: source must be an official Riot League URL`);
   else if(row.sourceType==='wiki'&&!/^https:\/\/wiki\.leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: wiki source must be League of Legends Wiki`);
   else if(row.sourceType!==undefined&&!['riot','wiki'].includes(row.sourceType))errors.push(`${prefix}: invalid source type`);
   if(!['physical','magic','true'].includes(row.damageType))errors.push(`${prefix}: invalid damage type`);
