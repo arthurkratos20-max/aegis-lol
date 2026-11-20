@@ -31,3 +31,23 @@ export function evaluateOfficialAdapter(adapter:OfficialDamageAdapter,rank:numbe
  if(!Number.isFinite(base)||!Number.isFinite(ratio)||!Number.isFinite(stats.ap))throw Error('Dados da fórmula oficial inválidos');
  return base+ratio*stats.ap;
 }
+
+/** Registry gate: invalid or ambiguous official rows must never enter runtime. */
+export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=officialDamageAdapters):string[]{
+ const errors:string[]=[];
+ const seen=new Set<string>();
+ for(const [index,row] of adapters.entries()){
+  const prefix=`adapter[${index}]`;
+  if(!row.champion.trim()||!row.spell.trim()||!row.calculation.trim())errors.push(`${prefix}: champion/spell/calculation required`);
+  if(!/^\\d+\\.\\d+\\.\\d+$/.test(row.patch))errors.push(`${prefix}: invalid patch version`);
+  if(!/^https:\\/\\/(www\\.)?leagueoflegends\\.com\\//.test(row.source))errors.push(`${prefix}: source must be an official Riot League URL`);
+  if(!['physical','magic','true'].includes(row.damageType))errors.push(`${prefix}: invalid damage type`);
+  if(!Array.isArray(row.baseByRank)||row.baseByRank.length!==5||row.baseByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: baseByRank must contain five finite nonnegative ranks`);
+  if(!Array.isArray(row.apRatioByRank)||row.apRatioByRank.length!==5||row.apRatioByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: apRatioByRank must contain five finite nonnegative ranks`);
+  if(!row.note.trim())errors.push(`${prefix}: scope note required`);
+  const key=`${row.patch}|${row.champion}|${row.spell}|${row.calculation}`;
+  if(seen.has(key))errors.push(`${prefix}: duplicate patch/champion/spell/calculation`);
+  seen.add(key);
+ }
+ return errors;
+}
