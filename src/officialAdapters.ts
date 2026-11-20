@@ -129,6 +129,11 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'Q · um impacto físico de Rampage: 60/90/120/150/180 + 90% DdA adicional. O motor aplica stacks, amplificação e redução de recarga com expiração escalonada; área e dano reduzido contra tropas não incluídos neste impacto isolado.'
  },
  {
+  champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'SingleTick',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
+  damageType:'magic',baseByRank:[20,30,40,50,60],apRatioByRank:[0.2,0.2,0.2,0.2,0.2],
+  note:'W · um de quatro ticks temporais do dano total, cada um equivalente a 25% da fórmula agregada. Requer quatro ações manuais separadas durante a janela de 4s; área e dano de aliados não incluídos.'
+ },
+ {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimW',calculation:'TotalDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
   damageType:'magic',baseByRank:[80,120,160,200,240],apRatioByRank:[0.8,0.8,0.8,0.8,0.8],
   note:'W · soma dos quatro ticks em um alvo durante 4s. Não simula ticks por segundo, área, resistências bônus nem cura baseada no dano causado na zona.'
