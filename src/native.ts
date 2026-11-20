@@ -55,7 +55,7 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
   {key:'R',spell:'GwenR',calculation:'ThirdCast',type:'magic',automatic:false,label:'R · terceiro lançamento (5 agulhas)',note:'Dano agregado das cinco agulhas; variante manual, não soma automaticamente aos lançamentos anteriores.'}
  ],
  Hecarim:[
-  {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 90% DdA adicional; sem stacks, área ou sequência de recasts.'},
+  {key:'Q',spell:'HecarimQ',calculation:'Damage',type:'physical',label:'Q · Rampage (um impacto)',note:'60/90/120/150/180 + 90% DdA adicional; o motor aplica amplificação e redução de recarga por stacks e expiração escalonada. Área e dano reduzido contra tropas ainda não simulados.'},
   {key:'W',spell:'HecarimW',calculation:'TotalDamage',type:'magic',label:'W · quatro ticks',note:'80/120/160/200/240 + 80% AP em 4s; sem ticks, área, resistências bônus ou cura.'},
   {key:'E',spell:'HecarimE',calculation:'MinimumDamage',type:'physical',automatic:false,label:'E · dano mínimo',note:'30/45/60/75/90 + 50% DdA adicional; variante manual de carga mínima.'},
   {key:'E',spell:'HecarimE',calculation:'MaximumDamage',type:'physical',automatic:false,label:'E · dano máximo',note:'60/90/120/150/180 + 100% DdA adicional; variante manual de carga máxima.'},
