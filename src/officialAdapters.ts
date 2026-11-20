@@ -13,6 +13,7 @@ export interface OfficialDamageAdapter {
  damageType:'physical'|'magic'|'true';
  baseByRank:number[];
  apRatioByRank:number[];
+ bonusADRatioByRank?:number[];
  note:string;
 }
 export const officialDamageAdapters:OfficialDamageAdapter[]=[
@@ -20,6 +21,16 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   champion:'Bard',patch:'16.23.1',spell:'BardQ',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
   damageType:'magic',baseByRank:[80,125,170,215,260],apRatioByRank:[1,1,1,1,1],
   note:'Q · um impacto confirmado. Fórmula oficial do patch 26.23; colisão, atordoamento, acerto em segundo alvo e passiva não simulados.'
+ },
+ {
+  champion:'Ezreal',patch:'16.23.1',spell:'EzrealW',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
+  damageType:'magic',baseByRank:[80,135,190,245,300],apRatioByRank:[1,1,1,1,1],bonusADRatioByRank:[1.15,1.15,1.15,1.15,1.15],
+  note:'W · somente detonação da marca em campeão; requer marca previamente aplicada e detonada. Não simula aplicação, reembolso de mana ou procs.'
+ },
+ {
+  champion:'Ezreal',patch:'16.23.1',spell:'EzrealR',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
+  damageType:'magic',baseByRank:[350,600,850],apRatioByRank:[1.2,1.2,1.2],bonusADRatioByRank:[1.1,1.1,1.1],
+  note:'R · dano contra campeão após a redução por alvos não campeões; colisões, redução por unidades atravessadas e trajetória não simuladas.'
  }
 ];
 export function officialAdapterFor(champion:string,spell:string,calculation:string,patch:string):OfficialDamageAdapter|undefined{
@@ -43,9 +54,9 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   if(!/^\d+\.\d+\.\d+$/.test(row.patch))errors.push(`${prefix}: invalid patch version`);
   if(!/^https:\/\/(www\.)?leagueoflegends\.com\//.test(row.source))errors.push(`${prefix}: source must be an official Riot League URL`);
   if(!['physical','magic','true'].includes(row.damageType))errors.push(`${prefix}: invalid damage type`);
-  if(!Array.isArray(row.baseByRank)||row.baseByRank.length!==5||row.baseByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: baseByRank must contain five finite nonnegative ranks`);
-  if(!Array.isArray(row.apRatioByRank)||row.apRatioByRank.length!==5||row.apRatioByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: apRatioByRank must contain five finite nonnegative ranks`);
-  if(!row.note.trim())errors.push(`${prefix}: scope note required`);
+  if(!Array.isArray(row.baseByRank)||![3,5].includes(row.baseByRank.length)||row.baseByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: baseByRank must contain five finite nonnegative ranks`);
+  if(!Array.isArray(row.apRatioByRank)||row.apRatioByRank.length!==row.baseByRank?.length||row.apRatioByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: apRatioByRank must contain five finite nonnegative ranks`);
+  if(row.bonusADRatioByRank&&(!Array.isArray(row.bonusADRatioByRank)||row.bonusADRatioByRank.length!==row.baseByRank?.length||row.bonusADRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: bonusADRatioByRank must match the rank table`);\n  if(!row.note.trim())errors.push(`${prefix}: scope note required`);
   const key=`${row.patch}|${row.champion}|${row.spell}|${row.calculation}`;
   if(seen.has(key))errors.push(`${prefix}: duplicate patch/champion/spell/calculation`);
   seen.add(key);
