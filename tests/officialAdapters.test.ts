@@ -127,6 +127,7 @@ test('Gwen E empowered hit and R recasts are separate modern Summoner’s Rift v
  assert.equal(evaluateOfficialAdapter(get('SecondCast'),3,{ap:100,targetMaxHP:2000}),90+30+0.048*2000);
  assert.equal(evaluateOfficialAdapter(get('ThirdCast'),3,{ap:100,targetMaxHP:2000}),150+50+0.08*2000);
  assert.equal(nativeOptions.Gwen.filter(x=>x.calculation==='SecondCast')[0].automatic,false);
+ assert.ok(nativeOptions.Gwen.some(x=>x.key==='W'&&x.calculation==='Activate'));
  assert.equal(nativeOptions.Gwen.filter(x=>x.calculation==='ThirdCast')[0].automatic,false);
  assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
