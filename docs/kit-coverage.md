@@ -1,6 +1,6 @@
 # Cobertura de kits — auditoria executada em 19 de novembro de 2026
 
-O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales pt_BR/en_US. A ingestão está na branch de trabalho. A cobertura de fórmulas de combate para esse catálogo, porém, é **2/173**: dois kits parciais (Bardo Q; Ezreal W/R) e 171 sem adapters ativos; zero kits integralmente validados. Os adapters são isolados e patch-scoped: Bardo Q não inclui passiva, colisão/segundo alvo ou controle de grupo; Ezreal W exige detonação de marca e R considera dano contra campeão, sem colisões nem redução por unidades atravessadas.
+O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales pt_BR/en_US. A ingestão está na branch de trabalho. A cobertura de fórmulas de combate para esse catálogo, porém, é **3/173**: três kits parciais (Bardo Q; Ezreal W/R; Master Yi Q (dano padrão e máximo isolado em um alvo)) e 170 sem adapters ativos; zero kits integralmente validados. Os adapters são isolados e patch-scoped: Bardo Q não inclui passiva, colisão/segundo alvo ou controle de grupo; Ezreal W exige detonação de marca e R considera dano contra campeão, sem colisões nem redução por unidades atravessadas.
 
 ## Resultado reproduzido
 
@@ -10,8 +10,8 @@ A cobertura declarada abaixo inclui o adapter patch-scoped recém-adicionado. A 
 |---|---:|
 | Patch do catálogo | 16.23.1 |
 | Campeões auditados | 173 |
-| Kits parciais ativos | 2 (Bardo: Q; Ezreal: W/R) |
-| Kits sem adapters ativos | 171 |
+| Kits parciais ativos | 3 (Bardo: Q; Ezreal: W/R; Master Yi: Q) |
+| Kits sem adapters ativos | 170 |
 | Kits completos validados | 0 |
 
 O relatório JSON será produzido em `artifacts/kit-coverage-16.23.1.json` pelo CI atual, caso os testes e a auditoria terminem com sucesso.
@@ -19,7 +19,7 @@ O relatório JSON será produzido em `artifacts/kit-coverage-16.23.1.json` pelo 
 ## Por que os adapters antigos não contam
 
 - `public/data/mechanics.json` permanece em 16.19.1.
-- `src/officialAdapters.ts` contém adapters de Bardo Q e Ezreal W/R, explicitamente vinculados ao patch 16.23.1 e às notas oficiais Riot; não depende do snapshot antigo.
+- `src/officialAdapters.ts` contém adapters de Bardo Q, Ezreal W/R e Master Yi Q, explicitamente vinculados ao patch 16.23.1 e às notas oficiais Riot; não depende do snapshot antigo.
 - `src/exactKits.ts` e seu snapshot de efeitos estão certificados apenas para 16.20.1.
 - O catálogo atual é 16.23.1. O carregador rejeita a combinação de snapshots incompatíveis e os efeitos exatos antigos ficam desativados.
 - `manualMechanicsTemplate` contém apenas seis registros vazios de piloto; não fornece fórmulas executáveis.
