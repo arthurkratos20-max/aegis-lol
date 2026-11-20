@@ -139,6 +139,21 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   note:'W · primeiro foguete da salva: 50/75/100/125/150 + 55% AP (patch 26.3+). Foguetes subsequentes, convergência, distribuição, redução por acertos repetidos e carga de torretas não simulados.'
  },
  {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenE',calculation:'EmpoweredAttack',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[15,15,15,15,15],apRatioByRank:[0.2,0.2,0.2,0.2,0.2],
+  note:'E · Skip n Slash: dano mágico adicional de 15 + 20% AP em ataques fortalecidos por 4s; velocidade de ataque e reembolso de cooldown não simulados.'
+ },
+ {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'SecondCast',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[90,150,210],apRatioByRank:[0.3,0.3,0.3],targetMaxHPRatioByRank:[0.03,0.03,0.03],targetMaxHPRatioPer100AP:0.018,
+  note:'R · segundo lançamento: três agulhas, dano agregado 90/150/210 + 30% AP + 3% (+1,8% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
+ },
+ {
+  champion:'Gwen',patch:'16.23.1',spell:'GwenR',calculation:'ThirdCast',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
+  damageType:'magic',baseByRank:[150,250,350],apRatioByRank:[0.5,0.5,0.5],targetMaxHPRatioByRank:[0.05,0.05,0.05],targetMaxHPRatioPer100AP:0.03,
+  note:'R · terceiro lançamento: cinco agulhas, dano agregado 150/250/350 + 50% AP + 5% (+3% por 100 AP) da vida máxima do alvo; uma única aplicação agregada, sem slow.'
+ },
+ {
   champion:'Hecarim',patch:'16.23.1',spell:'HecarimE',calculation:'MinimumDamage',source:'https://wiki.leagueoflegends.com/en-us/Hecarim',sourceType:'wiki',
   damageType:'physical',baseByRank:[30,45,60,75,90],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.5,0.5,0.5,0.5,0.5],
   note:'E · Devastating Charge: dano mínimo do ataque fortalecido 30/45/60/75/90 + 50% DdA adicional; distância percorrida não modelada.'
@@ -171,7 +186,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
-  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],targetMaxHPRatioByRank:[0.03,0.035,0.04,0.045,0.05],targetMaxHPADRatio:0.00035,
+  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],targetMaxHPRatioByRank:[0.03,0.035,0.04,0.045,0.05],targetMaxHPADRatio:0.00035,minimumDamageByRank:[20,30,40,50,60],
   note:'W · bônus físico do ataque fortalecido: 3/3,5/4/4,5/5% da vida máxima + 3,5% por 100 AD. O dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo não incluídos.'
  },
  {
