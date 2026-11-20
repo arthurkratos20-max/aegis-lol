@@ -37,8 +37,8 @@ export const kitDeclarations:Record<string,KitDeclaration>={
   P:{name:'A Thousand Cuts',role:'dano mágico adicional em ataques/habilidades e cura contra campeões',damageModel:'pending',notes:'Escala com vida máxima do alvo/AP e possui limite contra monstros.'},
   Q:{name:'Snip Snip!',role:'cortes repetidos e corte final verdadeiro no centro',damageModel:'partial',notes:'Dano mínimo e máximo agregado dos cortes externos implementado. Conversão do centro em dano verdadeiro, passiva por vida máxima, stacks dinâmicos e geometria ainda pendentes.'},
   W:{name:'Hallowed Mist',role:'zona defensiva que concede resistências e impede ataques/habilidades externas',damageModel:'pending',notes:'Estado espacial e duração; não é dano direto.'},
-  E:{name:"Skip 'n Slash",role:'dash que fortalece ataques com dano mágico adicional',damageModel:'pending',notes:'Ataques fortalecidos, velocidade de ataque e reembolso de cooldown ao acertar.'},
-  R:{name:'Needlework',role:'agulhas em sequência; recasts habilitados por ataques/habilidades',damageModel:'partial',notes:'Primeira agulha isolada implementada; recasts, número crescente de agulhas, passiva e slow pendentes.'}
+  E:{name:"Skip 'n Slash",role:'dash que fortalece ataques com dano mágico adicional',damageModel:'partial',notes:'Dano adicional por ataque fortalecido (15 + 20% AP) implementado como ação manual; velocidade de ataque, duração e reembolso de cooldown ao acertar pendentes.'},
+  R:{name:'Needlework',role:'agulhas em sequência; recasts habilitados por ataques/habilidades',damageModel:'partial',notes:'Primeira agulha e dano agregado de 3/5 agulhas nos recasts implementados em variantes manuais; desbloqueio por ataques, slow e passiva pendentes.'}
  }),
  Hecarim:declare('Hecarim','https://wiki.leagueoflegends.com/en-us/Hecarim',{
   P:{name:'Warpath',role:'converte velocidade de movimento adicional em dano de ataque',damageModel:'pending',notes:'Conversão dependente do nível e fontes elegíveis de velocidade.'},
