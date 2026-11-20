@@ -19,6 +19,7 @@ export interface OfficialDamageAdapter {
  targetMaxHPRatio?:number;
  targetMaxHPRatioByRank?:number[];
  targetMaxHPBonusADRatio?:number;
+ targetMaxHPADRatio?:number;
  note:string;
 }
 export const officialDamageAdapters:OfficialDamageAdapter[]=[
@@ -110,7 +111,7 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
  },
  {
   champion:'Illaoi',patch:'16.23.1',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',source:'https://wiki.leagueoflegends.com/en-us/Illaoi',sourceType:'wiki',
-  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],targetMaxHPRatioByRank:[0.03,0.035,0.04,0.045,0.05],targetMaxHPBonusADRatio:0.00035,
+  damageType:'physical',baseByRank:[0,0,0,0,0],apRatioByRank:[0,0,0,0,0],targetMaxHPRatioByRank:[0.03,0.035,0.04,0.045,0.05],targetMaxHPADRatio:0.00035,
   note:'W · bônus físico do ataque fortalecido: 3/3,5/4/4,5/5% da vida máxima + 3,5% por 100 AD. O dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo não incluídos.'
  },
  {
@@ -127,7 +128,7 @@ export function evaluateOfficialAdapter(adapter:OfficialDamageAdapter,rank:numbe
  if(!Number.isInteger(rank)||rank<1||rank>adapter.baseByRank.length)throw Error('Rank fora da tabela oficial');
  const base=adapter.baseByRank[rank-1],ratio=adapter.apRatioByRank[rank-1],bonusRatio=adapter.bonusADRatioByRank?.[rank-1]??0,adRatio=adapter.adRatioByRank?.[rank-1]??0,bonusAD=stats.bonusAD??0,ad=stats.ad??0,targetMaxHP=stats.targetMaxHP??0;
  if(!Number.isFinite(base)||!Number.isFinite(ratio)||!Number.isFinite(bonusRatio)||!Number.isFinite(adRatio)||!Number.isFinite(stats.ap)||!Number.isFinite(bonusAD)||!Number.isFinite(ad)||!Number.isFinite(targetMaxHP)||targetMaxHP<0)throw Error('Dados da fórmula oficial inválidos');
- return base+ratio*stats.ap+bonusRatio*bonusAD+adRatio*ad+(adapter.targetMaxHPRatio??adapter.targetMaxHPRatioByRank?.[rank-1]??0)*targetMaxHP+(adapter.targetMaxHPBonusADRatio??0)*bonusAD*targetMaxHP;
+ return base+ratio*stats.ap+bonusRatio*bonusAD+adRatio*ad+(adapter.targetMaxHPRatio??adapter.targetMaxHPRatioByRank?.[rank-1]??0)*targetMaxHP+(adapter.targetMaxHPBonusADRatio??0)*bonusAD*targetMaxHP+(adapter.targetMaxHPADRatio??0)*ad*targetMaxHP;
 }
 
 /** Registry gate: invalid or ambiguous official rows must never enter runtime. */
@@ -149,6 +150,7 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   if(row.targetMaxHPRatio!==undefined&&(!Number.isFinite(row.targetMaxHPRatio)||row.targetMaxHPRatio<0))errors.push(`${prefix}: targetMaxHPRatio must be finite and nonnegative`);
   if(row.targetMaxHPRatioByRank&&(!Array.isArray(row.targetMaxHPRatioByRank)||row.targetMaxHPRatioByRank.length!==row.baseByRank?.length||row.targetMaxHPRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: targetMaxHPRatioByRank must match the rank table`);
   if(row.targetMaxHPBonusADRatio!==undefined&&(!Number.isFinite(row.targetMaxHPBonusADRatio)||row.targetMaxHPBonusADRatio<0))errors.push(`${prefix}: targetMaxHPBonusADRatio must be finite and nonnegative`);
+  if(row.targetMaxHPADRatio!==undefined&&(!Number.isFinite(row.targetMaxHPADRatio)||row.targetMaxHPADRatio<0))errors.push(`${prefix}: targetMaxHPADRatio must be finite and nonnegative`);
   if(!row.note?.trim())errors.push(`${prefix}: scope note required`);
   const key=`${row.patch}|${row.champion}|${row.spell}|${row.calculation}`;
   if(seen.has(key))errors.push(`${prefix}: duplicate patch/champion/spell/calculation`);
