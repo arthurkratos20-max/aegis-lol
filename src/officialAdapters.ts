@@ -73,6 +73,32 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   damageType:'magic',baseByRank:[350,600,850],apRatioByRank:[1.2,1.2,1.2],bonusADRatioByRank:[1.1,1.1,1.1],
   note:'R · dano contra campeão após a redução por alvos não campeões; colisões, redução por unidades atravessadas e trajetória não simuladas.'
  },
+
+ {
+  champion:'Graves',patch:'16.23.1',spell:'GravesQ',calculation:'OnePellet',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
+  damageType:'physical',baseByRank:[60,90,120,150,180],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[0.75,0.75,0.75,0.75,0.75],
+  note:'League Classic 26.19 · Buckshot (kit pré-rework 2015): primeiro projétil, 60/90/120/150/180 + 75% DdA adicional. Um único projétil; não representa acerto de três projéteis.'
+ },
+ {
+  champion:'Graves',patch:'16.23.1',spell:'GravesQ',calculation:'ThreePellets',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
+  damageType:'physical',baseByRank:[120,180,240,300,360],apRatioByRank:[0,0,0,0,0],bonusADRatioByRank:[1.5,1.5,1.5,1.5,1.5],
+  note:'League Classic 26.19 · Buckshot: dano máximo quando os três projéteis atingem o mesmo alvo; projéteis adicionais causam 50% do dano do primeiro. A geometria e colisões não são simuladas.'
+ },
+ {
+  champion:'Graves',patch:'16.23.1',spell:'GravesW',calculation:'Impact',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
+  damageType:'magic',baseByRank:[60,110,160,210,260],apRatioByRank:[0.6,0.6,0.6,0.6,0.6],
+  note:'League Classic 26.19 · Smoke Screen: explosão inicial mágica, 60/110/160/210/260 + 60% AP. Não simula área, slow, nearsight nem duração da fumaça.'
+ },
+ {
+  champion:'Graves',patch:'16.23.1',spell:'GravesR',calculation:'DirectHit',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
+  damageType:'physical',baseByRank:[250,400,550],apRatioByRank:[0,0,0],bonusADRatioByRank:[1.5,1.5,1.5],
+  note:'League Classic 26.19 · Collateral Damage: impacto direto no primeiro alvo, 250/400/550 + 150% DdA adicional. Cone secundário separado.'
+ },
+ {
+  champion:'Graves',patch:'16.23.1',spell:'GravesR',calculation:'ConeExplosion',source:'https://wiki.leagueoflegends.com/en-us/Graves',sourceType:'wiki',
+  damageType:'physical',baseByRank:[200,320,440],apRatioByRank:[0,0,0],bonusADRatioByRank:[1.2,1.2,1.2],
+  note:'League Classic 26.19 · Collateral Damage: dano do cone de explosão, 200/320/440 + 120% DdA adicional. Não somar ao impacto direto no mesmo alvo; cone exige geometria e alvos adicionais.'
+ },
  {
   champion:'Gwen',patch:'16.23.1',spell:'GwenQ',calculation:'MinimumSnips',source:'https://wiki.leagueoflegends.com/en-us/Gwen',sourceType:'wiki',
   damageType:'magic',baseByRank:[70,99,128,157,186],apRatioByRank:[0.4,0.4,0.4,0.4,0.4],
