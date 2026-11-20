@@ -104,8 +104,8 @@ test('Master Yi Q exposes two separately scoped official 26.23 damage cases',()=
 
 test('Illaoi spirit health is reduced by damage after the spirit resistance check',()=>{
  const f=fighter(data,'Illaoi');f.level=1;f.skills=['E','Q','W','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
- const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1),attackAction(2)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:60,armor:100,mr:0};s.enemy.automaticAttacks=false;s.duration=4;
- const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,2);assert.equal(hits[0].raw,125);assert.equal(hits[1].raw,110);
+ const s=initialScenario(data);s.player=f;s.player.overrides={hp:1000,mana:500,ad:100};s.player.automaticAttacks=false;s.player.actions=[nativeAction(s.player,data,0),attackAction(1),attackAction(2),attackAction(3)];s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:200,armor:100,mr:0};s.enemy.automaticAttacks=false;s.duration=5;
+ const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,3);assert.equal(hits[0].raw,125);assert.equal(hits[1].raw,125);assert.equal(hits[2].raw,125);
 });
 
 test('Heimerdinger W full five-rocket salvo is separate from the isolated first rocket',()=>{
