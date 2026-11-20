@@ -13,13 +13,13 @@ const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',i
 test('Gragas Q official patch 26.17 minimum and fully fermented impacts are separate',()=>{
  const q=officialAdapterFor('Gragas','GragasQ','Damage','16.23.1');assert.ok(q);assert.deepEqual(q.baseByRank,[75,125,175,225,275]);assert.equal(evaluateOfficialAdapter(q,5,{ap:100}),365);
  const max=officialAdapterFor('Gragas','GragasQ','MaxFermentedDamage','16.23.1');assert.ok(max);assert.equal(evaluateOfficialAdapter(max,5,{ap:100}),547.5);
- const w=officialAdapterFor('Gragas','GragasW','EmpoweredAttack','16.23.1');assert.ok(w);assert.equal(evaluateOfficialAdapter(w,5,{ap:100,targetMaxHP:2000}),330);
+ const w=officialAdapterFor('Gragas','GragasW','EmpoweredAttack','16.23.1');assert.ok(w);assert.equal(evaluateOfficialAdapter(w,5,{ap:100,targetMaxHP:2000}),350);
  const e=officialAdapterFor('Gragas','GragasE','Damage','16.23.1');assert.ok(e);assert.equal(evaluateOfficialAdapter(e,5,{ap:100}),320);
  const r=officialAdapterFor('Gragas','GragasR','Damage','16.23.1');assert.ok(r);assert.equal(evaluateOfficialAdapter(r,3,{ap:100}),480);
  const f=fighter(data,'Gragas');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
  const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);const minimum=nativeAction(f,data,0),fermented=nativeAction(f,data,1);
  assert.equal(nativeDamage(minimum,f,data,actor,target),75+0.9*actor.ap);assert.equal(nativeDamage(fermented,f,data,actor,target),112.5+1.35*actor.ap);
- const fW={...f,skills:['Q','W',...f.skills.slice(2)] as SkillKey[]};const wAction=nativeAction(fW,data,2);assert.equal(nativeDamage(wAction,fW,data,actor,{...target,hp:2000}),80+0.7*actor.ap+140);
+ const fW={...f,skills:['Q','W','W','W','W','R','W',...f.skills.slice(7)] as SkillKey[]};const wAction=nativeAction(fW,data,2);assert.equal(nativeDamage(wAction,fW,data,actor,{...target,hp:2000}),140+0.7*actor.ap+140);
  assert.equal(nativeOptions.Gragas[1].automatic,false);assert.equal(nativeOptions.Gragas[2].automatic,false);assert.equal(nativeOptions.Gragas.length,5);const coverage=championKitCoverage('Gragas',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','E','R']);assert.deepEqual(coverage.missing,['P']);assert.equal(coverage.isExactFormula,false);
 });
 
