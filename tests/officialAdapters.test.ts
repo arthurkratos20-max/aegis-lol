@@ -108,6 +108,15 @@ test('Illaoi spirit health is reduced by damage after the spirit resistance chec
  const result=simulate(s,data);const hits=result.events.filter(e=>e.source==='Ataque básico');assert.equal(hits.length,3);assert.equal(hits[0].raw,125);assert.equal(hits[1].raw,125);assert.equal(hits[2].raw,125);
 });
 
+test('Hecarim W supports four separately timed ticks within one cooldown',()=>{
+ const s=initialScenario(data);s.player=fighter(data,'Hecarim');s.player.level=18;s.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
+ const index=nativeOptions.Hecarim.findIndex(x=>x.calculation==='SingleTick');assert.ok(index>=0);
+ s.player.actions=[0,1,2,3].map(at=>({...nativeAction(s.player,data,index),at}));s.player.automaticAttacks=false;
+ s.enemy=fighter(data,'Azir');s.enemy.overrides={hp:5000,armor:0,mr:0};s.enemy.automaticAttacks=false;s.duration=5;
+ const result=simulate(s,data);const ticks=result.events.filter(e=>e.source==='W · um tick (25% do total)');assert.equal(ticks.length,4);
+ const ap=statsFor(s.player,data).ap;assert.equal(result.player.composition.magic,240+.8*ap);
+});
+
 test('Gwen Q center converts half of the six-snip aggregate to true damage',()=>{
  const adapter=officialAdapterFor('Gwen','GwenQ','MaximumSnipsCenter','16.23.1');assert.ok(adapter);
  assert.equal(evaluateOfficialAdapter(adapter,5,{ap:100}),350);
