@@ -26,40 +26,40 @@ export const kitDeclarations:Record<string,KitDeclaration>={
   E:{name:'Body Slam',role:'avanço, colisão em área, dano mágico, controle e redução de recarga ao acertar',damageModel:'partial',notes:'Dano, atordoamento de 1s e redução de 40% do cooldown em acerto confirmado implementados; dash, geometria e dano em área pendentes.'},
   R:{name:'Explosive Cask',role:'projétil em área que causa dano mágico e deslocamento',damageModel:'partial',notes:'Dano-base e escalamento AP implementados; trajetória, área, knockback e colisão com terreno pendentes.'}
  }),
- Graves:declare('Graves','https://wiki.leagueoflegends.com/en-us/Graves',{
-  P:{name:'New Destiny',role:'ataques de espingarda com munição, recarga e múltiplos projéteis',damageModel:'pending',notes:'Contagem de projéteis, cone, primeiro alvo por projétil e recarga dependente de velocidade de ataque.'},
-  Q:{name:'End of the Line',role:'projétil que detona após atraso ou colisão com parede/estrutura',damageModel:'pending',notes:'Dois momentos de dano; geometria e detonação antecipada.'},
-  W:{name:'Smoke Screen',role:'explosão de fumaça com dano e obscurecimento/slow',damageModel:'pending',notes:'Impacto e zona persistente devem ser separados.'},
-  E:{name:'Quickdraw',role:'dash que recarrega munição e acumula True Grit',damageModel:'pending',notes:'Stacks de resistências, recarga, redução de cooldown por pellet e reset de ataque.'},
-  R:{name:'Collateral Damage',role:'projétil explosivo de dano físico com cone secundário e recuo',damageModel:'pending',notes:'Impacto primário e explosão secundária não podem ser confundidos.'}
+ Graves:declare('Graves','https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-19-notes/',{
+  P:{name:'New Destiny',role:'ataques de espingarda com munição, recarga e múltiplos projéteis',damageModel:'pending',notes:'A versão que entrou no League Classic em 26.19 tem shotgun com três projéteis; não reutilizar fórmulas da versão moderna de Summoner’s Rift. Falta snapshot de dados e tabelas numéricas específicos do Classic.'},
+  Q:{name:'End of the Line',role:'projétil que detona após atraso ou colisão com parede/estrutura',damageModel:'pending',notes:'Classic: três projéteis em linha e dano reduzido em acertos repetidos; fórmula por alvo/projétil e colisão ainda sem snapshot verificável.'},
+  W:{name:'Smoke Screen',role:'explosão de fumaça com dano e obscurecimento/slow',damageModel:'pending',notes:'Classic: granada de fumaça com dano, lentidão e visão obscurecida; fórmula e duração da zona ainda sem snapshot verificável.'},
+  E:{name:'Quickdraw',role:'dash que recarrega munição e acumula True Grit',damageModel:'pending',notes:'Classic: avanço que concede velocidade de ataque; falta fórmula/estado de recarga por ataques e dados de resistência.'},
+  R:{name:'Collateral Damage',role:'projétil explosivo de dano físico com cone secundário e recuo',damageModel:'pending',notes:'Classic: projétil e cone de explosão secundário; fórmulas de impacto e distribuição ainda sem snapshot verificável.'}
  }),
  Gwen:declare('Gwen','https://wiki.leagueoflegends.com/en-us/Gwen',{
   P:{name:'A Thousand Cuts',role:'dano mágico adicional em ataques/habilidades e cura contra campeões',damageModel:'pending',notes:'Escala com vida máxima do alvo/AP e possui limite contra monstros.'},
-  Q:{name:'Snip Snip!',role:'cortes repetidos e corte final verdadeiro no centro',damageModel:'pending',notes:'Stacks de Snippy, número de cortes, sweet spot central e conversão de dano.'},
+  Q:{name:'Snip Snip!',role:'cortes repetidos e corte final verdadeiro no centro',damageModel:'partial',notes:'Dano mínimo e máximo agregado dos cortes externos implementado. Conversão do centro em dano verdadeiro, passiva por vida máxima, stacks dinâmicos e geometria ainda pendentes.'},
   W:{name:'Hallowed Mist',role:'zona defensiva que concede resistências e impede ataques/habilidades externas',damageModel:'pending',notes:'Estado espacial e duração; não é dano direto.'},
   E:{name:"Skip 'n Slash",role:'dash que fortalece ataques com dano mágico adicional',damageModel:'pending',notes:'Ataques fortalecidos, velocidade de ataque e reembolso de cooldown ao acertar.'},
-  R:{name:'Needlework',role:'agulhas em sequência; recasts habilitados por ataques/habilidades',damageModel:'pending',notes:'Até três lançamentos, número de agulhas, dano por agulha e aplicação da passiva.'}
+  R:{name:'Needlework',role:'agulhas em sequência; recasts habilitados por ataques/habilidades',damageModel:'partial',notes:'Primeira agulha isolada implementada; recasts, número crescente de agulhas, passiva e slow pendentes.'}
  }),
  Hecarim:declare('Hecarim','https://wiki.leagueoflegends.com/en-us/Hecarim',{
   P:{name:'Warpath',role:'converte velocidade de movimento adicional em dano de ataque',damageModel:'pending',notes:'Conversão dependente do nível e fontes elegíveis de velocidade.'},
-  Q:{name:'Rampage',role:'dano físico em área com stacks que amplificam dano e reduzem recarga',damageModel:'pending',notes:'Stacks, expiração gradual, cooldown reduzido e amplificação por AD adicional.'},
-  W:{name:'Spirit of Dread',role:'dano mágico periódico em área e cura baseada no dano sofrido pelos inimigos',damageModel:'pending',notes:'Ticks, dano de aliados dentro da área e limite/coeficiente de cura.'},
+  Q:{name:'Rampage',role:'dano físico em área com stacks que amplificam dano e reduzem recarga',damageModel:'partial',notes:'Impacto-base por rank e razão de DdA adicional implementados. Stacks, expiração, redução de recarga, área e dano contra tropas pendentes.'},
+  W:{name:'Spirit of Dread',role:'dano mágico periódico em área e cura baseada no dano sofrido pelos inimigos',damageModel:'partial',notes:'Dano total dos quatro ticks por rank implementado. Ticks, área, resistências bônus e cura por dano de aliados/inimigos pendentes.'},
   E:{name:'Devastating Charge',role:'velocidade crescente e próximo ataque com dano físico e knockback',damageModel:'pending',notes:'Dano escala com distância percorrida; duração e distância alteram resultado.'},
   R:{name:'Onslaught of Shadows',role:'investida com cavaleiros espectrais, dano mágico e medo ao final',damageModel:'pending',notes:'Múltiplos impactos e medo dependem da posição/direção e distância.'}
  }),
  Heimerdinger:declare('Heimerdinger','https://www.leagueoflegends.com/en-us/champions/heimerdinger/',{
   P:{name:'Hextech Affinity',role:'velocidade de movimento perto de torres aliadas e torretas próprias',damageModel:'pending',notes:'Aura de proximidade; não causa dano.'},
-  Q:{name:'H-28G Evolution Turret',role:'instala torreta com disparos básicos e raio carregado',damageModel:'pending',notes:'Pet persistente, alvo prioritário, cargas, recarga, tiros e laser em ciclos.'},
-  W:{name:'Hextech Micro-Rockets',role:'salva de foguetes com distribuição e convergência',damageModel:'pending',notes:'Cada foguete precisa de colisão individual; dano total varia com quantos atingem o mesmo alvo.'},
+  Q:{name:'H-28G Evolution Turret',role:'instala torreta com disparos básicos e raio carregado',damageModel:'partial',notes:'Dano de um disparo básico isolado implementado. Pet persistente, alvo prioritário, cargas, recarga, cadência e laser em ciclos pendentes.'},
+  W:{name:'Hextech Micro-Rockets',role:'salva de foguetes com distribuição e convergência',damageModel:'partial',notes:'Dano de um foguete inicial isolado implementado. Distribuição, convergência, foguetes subsequentes e redução por acertos repetidos pendentes.'},
   E:{name:'CH-2 Electron Storm Grenade',role:'granada em área com dano, stun no centro e slow na borda',damageModel:'pending',notes:'Separar centro/borda, ricochete e área de explosão.'},
   R:{name:'UPGRADE!!!',role:'fortalece a próxima habilidade básica: torreta, foguetes ou granada',damageModel:'pending',notes:'Três variantes distintas; R não deve ser contado como impacto independente.'}
  }),
  Illaoi:declare('Illaoi','https://wiki.leagueoflegends.com/en-us/Illaoi',{
   P:{name:'Prophet of an Elder God',role:'gera tentáculos que atacam periodicamente e curam Illaoi',damageModel:'pending',notes:'Spawn, cooldown, alvos e redução por múltiplos tentáculos.'},
   Q:{name:'Tentacle Smash',role:'passiva amplifica tentáculos; ativa golpeia em linha/área',damageModel:'pending',notes:'O dano real inclui tentáculo convocado; não duplicar amplificação e impacto.'},
-  W:{name:'Harsh Lesson',role:'ataque fortalecido com avanço e comando para tentáculos golpearem',damageModel:'pending',notes:'Dano baseado na vida máxima do alvo e ataques dos tentáculos são impactos separados.'},
+  W:{name:'Harsh Lesson',role:'ataque fortalecido com avanço e comando para tentáculos golpearem',damageModel:'partial',notes:'Bônus físico baseado na vida máxima do alvo, com escala por rank e AD total, implementado. Dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo pendentes.'},
   E:{name:'Test of Spirit',role:'projétil que extrai espírito; dano ao espírito é parcialmente replicado no campeão',damageModel:'pending',notes:'Vínculo, duração, transferência de dano, vessel e tentáculos convocados.'},
-  R:{name:'Leap of Faith',role:'dano físico em área e invocação de tentáculos por campeão atingido',damageModel:'pending',notes:'Número de campeões atingidos define invocações; acelera W e ataques de tentáculos.'}
+  R:{name:'Leap of Faith',role:'dano físico em área e invocação de tentáculos por campeão atingido',damageModel:'partial',notes:'Impacto físico inicial e razão de DdA adicional implementados. Área, número de campeões atingidos, tentáculos invocados e ataques subsequentes pendentes.'}
  })
 };
 
