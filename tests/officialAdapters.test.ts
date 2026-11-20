@@ -157,6 +157,7 @@ test('Graves True Grit, Gwen defensive/offensive states and Heimerdinger passive
  const e= nativeAction(graves,data,5),activated=kitImpact(e,graves,data,gActor,gBase,gTarget,gTarget.hp,gState);assert.ok(activated);assert.equal(gState.gravesTrueGritStacks,1);
  const defended=kitActorStats(graves,gActor,gBase,gState,1);assert.equal(defended.armor-gActor.armor,4);assert.equal(defended.mr-gActor.mr,2);
  const expired=kitActorStats(graves,gActor,gBase,gState,5);assert.equal(expired.armor,gActor.armor);
+ const rankFive={...graves,skills:['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[]};rankFive.level=18;const rankFiveState=kitState(rankFive);rankFiveState.gravesTrueGritStacks=8;rankFiveState.gravesTrueGritExpires=10;const rankFiveStats=statsFor(rankFive,data);const maxGrit=kitActorStats(rankFive,rankFiveStats,statsFor({...rankFive,items:[],overrides:{},runes:{...rankFive.runes,shards:[]}},data),rankFiveState,1);assert.equal(maxGrit.armor-rankFiveStats.armor,128);assert.equal(maxGrit.mr-rankFiveStats.mr,64);
  const gwen=fighter(data,'Gwen');gwen.level=3;gwen.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];
  const wActor=statsFor(gwen,data),wBase=statsFor({...gwen,items:[],overrides:{},runes:{...gwen.runes,shards:[]}},data),wTarget=statsFor(fighter(data,'Azir'),data),wState=kitState(gwen);
  const w=kitImpact(nativeAction(gwen,data,2),gwen,data,wActor,wBase,wTarget,wTarget.hp,wState);assert.ok(w?.passive);
