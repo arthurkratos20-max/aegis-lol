@@ -195,3 +195,24 @@ test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
  assert.equal(nativeOptions.Graves.length,6);assert.equal(nativeOptions.Graves[1].automatic,false);assert.equal(nativeOptions.Graves[4].automatic,false);
  assert.equal(kitDeclarations.Graves.abilities.Q.name,'End of the Line');assert.deepEqual(validateOfficialDamageAdapters(),[]);
 });
+
+
+test('every declared impact in batch 02 resolves against the 16.23.1 Summoner\'s Rift adapters',()=>{
+ const champions=['Gragas','Graves','Gwen','Hecarim','Heimerdinger','Illaoi'];
+ const ranks:SkillKey[]=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'];
+ for(const champion of champions){
+  const f=fighter(data,champion);f.level=18;f.skills=[...ranks];f.actions=[];f.automaticAttacks=false;
+  const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+  assert.ok(nativeOptions[champion]?.length,champion+' must expose explicit native options');
+  for(const [index,opt] of nativeOptions[champion].entries()){
+   const adapter=officialAdapterFor(champion,opt.spell,opt.calculation,data.version);
+   assert.ok(adapter,champion+' '+opt.spell+'/'+opt.calculation+' must resolve to a patch-matched adapter');
+   const action=nativeAction(f,data,index);
+   const value=nativeDamage(action,f,data,actor,target);
+   assert.ok(Number.isFinite(value)&&value>=0,champion+' '+opt.label+' must evaluate to finite non-negative damage');
+  }
+  const declaration=kitDeclarations[champion];
+  assert.deepEqual(Object.keys(declaration.abilities).sort(),['E','P','Q','R','W']);
+  assert.ok(Object.values(declaration.abilities).every(x=>x.damageModel==='partial'),champion+' must not be falsely certified complete');
+ }
+});
