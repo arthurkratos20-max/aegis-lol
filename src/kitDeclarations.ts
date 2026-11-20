@@ -48,7 +48,7 @@ export const kitDeclarations:Record<string,KitDeclaration>={
   R:{name:'Onslaught of Shadows',role:'investida com cavaleiros espectrais, dano mágico e medo ao final',damageModel:'partial',notes:'Dano dos cavaleiros espectrais implementado; trajetória, múltiplos alvos e fear dependem da geometria e distância.'}
  }),
  Heimerdinger:declare('Heimerdinger','https://www.leagueoflegends.com/en-us/champions/heimerdinger/',{
-  P:{name:'Hextech Affinity',role:'velocidade de movimento perto de torres aliadas e torretas próprias',damageModel:'pending',notes:'Aura de proximidade; não causa dano.'},
+  P:{name:'Hextech Affinity',role:'velocidade de movimento perto de torres aliadas e torretas próprias',damageModel:'partial',notes:'Bônus de 20% de velocidade de movimento aplicado quando o estado heimer-turret-nearby é explicitamente ativado; detecção automática de proximidade pendente.'},
   Q:{name:'H-28G Evolution Turret',role:'instala torreta com disparos básicos e raio carregado',damageModel:'partial',notes:'Dano de um disparo básico isolado implementado. Pet persistente, alvo prioritário, cargas, recarga, cadência e laser em ciclos pendentes.'},
   W:{name:'Hextech Micro-Rockets',role:'salva de foguetes com distribuição e convergência',damageModel:'partial',notes:'Dano do primeiro foguete 50/75/100/125/150 + 55% AP implementado. Distribuição, convergência, foguetes subsequentes e redução por acertos repetidos pendentes.'},
   E:{name:'CH-2 Electron Storm Grenade',role:'granada em área com dano, stun no centro e slow na borda',damageModel:'partial',notes:'Dano 60/100/140/180/220 + 60% AP implementado; área central, stun, slow e recarga de raios pendentes.'},
@@ -58,7 +58,7 @@ export const kitDeclarations:Record<string,KitDeclaration>={
   P:{name:'Prophet of an Elder God',role:'gera tentáculos que atacam periodicamente e curam Illaoi',damageModel:'partial',notes:'Fórmula de um golpe de tentáculo por nível, AD e AP está disponível via Q; geração periódica, quantidade, alvos e cura por acerto ainda não simulados.'},
   Q:{name:'Tentacle Smash',role:'passiva amplifica tentáculos; ativa golpeia em linha/área',damageModel:'partial',notes:'Um golpe de tentáculo por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q. Múltiplos tentáculos e cura passiva não simulados.'},
   W:{name:'Harsh Lesson',role:'ataque fortalecido com avanço e comando para tentáculos golpearem',damageModel:'partial',notes:'Bônus físico baseado na vida máxima do alvo, com escala por rank e AD total, implementado. Dano mínimo, limite contra não campeões, ataque básico e golpes de tentáculo pendentes.'},
-  E:{name:'Test of Spirit',role:'projétil que extrai espírito; dano ao espírito é parcialmente replicado no campeão',damageModel:'pending',notes:'Vínculo, duração, transferência de dano, vessel e tentáculos convocados.'},
+  E:{name:'Test of Spirit',role:'projétil que extrai espírito; dano ao espírito é parcialmente replicado no campeão',damageModel:'partial',notes:'Vínculo de 7s e eco de 25–45% (+8% por 100 AD) do dano pré-mitigação, limitado pela vida do espírito, implementados; vessel, lentidão e tentáculos autônomos pendentes.'},
   R:{name:'Leap of Faith',role:'dano físico em área e invocação de tentáculos por campeão atingido',damageModel:'partial',notes:'Impacto físico inicial e razão de DdA adicional implementados. Área, número de campeões atingidos, tentáculos invocados e ataques subsequentes pendentes.'}
  })
 };
