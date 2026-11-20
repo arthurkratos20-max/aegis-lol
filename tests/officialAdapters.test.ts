@@ -117,6 +117,16 @@ test('Hecarim W supports four separately timed ticks within one cooldown',()=>{
  const ap=statsFor(s.player,data).ap;assert.equal(result.player.composition.magic,240+.8*ap);
 });
 
+test('Gragas Q supports one-second fermentation and Heimerdinger R+W full swarm',()=>{
+ const half=officialAdapterFor('Gragas','GragasQ','HalfFermentedDamage','16.23.1');assert.ok(half);
+ assert.equal(evaluateOfficialAdapter(half,5,{ap:100}),400);
+ const swarm=officialAdapterFor('Heimerdinger','HeimerdingerR','RocketSwarm','16.23.1');assert.ok(swarm);
+ assert.equal(evaluateOfficialAdapter(swarm,3,{ap:100}),1075);
+ assert.ok(nativeOptions.Gragas.some(x=>x.calculation==='HalfFermentedDamage'&&x.automatic===false));
+ assert.ok(nativeOptions.Heimerdinger.some(x=>x.calculation==='RocketSwarm'&&x.automatic===false));
+ assert.deepEqual(validateOfficialDamageAdapters(),[]);
+});
+
 test('Gwen Q center converts half of the six-snip aggregate to true damage',()=>{
  const adapter=officialAdapterFor('Gwen','GwenQ','MaximumSnipsCenter','16.23.1');assert.ok(adapter);
  assert.equal(evaluateOfficialAdapter(adapter,5,{ap:100}),350);
