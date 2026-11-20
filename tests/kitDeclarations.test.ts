@@ -6,7 +6,7 @@ test('second batch declares all five slots for all six champions without false i
  assert.deepEqual(Object.keys(kitDeclarations).sort(),['Gragas','Graves','Gwen','Hecarim','Heimerdinger','Illaoi']);
  assert.deepEqual(validateKitDeclarations(),[]);
  for(const kit of Object.values(kitDeclarations))assert.deepEqual(Object.keys(kit.abilities).sort(),['E','P','Q','R','W']);
- const expected:Record<string,string[]>={Gragas:['partial','partial','partial','partial','partial'],Graves:['pending','partial','partial','pending','partial'],Gwen:['pending','partial','pending','pending','partial'],Hecarim:['pending','partial','partial','pending','pending'],Heimerdinger:['pending','partial','partial','pending','pending'],Illaoi:['pending','pending','partial','pending','partial']};
+ const expected:Record<string,string[]>={Gragas:['partial','partial','partial','partial','partial'],Graves:['partial','partial','partial','partial','partial'],Gwen:['partial','partial','pending','partial','partial'],Hecarim:['pending','partial','partial','partial','partial'],Heimerdinger:['pending','partial','partial','partial','partial'],Illaoi:['pending','partial','partial','pending','partial']};
  for(const [champion,kit] of Object.entries(kitDeclarations))assert.deepEqual(['P','Q','W','E','R'].map(slot=>kit.abilities[slot as keyof typeof kit.abilities].damageModel),expected[champion]);
 });
 
