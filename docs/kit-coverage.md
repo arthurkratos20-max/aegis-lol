@@ -1,102 +1,37 @@
-# Cobertura de kits — auditoria executada em 19 de novembro de 2026
+# Auditoria de cobertura de kits — LoL base
 
-O catálogo Data Dragon 16.23.1 (patch 26.23) contém 173 campeões e os locales pt_BR/en_US. A ingestão está na branch de trabalho. A cobertura de fórmulas de combate para esse catálogo, porém, é **3/173**: três kits parciais (Bardo Q; Ezreal W/R; Master Yi Q (dano padrão e máximo isolado em um alvo)) e 170 sem adapters ativos; zero kits integralmente validados. Os adapters são isolados e patch-scoped: Bardo Q não inclui passiva, colisão/segundo alvo ou controle de grupo; Ezreal W exige detonação de marca e R considera dano contra campeão, sem colisões nem redução por unidades atravessadas.
+**Catálogo:** Data Dragon 16.23.1 (patch 26.23), 173 campeões, locales pt_BR/en_US.  
+**Modo:** Summoner's Rift moderno. Não utilizar dados do League of Legends Classic.
 
-## Resultado reproduzido
+## Interpretação da cobertura
 
-A cobertura declarada abaixo inclui o adapter patch-scoped recém-adicionado. A auditoria automatizada correspondente está sendo executada no CI do commit atual; o resultado gerado pelo workflow ainda precisa ser confirmado antes de tratar estes números como aprovados.
+A cobertura é dividida em três camadas diferentes:
 
-| Métrica | Resultado |
-|---|---:|
-| Patch do catálogo | 16.23.1 |
-| Campeões auditados | 173 |
-| Kits parciais ativos | 3 (Bardo: Q; Ezreal: W/R; Master Yi: Q) |
-| Kits sem adapters ativos | 170 |
-| Kits completos validados | 0 |
+1. **Catálogo:** o campeão e suas habilidades estão disponíveis no seletor.
+2. **Impactos isolados:** existem opções/adaptadores para um ou mais impactos, com patch e fonte declarados.
+3. **Kit completo validado:** passiva e Q/W/E/R, incluindo estados, gatilhos, condições, múltiplos impactos e interações relevantes, têm implementação e fixtures independentes.
 
-O relatório JSON será produzido em `artifacts/kit-coverage-16.23.1.json` pelo CI atual, caso os testes e a auditoria terminem com sucesso.
+A camada 2 não implica a camada 3. Um impacto isolado não é um combo, não representa DPS contínuo e não deve ser apresentado como build matematicamente exata.
 
-## Por que os adapters antigos não contam
+## Adaptadores ativos
 
-- `public/data/mechanics.json` permanece em 16.19.1.
-- `src/officialAdapters.ts` contém adapters de Bardo Q, Ezreal W/R e Master Yi Q, explicitamente vinculados ao patch 16.23.1 e às notas oficiais Riot; não depende do snapshot antigo.
-- `src/exactKits.ts` e seu snapshot de efeitos estão certificados apenas para 16.20.1.
-- O catálogo atual é 16.23.1. O carregador rejeita a combinação de snapshots incompatíveis e os efeitos exatos antigos ficam desativados.
-- `manualMechanicsTemplate` contém apenas seis registros vazios de piloto; não fornece fórmulas executáveis.
-- Portanto, os seis kits parciais do snapshot antigo **não estão ativos no patch 16.23.1**. As duas coberturas parciais atuais são os impactos isolados de Bardo Q e Ezreal W/R, com escopo limitado e sem certificação de kit completo.
+O registro `src/officialAdapters.ts` contém adaptadores isolados vinculados a 16.23.1. O lote 02 adiciona Gragas, Graves, Gwen, Hecarim, Heimerdinger e Illaoi, além dos adaptadores anteriores de Bardo, Ezreal e Master Yi. Alguns impactos são apenas variantes manuais; os efeitos espaciais e sequenciais permanecem incompletos.
 
-## O que continua funcionando
+O relatório gerado por `npm run audit:coverage` é a fonte de contagem dos campeões e impactos no commit executado. Não reutilizar relatórios antigos de 16.19.1 como se fossem a auditoria do catálogo 16.23.1.
 
-- Catálogo de campeões, habilidades descritivas, itens e runas do Data Dragon.
-- Seleção de campeões e cenários, pesos ofensivo/defensivo/utilidade e otimização heurística de itens/runas.
-- Ações de combate inseridas manualmente pelo usuário.
-- Fórmulas isoladas dos seis campeões-piloto somente quando executadas com o snapshot certificado correspondente (16.20.1); elas não são promovidas automaticamente para 16.23.1.
-- Avisos de cobertura e bloqueio de modo estrito evitam apresentar estimativas como dano exato.
+## Lote 02
 
-Essas funcionalidades não equivalem a um simulador fiel de todos os kits no patch atual. A otimização de builds usa heurísticas onde não há cálculo validado.
+O inventário detalhado, com efeitos implementados e lacunas por campeão, está em [kit-batch-02.md](./kit-batch-02.md). Os seis kits permanecem parciais. A suíte testa fórmulas e estados selecionados e também verifica que cada opção nativa do lote resolve para adaptador 16.23.1; esse teste não certifica a simulação integral do kit.
 
-## Validação técnica
+## Fontes e quarentena
 
-CI anterior (44576440785) validou a base anterior, não este adapter. A validação do novo adapter está pendente no workflow atual.
-- Auditoria dos 173 campeões passou e gerou o relatório acima.
-- Artefato estático e relatório foram enviados com sucesso.
+- Adaptadores com `sourceType: 'riot'` devem apontar para notas oficiais Riot que comprovem o ajuste de balanceamento.
+- Adaptadores baseados na Wiki devem manter URL, patch de escopo e limitações explícitas; não os descrever como transcrição oficial da Riot.
+- O inventário Meraki antigo é material de revisão, não runtime. Os candidatos permanecem `unreviewed` e `runtimeEnabled: false` enquanto não houver validação por patch e fixture.
+- Snapshots antigos, incluindo `public/data/mechanics.json` 16.19.1, não podem ser usados para certificar automaticamente o catálogo 16.23.1.
 
-Para reproduzir a auditoria:
+## Critério de conclusão global
 
-```bash
-npm run audit:coverage
-```
+Nenhum campeão deve ser marcado como completo até que a passiva e todas as habilidades relevantes estejam implementadas com condições e estados, e cobertas por testes de ranks, níveis, atributos, alvos, duração, ausência de dados e interações. Após ampliar a cobertura, revalidar combos, DPS, EHP, TTK e o otimizador antes de liberar qualquer modo estrito.
 
-## Bloqueio para concluir os kits
-
-A ingestão Meraki encontrou 171/173 campeões, com slots P/Q/W/E/R presentes, mas a auditoria do campo `patchLastChanged` revelou que os registros mais recentes chegam somente ao patch 25.15. O catálogo Data Dragon 16.23.1 corresponde ao patch de jogo 26.23. A fonte está, portanto, desatualizada e não pode ser usada para certificar fórmulas atuais. Locke e Zaahen não aparecem no snapshot Meraki.
-
-Foi adicionado `scripts/extract-meraki-formula-review.mjs`, que transforma os efeitos estruturados em um inventário de candidatos para revisão, preservando descrição, valores, unidades, tipo de dano, slot, condições de alvo e notas. O resultado `public/data/meraki-formula-review.json` mantém cada candidato como `unreviewed` e `runtimeEnabled: false`. Isso permite auditar e priorizar fórmulas sem executar coeficientes antigos. A auditoria compara agora a versão mais recente da fonte com a versão de jogo do catálogo, em vez de apenas verificar se os campos existem.
-
-O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403 nas tentativas anteriores. Descrições do Data Dragon e notas de balanceamento não fornecem, sozinhas, todas as fórmulas, condições, múltiplos impactos, recasts, pets, geometria e interações necessárias.
-
-Ainda faltam:
-- Adapters de dano/escudo/cura para P/Q/W/E/R de cada campeão.
-- Passivas, stacks, marcas, recasts, cargas, formas, pets, DoT, projéteis e condições espaciais.
-- Procs, efeitos e grupos exclusivos de itens e runas integrados à simulação.
-- Fixtures independentes por campeão e por patch, comparadas com fontes atuais.
-- Revalidação do modo estrito após cobertura suficiente e testes de combos/DPS/TTK.
-
-Não é seguro preencher essas lacunas com coeficientes inferidos ou inventados. Cada adapter só deve ser ativado depois de fonte patchada, implementação explícita e fixture independente.
-
-## Próximos marcos
-
-1. Continuar ampliando adapters isolados patch-scoped a partir de notas oficiais, com fixtures e limites explícitos; obter também uma fonte atual de mecânicas para passivas e interações complexas.
-2. Atualizar os snapshots mecânicos e criar fixtures por campeão.
-3. Implementar e validar kits em lotes pequenos, sem marcar como completos os campeões ainda incompletos.
-4. Integrar efeitos de itens/runas e interações ao motor de combate.
-5. Revalidar combos, DPS, EHP, TTK e o otimizador; só então considerar liberar modo estrito.
-
-
-## Inventário externo em quarentena
-
-- Fonte: Meraki Analytics / dados derivados da League of Legends Wiki.
-- Cobertura observada: 171/173 campeões; Locke e Zaahen ausentes.
-- Atualidade observada: último marcador de alteração 25.15, contra patch de jogo 26.23 no catálogo.
-- Todos os registros são apenas candidatos de revisão; nenhum é ativado pelo runtime.
-- O inventário preserva fórmulas/descrições estruturadas, mas não resolve automaticamente passivas, recasts, sweetspots, stacks, modificadores condicionais, pets ou geometria.
-- A fonte só poderá ser promovida depois de confirmação da versão por campeão, revisão de cada impacto e fixture independente comparada ao patch atual.
-
-### Métricas do inventário gerado em 19/11/2026
-
-O refresh run [44606542886](https://github.com/arthurkratos20-max/aegis-lol/actions/runs/44606542886) concluiu com sucesso e persistiu o inventário na branch:
-
-| Métrica | Resultado |
-|---|---:|
-| Campeões Meraki encontrados | 171/173 |
-| Último patch indicado pela fonte | 25.15 |
-| Patch do catálogo | 26.23 |
-| Habilidades/slots inventariados | 927 |
-| Efeitos estruturados examinados | 2.515 |
-| Efeitos com tabelas de nivelamento | 1.019 |
-| Candidatos de fórmula extraídos | 1.709 |
-| Modificadores com unidade ainda não suportada | 655 |
-| Modificadores estruturalmente malformados | 0 |
-| Efeitos sem tabela de nivelamento | 1.496 |
-
-Os 1.709 candidatos são linhas de revisão, não 1.709 fórmulas prontas: muitos pertencem a habilidades antigas, condicionais ou com múltiplos impactos. Todos permanecem `unreviewed` e `runtimeEnabled: false`. O campo de unidade desconhecida é preservado em vez de descartado ou convertido por aproximação.
+Para reproduzir a auditoria: `npm run audit:coverage`.
