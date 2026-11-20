@@ -14,6 +14,7 @@ export interface OfficialDamageAdapter {
  baseByRank:number[];
  apRatioByRank:number[];
  bonusADRatioByRank?:number[];
+ adRatioByRank?:number[];
  note:string;
 }
 export const officialDamageAdapters:OfficialDamageAdapter[]=[
@@ -21,6 +22,16 @@ export const officialDamageAdapters:OfficialDamageAdapter[]=[
   champion:'Bard',patch:'16.23.1',spell:'BardQ',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
   damageType:'magic',baseByRank:[80,125,170,215,260],apRatioByRank:[1,1,1,1,1],
   note:'Q · um impacto confirmado. Fórmula oficial do patch 26.23; colisão, atordoamento, acerto em segundo alvo e passiva não simulados.'
+ },
+ {
+  champion:'MasterYi',patch:'16.23.1',spell:'MasterYiQ',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
+  damageType:'physical',baseByRank:[20,40,60,80,100],apRatioByRank:[0,0,0,0,0],adRatioByRank:[0.6,0.6,0.6,0.6,0.6],
+  note:'Q · dano padrão isolado em um alvo. Fórmula do patch 26.23; crítico, acertos adicionais, seleção/teleporte entre alvos e efeitos ao contato não simulados.'
+ },
+ {
+  champion:'MasterYi',patch:'16.23.1',spell:'MasterYiQ',calculation:'MaxSingleTargetDamage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
+  damageType:'physical',baseByRank:[35,70,105,140,175],apRatioByRank:[0,0,0,0,0],adRatioByRank:[1.05,1.05,1.05,1.05,1.05],
+  note:'Q · máximo contra um único alvo, exigindo a distribuição de acertos descrita pela Riot. Crítico adicional, efeitos ao contato e distribuição geométrica dos alvos não simulados; opção manual separada.'
  },
  {
   champion:'Ezreal',patch:'16.23.1',spell:'EzrealW',calculation:'Damage',source:'https://www.leagueoflegends.com/pt-br/news/game-updates/league-of-legends-patch-26-23-notes/',
@@ -37,11 +48,11 @@ export function officialAdapterFor(champion:string,spell:string,calculation:stri
  const validation=validateOfficialDamageAdapters();if(validation.length)throw Error(`Official adapter registry invalid: ${validation.join('; ')}`);
  return officialDamageAdapters.find(a=>a.champion===champion&&a.spell===spell&&a.calculation===calculation&&a.patch===patch);
 }
-export function evaluateOfficialAdapter(adapter:OfficialDamageAdapter,rank:number,stats:Pick<Stats,'ap'> & {bonusAD?:number}):number{
+export function evaluateOfficialAdapter(adapter:OfficialDamageAdapter,rank:number,stats:Pick<Stats,'ap'> & {bonusAD?:number;ad?:number}):number{
  if(!Number.isInteger(rank)||rank<1||rank>adapter.baseByRank.length)throw Error('Rank fora da tabela oficial');
- const base=adapter.baseByRank[rank-1],ratio=adapter.apRatioByRank[rank-1],bonusRatio=adapter.bonusADRatioByRank?.[rank-1]??0,bonusAD=stats.bonusAD??0;
- if(!Number.isFinite(base)||!Number.isFinite(ratio)||!Number.isFinite(bonusRatio)||!Number.isFinite(stats.ap)||!Number.isFinite(bonusAD))throw Error('Dados da fórmula oficial inválidos');
- return base+ratio*stats.ap+bonusRatio*bonusAD;
+ const base=adapter.baseByRank[rank-1],ratio=adapter.apRatioByRank[rank-1],bonusRatio=adapter.bonusADRatioByRank?.[rank-1]??0,adRatio=adapter.adRatioByRank?.[rank-1]??0,bonusAD=stats.bonusAD??0,ad=stats.ad??0;
+ if(!Number.isFinite(base)||!Number.isFinite(ratio)||!Number.isFinite(bonusRatio)||!Number.isFinite(adRatio)||!Number.isFinite(stats.ap)||!Number.isFinite(bonusAD)||!Number.isFinite(ad))throw Error('Dados da fórmula oficial inválidos');
+ return base+ratio*stats.ap+bonusRatio*bonusAD+adRatio*ad;
 }
 
 /** Registry gate: invalid or ambiguous official rows must never enter runtime. */
@@ -57,6 +68,7 @@ export function validateOfficialDamageAdapters(adapters:OfficialDamageAdapter[]=
   if(!Array.isArray(row.baseByRank)||![3,5].includes(row.baseByRank.length)||row.baseByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: baseByRank must contain three or five finite nonnegative ranks`);
   if(!Array.isArray(row.apRatioByRank)||row.apRatioByRank.length!==row.baseByRank?.length||row.apRatioByRank.some(v=>!Number.isFinite(v)||v<0))errors.push(`${prefix}: apRatioByRank must match baseByRank`);
   if(row.bonusADRatioByRank&&(!Array.isArray(row.bonusADRatioByRank)||row.bonusADRatioByRank.length!==row.baseByRank?.length||row.bonusADRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: bonusADRatioByRank must match the rank table`);
+  if(row.adRatioByRank&&(!Array.isArray(row.adRatioByRank)||row.adRatioByRank.length!==row.baseByRank?.length||row.adRatioByRank.some(v=>!Number.isFinite(v)||v<0)))errors.push(`${prefix}: adRatioByRank must match the rank table`);
   if(!row.note?.trim())errors.push(`${prefix}: scope note required`);
   const key=`${row.patch}|${row.champion}|${row.spell}|${row.calculation}`;
   if(seen.has(key))errors.push(`${prefix}: duplicate patch/champion/spell/calculation`);
