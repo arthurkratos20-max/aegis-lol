@@ -64,6 +64,7 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  Heimerdinger:[
   {key:'Q',spell:'HeimerdingerQ',calculation:'TurretShot',type:'magic',label:'Q · um tiro de torreta',note:'7/11/15/19/23 + 35% AP por tiro; sem cadência, alvo, duração ou raio carregado.'},
   {key:'W',spell:'HeimerdingerW',calculation:'FirstRocket',type:'magic',label:'W · primeiro foguete',note:'50/75/100/125/150 + 55% AP; apenas um foguete, sem convergência ou dano reduzido dos seguintes.'},
+  {key:'W',spell:'HeimerdingerW',calculation:'FullSalvo',type:'magic',automatic:false,label:'W · salva completa (5 foguetes, um campeão)',note:'90/135/180/225/270 + 103% AP contra um campeão: primeiro foguete + quatro subsequentes reduzidos. Variante manual, não soma ao primeiro foguete isolado; geometria e distribuição não simuladas.'},
   {key:'E',spell:'HeimerdingerE',calculation:'Impact',type:'magic',label:'E · impacto da granada',note:'60/100/140/180/220 + 60% AP; stun central e slow não simulados.'},
   {key:'R',spell:'HeimerdingerR',calculation:'UpgradedGrenade',type:'magic',automatic:false,label:'R+E · uma explosão aprimorada',note:'100/200/300 + 60% AP por explosão; três ricochetes e limites por campeão não simulados.'}
  ],
