@@ -25,14 +25,14 @@ O teste de lote verifica agora que todas as opções nativas declaradas para est
 | Graves | P: baseline conservador do primeiro projétil; Q: impacto/detonação separados; W: impacto; E: True Grit com 4/7/10/13/16 de armadura por stack e 50% desse valor como MR; R: impacto direto/cone separados | Pellets e distância; munição/recarga; geometria/terreno; nuvem, slow e nearsight; recuo |
 | Gwen | P: dano adicional em ataques; Q: faixas agregadas; W: resistências temporárias; E: AS e ataque fortalecido; R: lançamentos separados e dano por vida máxima | Centro verdadeiro do Q e stacks Snippy; cura da P; fronteira/untargetability da W; dash/reembolso do E; condições e slow dos recasts do R |
 | Hecarim | P: conversão de velocidade em AD; Q: stacks com expiração escalonada, amplificação e redução de recarga; W: dano agregado, resistências e cura do próprio dano; E: mínimo/máximo; R: dano | Ticks/área e cura de aliados no W; carga/distância/knockback do E; trajetória, alvos e fear do R |
-| Heimerdinger | P: bônus de movimento quando proximidade é informada; Q: tiro básico; W: primeiro foguete; E: impacto; R+E: explosão | Proximidade automática; ciclo de torretas/laser/cargas; salva completa e convergência de foguetes; área/stun; variantes R+Q e R+W |
+| Heimerdinger | P: bônus de movimento quando proximidade é informada; Q: tiro básico; W: primeiro foguete e salva completa de cinco foguetes contra um campeão; E: impacto; R+E: explosão | Proximidade automática; ciclo de torretas/laser/cargas; distribuição/convergência e múltiplos alvos da salva; área/stun; variantes R+Q e R+W |
 | Illaoi | Q: golpe isolado; W: bônus de vida máxima; E: espírito, duração e eco limitado pela vida do espírito; R: impacto inicial | Cadência/cura da P; ataques e tentáculos do W; vida/mitigação/slow do espírito e tentáculos do E; área, número de alvos e tentáculos acelerados do R |
 
 ## Restrições de interpretação
 
 - Os impactos mínimos/máximos alternativos são variantes manuais; não devem ser somados automaticamente quando representam cenários mutuamente exclusivos.
 - O dano agregado de Hecarim W não reproduz os quatro eventos temporais.
-- O primeiro projétil de Graves é uma aproximação conservadora declarada, não uma simulação fiel da espingarda.
+- O primeiro projétil de Graves é uma aproximação conservadora declarada, não uma simulação fiel da espingarda. A salva de Heimerdinger W é um cenário agregado de cinco acertos num único campeão; não reproduz trajetória nem distribuição espacial.
 - A detecção de proximidade de Heimerdinger depende do estado explícito `heimer-turret-nearby`; o motor não calcula posição no mapa.
 - O eco de Illaoi usa o dano bruto limitado pela vida restante do espírito; a simulação espacial do espírito ainda é simplificada.
 - Fórmulas da Gwen R incluem a parcela de dano por vida máxima correspondente à passiva no valor agregado de cada lançamento; a passiva não é um proc independente adicional no R.
