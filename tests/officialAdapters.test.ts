@@ -21,7 +21,7 @@ test('Bard Q official patch adapter matches Riot 26.23 rank table and AP ratio',
 
 test('Bard Q is executable as a patch-matched isolated magic impact without stale mechanics',()=>{
  assert.equal(data.version,'16.23.1');
- const f=fighter(data,'Bard');f.skills=Array(18).fill('Q') as SkillKey[];f.actions=[];f.automaticAttacks=false;f.initialResource=1;
+ const f=fighter(data,'Bard');f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;f.initialResource=1;
  const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
  const action=nativeAction(f,data,0);
  assert.equal(action.native?.spell,'BardQ');assert.equal(action.type,'magic');
