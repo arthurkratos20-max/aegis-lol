@@ -1,40 +1,37 @@
-# Cobertura de kits — 6 de outubro de 2026
+# Auditoria de cobertura de kits — LoL base
 
-O processamento dos 173 campeões agora conta com um fallback de classe. A cobertura exata e integral dos kits **não está concluída**. Veja `attribute-preferences.md` para a versão híbrida atual.
+**Catálogo:** Data Dragon 16.23.1 (patch 26.23), 173 campeões, locales pt_BR/en_US.  
+**Modo:** Summoner's Rift moderno. Não utilizar dados do League of Legends Classic.
 
-Patch do catálogo: 16.19.1. Cobertura: seis kits parciais, 167 sem adapters numéricos nativos disponíveis e zero kits integralmente validados.
+## Interpretação da cobertura
 
-| Campeão | Fórmulas disponíveis | Pendentes |
-|---|---|---|
-| Darius | Q, R | P, W, E |
-| Ezreal | Q, W (detonação manual), E, R | P |
-| Riven | Q, W, E, R (mínimo manual) | P |
-| Shen | Q, E | P, W, R |
-| Yasuo | Q, E, R (alvo no ar manual) | P, W |
-| Yone | Q | P, W, E, R |
+A cobertura é dividida em três camadas diferentes:
 
-## Implementado
+1. **Catálogo:** o campeão e suas habilidades estão disponíveis no seletor.
+2. **Impactos isolados:** existem opções/adaptadores para um ou mais impactos, com patch e fonte declarados.
+3. **Kit completo validado:** passiva e Q/W/E/R, incluindo estados, gatilhos, condições, múltiplos impactos e interações relevantes, têm implementação e fixtures independentes.
 
-- Cobertura identificada por campeão e compartilhada entre a montagem de builds e os avisos da simulação.
-- Na ausência de ações configuradas, os seis kits disponíveis são comparados por impactos isolados das fórmulas do snapshot: um impacto por habilidade suportada/evoluída, custo de recurso e mitigação do alvo. Um ataque físico é somado quando habilitado e em alcance. Não representa DPS, repetição automática, ordem temporal validada ou combo completo.
-- Duplicação das variantes do Q de Shen evitada; bônus não considerado quando os ataques estão desativados ou fora de alcance. Escudos são mantidos separados do dano e não adicionados arbitrariamente ao EHP.
-- Ações manuais permanecem autoritativas. O simulador continua executando apenas essas ações e os ataques habilitados; não inventa habilidades/passivas ausentes.
-- DPS/TTK existentes não recebem dano fictício da estimativa. A comparação por potencial mágico continua estimada quando não há adapters nem ações configuradas.
-- O caminho de reserva do carregamento agora anexa mecânicas compatíveis com o patch. Snapshots de outro patch ou com estrutura de atributos inválida são rejeitados; flags inferidas são recalculadas após carregar fórmulas.
-- Cobertura parcial/ausente aparece na interface e nas advertências.
+A camada 2 não implica a camada 3. Um impacto isolado não é um combo, não representa DPS contínuo e não deve ser apresentado como build matematicamente exata.
 
-- W de Ezreal, R de Yasuo e dano mínimo do R de Riven disponíveis como impactos manuais condicionais. Não entram no índice automático; seus requisitos e interações pendentes aparecem junto à ação. Fórmulas verificadas contra valores base e coeficientes AD/AP do snapshot.
+## Adaptadores ativos
 
-## Validação
+O registro `src/officialAdapters.ts` contém adaptadores isolados vinculados a 16.23.1. O lote 02 adiciona Gragas, Graves, Gwen, Hecarim, Heimerdinger e Illaoi, além dos adaptadores anteriores de Bardo, Ezreal e Master Yi. Graves True Grit usa os valores por stack atualizados no patch 25.21 (4/7/10/13/16 de armadura por rank e 50% desse valor como MR). Alguns impactos são apenas variantes manuais; os efeitos espaciais e sequenciais permanecem incompletos.
 
-180 testes passaram; TypeScript e compilação passaram. A varredura adicional cobriu 173 campeões × 18 níveis × três pesos (0/50/100), totalizando 9.342 builds e páginas de runas em adversário desconhecido, sem erros de legalidade ou métricas não finitas detectados. Não é validação de fidelidade integral ao jogo, de todas as habilidades ou de todos os matchups.
+O relatório gerado por `npm run audit:coverage` é a fonte de contagem dos campeões e impactos no commit executado. Não reutilizar relatórios antigos de 16.19.1 como se fossem a auditoria do catálogo 16.23.1.
 
-Para reproduzir o inventário de cobertura:
+## Lote 02
 
-    node --experimental-strip-types scripts/audit-kit-coverage.mjs
+O inventário detalhado, com efeitos implementados e lacunas por campeão, está em [kit-batch-02.md](./kit-batch-02.md). Os seis kits permanecem parciais. A suíte testa fórmulas e estados selecionados e também verifica que cada opção nativa do lote resolve para adaptador 16.23.1; esse teste não certifica a simulação integral do kit.
 
-## Bloqueio para concluir
+## Fontes e quarentena
 
-O acesso aos arquivos atuais do CommunityDragon retornou HTTP 403. O espelho alternativo acessível expõe dados do patch 14.10.1 e apenas 167 campeões; esses coeficientes não foram incorporados ao catálogo 16.19.1. Uma consulta adicional ao CDN original de Meraki encontrou 171 campeões, com últimas alterações até 25.15; não confirma compatibilidade com 16.19 e não foi incorporada. A base de fórmulas atuais por campeão precisa ser obtida antes de implementar e validar os adapters restantes.
+- Adaptadores com `sourceType: 'riot'` devem apontar para notas oficiais Riot que comprovem o ajuste de balanceamento.
+- Adaptadores baseados na Wiki devem manter URL, patch de escopo e limitações explícitas; não os descrever como transcrição oficial da Riot.
+- O inventário Meraki antigo é material de revisão, não runtime. Os candidatos permanecem `unreviewed` e `runtimeEnabled: false` enquanto não houver validação por patch e fixture.
+- Snapshots antigos, incluindo `public/data/mechanics.json` 16.19.1, não podem ser usados para certificar automaticamente o catálogo 16.23.1.
 
-Ainda faltam os adapters de passivas, múltiplos impactos/DoT, recasts, cargas, formas, pets, conversões de atributos, cura/escudos, CC, efeitos de itens/runas e interações específicas não modeladas. Os pesos de Utilidade e os objetivos de Dano/Defesa foram conectados à montagem ao vivo na implementação híbrida descrita em `attribute-preferences.md`.
+## Critério de conclusão global
+
+Nenhum campeão deve ser marcado como completo até que a passiva e todas as habilidades relevantes estejam implementadas com condições e estados, e cobertas por testes de ranks, níveis, atributos, alvos, duração, ausência de dados e interações. Após ampliar a cobertura, revalidar combos, DPS, EHP, TTK e o otimizador antes de liberar qualquer modo estrito.
+
+Para reproduzir a auditoria: `npm run audit:coverage`.

@@ -1,0 +1,71 @@
+name: Refresh Riot catalog
+
+on:
+  push:
+    branches:
+      - 'aegis/**'
+    paths:
+      - '.github/workflows/refresh-riot-catalog.yml'
+      - 'tests/exactKits.test.ts'
+      - 'package-lock.json'
+      - 'src/patchCatalog.ts'
+      - 'scripts/ingest-meraki-candidates.mjs'
+      - 'scripts/audit-meraki-candidates.mjs'
+      - 'scripts/extract-meraki-formula-review.mjs'
+      - 'package.json'
+      - 'tests/patchCatalog.test.ts'
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: riot-catalog-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Download and validate the latest Riot catalog
+        run: npm run ingest
+      - name: Import Meraki champion mechanics as review-only candidates
+        run: npm run ingest:meraki
+      - name: Extract formula candidates for human review only
+        run: npm run extract:meraki-review
+      - name: Audit imported candidate coverage (never runtime-enabled)
+        run: npm run audit:meraki
+      - name: Verify tests, types, build and champion coverage
+        run: |
+          npm test
+          npm run typecheck
+          npm run build
+          npm run audit:coverage
+          npm run audit:meraki
+      - name: Commit validated catalog to the same working branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add public/data/pt_BR.json public/data/en_US.json public/data/manifest.json
+          git add -f public/data/meraki-candidates.json public/data/meraki-formula-review.json
+          if git diff --cached --quiet; then
+            echo "Catalog and review snapshots are already current; no commit needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(data): refresh Riot catalog"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          gh workflow run ci.yml --ref "${GITHUB_REF_NAME}"

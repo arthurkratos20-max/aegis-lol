@@ -3,6 +3,7 @@ import {teamWorkspace} from './teamWorkspace.ts';
 import {normalizeDraft} from './draft.ts';
 import {attachItemGroups} from './itemGroups.ts';
 import {attachChampionScaling} from './championScaling.ts';
+import {manualMechanicsTemplate,mergeVerifiedManualMechanics} from './manualMechanics.ts';
 import type {Dataset,Scenario} from './contracts.ts';
 export let CURRENT_PATCH_VERSION='';
 export interface PatchState {version:string;checkedAt:string|null;fallback:boolean;warnings?:string[]}
@@ -14,13 +15,15 @@ async function json(url:string){const r=await fetch(url,{cache:'no-store',signal
 async function withMechanics(data:Dataset):Promise<Dataset>{
  try{
   const m=await json('/data/mechanics.json');
-  const mechanics=m.version===data.version?Object.fromEntries(Object.entries(m.champions??{}).filter(([id,value])=>{
+  const compatible=m.version===data.version;
+  const mechanics=compatible?Object.fromEntries(Object.entries(m.champions??{}).filter(([id,value])=>{
    const c=value as Record<string,unknown>;
    return data.champions[id]&&Number.isFinite(c.ratio)&&Number.isFinite(c.critMultiplier)&&c.spells&&typeof c.spells==='object'&&!Array.isArray(c.spells);
   })):undefined;
   // Previously inferred flags must be recomputed with the newly loaded formulas.
   const champions=Object.fromEntries(Object.entries(data.champions).map(([id,c])=>[id,c.scaling?.coverage==='estimated'?{...c,scaling:undefined}:c]));
-  return {...data,champions,mechanics:mechanics as Dataset['mechanics']};
+  const catalogWarnings=compatible?data.catalogWarnings:[...(data.catalogWarnings??[]),`Mecânicas do patch ${String(m.version??'desconhecido')} ignoradas: catálogo ${data.version}.`];
+  return {...data,champions,mechanics:mechanics as Dataset['mechanics'],catalogWarnings};
  }catch{return data;}
 }
 const pending=new Map<string,Promise<{data:Dataset;state:PatchState}>>();
@@ -33,13 +36,13 @@ export async function loadPatch(locale:string):Promise<{data:Dataset;state:Patch
    const version=await latestRiotPatch();
    if(old&&comparePatch(version,old.version)<0)throw Error('Resposta Riot anterior ao cache');
    let data=old?.version===version?old:await fetchPatchCatalog(version,locale);
-   data=await withMechanics(data);attachItemGroups(attachChampionScaling(data));await saveCache(locale,data);CURRENT_PATCH_VERSION=data.version;
+   data=await withMechanics(data);data=mergeVerifiedManualMechanics(data,manualMechanicsTemplate);attachItemGroups(attachChampionScaling(data));await saveCache(locale,data);CURRENT_PATCH_VERSION=data.version;
    return {data,state:{version:data.version,checkedAt:new Date().toISOString(),fallback:false,warnings:data.catalogWarnings}};
   }catch{
    let bundled:Dataset|null=null;try{bundled=valid(await json(`/data/${locale}.json`));validatePatchCatalog(bundled);}catch{}
    const fallback=newestCatalog(old,bundled);
    if(!fallback)throw Error('Nenhum catálogo validado disponível');
-   const data=await withMechanics(fallback);attachItemGroups(attachChampionScaling(data));await saveCache(locale,data);CURRENT_PATCH_VERSION=data.version;
+   const data=mergeVerifiedManualMechanics(await withMechanics(fallback),manualMechanicsTemplate);attachItemGroups(attachChampionScaling(data));await saveCache(locale,data);CURRENT_PATCH_VERSION=data.version;
    return {data,state:{version:data.version,checkedAt:null,fallback:true,warnings:data.catalogWarnings}};
   }
  })();pending.set(locale,work);try{return await work;}finally{pending.delete(locale);}

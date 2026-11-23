@@ -10,7 +10,8 @@ import {nativeAction,nativeDamage} from '../src/native.ts';
 const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 data.mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8')).champions;
 function scene():Scenario{const s=initialScenario(data);s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;s.player.overrides={hp:1000,ad:100,armor:100,mr:100,mana:100};s.enemy.overrides={hp:1000,ad:100,armor:100,mr:100,mana:100};return s;}
-function action(p:Partial<Action>={}):Action{return {id:'a',at:0,kind:'spell',key:'Q',name:'Test spell',type:'physical',formula:{...EMPTY_FORMULA,base:100},cooldown:0,cost:0,cast:0,duration:1,hit:1,onHit:false,custom:true,coverage:'testing',...p};}
+let actionSequence=0;
+function action(p:Partial<Action>={}):Action{return {id:p.id??`test-action-${++actionSequence}`,at:0,kind:'spell',key:'Q',name:'Test spell',type:'physical',formula:{...EMPTY_FORMULA,base:100},cooldown:0,cost:0,cast:0,duration:1,hit:1,onHit:false,custom:true,coverage:'testing',...p};}
 test('growth reaches level 18 scaling, without assuming linear progression',()=>{assert.equal(growth(1),0);assert.equal(growth(18),17);assert.equal(growth(2),.72);});
 test('mitigation positive resistance',()=>assert.equal(mitigate(100,100),50));
 test('negative resistance amplifies damage',()=>assert.equal(mitigate(100,-100),150));
@@ -62,3 +63,38 @@ test('beneficial missing-health formulas use actor rather than opponent',()=>{co
 test('zero hit cannot heal, shield or apply control',()=>{for(const kind of ['heal','shield','cc'] as const){const s=scene();s.player.initialHP=.5;s.player.actions=[action({kind,hit:0,duration:3})];s.enemy.actions=[action({at:1,type:'true'})];const r=simulate(s,data);assert.equal(r.player.healing,0);assert.equal(r.player.shielding,0);assert.equal(r.player.ccSeconds,0);assert.equal(r.enemy.damage,100);}});
 test('CC seconds merge overlaps and stop at window boundary',()=>{const s=scene();s.duration=3;s.player.actions=[action({kind:'cc',duration:2}),action({at:1,key:'W',kind:'cc',duration:5})];assert.equal(simulate(s,data).player.ccSeconds,3);});
 test('manual and automatic actions share exclusive window endpoint',()=>{const s=scene();s.player.actions=[action({at:s.duration,type:'true'})];assert.equal(simulate(s,data).player.damage,0);});
+
+
+test('strict mode also blocks optimizer before any candidate is evaluated',()=>{
+ const s=scene();s.mode='strict';
+ assert.throws(()=>optimize(s,data,{exact:true,candidates:['3031'],limit:10}),/Otimização estrita indisponível/);
+});
+
+test('strict mode remains blocked until patch-level fixtures certify the combat model', () => {
+ const s=scene();s.mode='strict';
+ assert.throws(()=>simulate(s,data),/Modo Estrito indisponível/);
+});
+
+
+test('exact optimizer enumerates every legal build in a bounded candidate set',()=>{
+ const s=scene();s.player.items=[];s.player.owned=[];s.player.locked=[];s.slots=2;s.budget=10000;
+ const candidates=['3031','3072','3089','3157','3084'];
+ const expected=new Set<string>();
+ for(let mask=0;mask<(1<<candidates.length);mask++){
+  const items=candidates.filter((_,i)=>(mask&(1<<i))!==0);
+  if(items.length<=s.slots&&legalBuild(items,s,data))expected.add([...items].sort().join(','));
+ }
+ const result=optimize(s,data,{exact:true,candidates,limit:1000,timeoutMs:60000});
+ assert.equal(result.complete,true);
+ assert.match(result.method,/Enumeração completa/);
+ assert.equal(result.evaluated,expected.size);
+ assert.deepEqual(new Set(result.alternatives.map(a=>[...a.items].sort().join(','))),expected);
+});
+
+test('invalid skill allocation and native multipliers fail closed',()=>{
+ const s=scene();s.player.skills=['R'];assert.throws(()=>simulate(s,data),/Ordem de habilidades/);
+ const native=scene();native.player.champion='Shen';native.player.skills=conservative(data,'Shen');const a=nativeAction(native.player,data,0);a.native!.multiplier=NaN;native.player.actions=[a];assert.throws(()=>simulate(native,data),/Ação inválida/);
+});
+test('duplicate action identifiers are rejected before event attribution',()=>{
+ const s=scene();s.player.actions=[action({id:'duplicate'}),action({id:'duplicate',at:1})];assert.throws(()=>simulate(s,data),/IDs de ações duplicados/);
+});
