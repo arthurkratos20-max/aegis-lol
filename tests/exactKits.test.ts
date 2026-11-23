@@ -96,3 +96,8 @@ test('mechanics snapshots cannot override the live 175 percent base critical mul
   const f=fighter(data,champion);assert.equal(statsFor(f,data).critMultiplier,1.75,champion);
  }
 });
+
+test('Infinity Edge adds 40 percentage points to the 175 percent base critical multiplier',()=>{
+ const f=fighter(data,'Darius');f.items=['3031'];
+ assert.equal(statsFor(f,data).critMultiplier,2.15);
+});
