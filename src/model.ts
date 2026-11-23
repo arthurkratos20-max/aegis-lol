@@ -35,7 +35,7 @@ export function statsFor(f:Fighter,data:Dataset):Stats{
  for(const shard of f.runes.shards){if(shard==='ad')x.ad+=5.4;if(shard==='ap')x.ap+=9;if(shard==='as')x.bonusAS+=.1;if(shard==='hp')x.hp+=65;if(shard==='haste')x.haste+=8;if(shard==='scalingHP')x.hp+=10*f.level;if(shard==='move')x.move*=1.02;if(shard==='adaptive'){const bonusAD=x.ad-val('attackdamage');if(x.ap>bonusAD/.6||x.ap===0&&bonusAD===0&&c.tags.includes('Mage'))x.ap+=9;else x.ad+=5.4;}}
  applyStacks(x,f,data);
  // Attack speed ratio is not supplied by Data Dragon; approximation is declared by coverage.
- if(data.mechanics?.[f.champion]){x.ratio=data.mechanics[f.champion].ratio;x.critMultiplier=data.mechanics[f.champion].critMultiplier;}
+ if(data.mechanics?.[f.champion])x.ratio=data.mechanics[f.champion].ratio;
  x.critMultiplier+=critDamage;
  if(f.items.includes('3089')){const desc=plain(data.items['3089']?.description??'');const m=desc.match(/(?:aumenta|increases)[^%]{0,100}?(\d+)%/i);if(m)x.ap*=1+Number(m[1])/100;}
  x.as=Math.min(2.5,x.baseAS+x.ratio*x.bonusAS);x.crit=Math.min(1,x.crit);
