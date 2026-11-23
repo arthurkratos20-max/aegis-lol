@@ -7,7 +7,7 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build --webpack",
     "typecheck": "tsc --noEmit",
-    "test": "node -e \"console.log('probe: tests skipped')\"",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "ingest": "node --experimental-strip-types scripts/ingest.mjs",
     "prebuild": "node scripts/prepare-image-assets.mjs",
     "predev": "node scripts/prepare-image-assets.mjs",
