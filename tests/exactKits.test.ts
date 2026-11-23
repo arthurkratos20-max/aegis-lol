@@ -84,3 +84,15 @@ describe('Camada 6 · Regressão e cobertura',()=>{
 });
 
 test("Foguete explícito substitui o ataque automático do mesmo instante",()=>{const s=scene("Jinx");s.duration=1;s.player.automaticAttacks=true;s.player.actions=[exactAction(s.player,data,"jinx-rocket",0)];const r=simulate(s,data);assert.equal(r.events.filter(e=>e.actor==="player"&&e.raw>0).length,1);close(r.player.raw,110);});
+
+
+test('exact spell costs use rank-1 indexing while cooldowns keep rank indexing',()=>{
+ const lux=fighter(data,'Lux');lux.level=1;lux.skills=['E'];assert.equal(exactAction(lux,data,'lux-e').cost,70);
+ lux.level=2;lux.skills=['E','E'];assert.equal(exactAction(lux,data,'lux-e').cost,80);
+ const darius=fighter(data,'Darius');darius.level=1;darius.skills=['Q'];assert.equal(exactAction(darius,data,'darius-q').cost,25);
+});
+test('mechanics snapshots cannot override the live 175 percent base critical multiplier',()=>{
+ for(const champion of ['Shen','Ezreal','Yasuo','Yone','Riven','Darius']){
+  const f=fighter(data,champion);assert.equal(statsFor(f,data).critMultiplier,1.75,champion);
+ }
+});
