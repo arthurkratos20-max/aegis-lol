@@ -6,6 +6,7 @@ import {fighter,initialScenario} from '../src/model.ts';
 import {KIT_BUILD_PROFILES} from '../src/kitBuildProfiles.ts';
 import {runeAffinity} from '../src/runeAffinity.ts';
 import {recommend} from '../src/recommendation.ts';
+import {getChampionScaling} from '../src/championScaling.ts';
 
 const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 test('first six uncovered champions have explicit, non-certified build-facing kit profiles',()=>{
@@ -23,5 +24,16 @@ test('kit profile core items enter the shared item recommendation pool',()=>{
   const eligible=KIT_BUILD_PROFILES[id].coreItems.filter(item=>!!data.items[item]&&data.items[item].maps['11']&&data.items[item].gold.purchasable);
   assert.ok(eligible.length>0, id+' has no catalog-backed core item');
   assert.ok(result.cores.some(item=>eligible.includes(item)),id+' did not surface a kit-profile core item');
+ }
+});
+
+test('kit scaling profiles feed champion stat scaling used by build evaluation',()=>{
+ const expected:Record<string,{ad:boolean;ap:boolean}>={Aatrox:{ad:true,ap:false},Ahri:{ad:false,ap:true},Akali:{ad:true,ap:true},Alistar:{ad:false,ap:true},Amumu:{ad:false,ap:true},Annie:{ad:false,ap:true}};
+ for(const [id,want] of Object.entries(expected)){
+  const scaling=getChampionScaling(data.champions[id],data);
+  assert.equal(scaling.hasADScaling,want.ad,id+' AD scaling');
+  assert.equal(scaling.hasAPScaling,want.ap,id+' AP scaling');
+  assert.ok(scaling.evidence.some(x=>x.startsWith('kit-profile:')),id+' missing kit profile evidence');
+  assert.equal(scaling.coverage,'estimated',id+' must not be promoted to exact formula coverage');
  }
 });
