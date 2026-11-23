@@ -24,7 +24,7 @@ test('Gragas Q standard Summoner\'s Rift minimum and fully fermented impacts are
  const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);const minimum=nativeAction(f,data,0),fermented=nativeAction(f,data,1);
  assert.equal(nativeDamage(minimum,f,data,actor,target),80+0.8*actor.ap);assert.equal(nativeDamage(fermented,f,data,actor,target),100+actor.ap);
  const fW={...f,level:18,skills:['Q','W','E','W','W','R','W','Q','Q','W','R','E','E','E','E','R','Q','Q'] as SkillKey[]};const wIndex=nativeOptions.Gragas.findIndex(x=>x.spell==='GragasW'&&x.calculation==='EmpoweredAttack');const wAction=nativeAction(fW,data,wIndex);assert.equal(nativeDamage(wAction,fW,data,actor,{...target,hp:2000}),140+0.7*actor.ap+140);
- assert.equal(nativeOptions.Gragas[1].automatic,false);assert.equal(nativeOptions.Gragas[2].automatic,false);assert.equal(nativeOptions.Gragas.length,5);const coverage=championKitCoverage('Gragas',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','E','R']);assert.deepEqual(coverage.missing,['P']);assert.equal(coverage.isExactFormula,false);
+ assert.equal(nativeOptions.Gragas[1].automatic,false);assert.equal(nativeOptions.Gragas[2].automatic,false);assert.equal(nativeOptions.Gragas.length,6);const coverage=championKitCoverage('Gragas',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','E','R']);assert.deepEqual(coverage.missing,['P']);assert.equal(coverage.isExactFormula,false);
 });
 
 test('Gragas Happy Hour heals on cast and respects its level-scaled static cooldown',()=>{
