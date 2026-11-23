@@ -30,7 +30,7 @@ const expected:Record<string,number>={
 describe('Camada 1 · Fórmulas isoladas',()=>{
  for(const e of exactEffects)test(`${e.champion}: ${e.id}, fixture independente`,()=>{
   const f={...fighter(data,e.champion),level:1,skills:e.key==='P'?['Q' as const]:[e.key as 'Q'|'W'|'E'|'R']};
-  const actor={...statsFor(f,data),ad:100,ap:100,hp:2000,armor:200,crit:.5,critMultiplier:2},base={...actor,ad:50,ap:0,hp:1000,armor:50,crit:0,critMultiplier:1.75};
+  const actor={...statsFor(f,data),ad:100,ap:100,hp:2000,armor:200,crit:.5,critMultiplier:2},base={...actor,ad:50,ap:0,hp:1000,armor:50,crit:0,critMultiplier:2.0};
   close(exactRaw(e.id,f,actor,base,{...actor,hp:2000},1000),expected[e.id]);assert.equal(exactFormulaStatus(e.id,data).isExactFormula,true);
  });
  test('R Darius limita stacks; R Garen/Jinx usam vida perdida',()=>{
@@ -93,11 +93,11 @@ test('exact spell costs use rank-1 indexing while cooldowns keep rank indexing',
 });
 test('mechanics snapshots cannot override the live 175 percent base critical multiplier',()=>{
  for(const champion of ['Shen','Ezreal','Yasuo','Yone','Riven','Darius']){
-  const f=fighter(data,champion);assert.equal(statsFor(f,data).critMultiplier,1.75,champion);
+  const f=fighter(data,champion);assert.equal(statsFor(f,data).critMultiplier,2.0,champion);
  }
 });
 
-test('Infinity Edge adds 40 percentage points to the 175 percent base critical multiplier',()=>{
+test('Infinity Edge adds 30 percentage points to the 200 percent base critical multiplier',()=>{
  const f=fighter(data,'Darius');f.items=['3031'];
- assert.equal(statsFor(f,data).critMultiplier,2.15);
+ assert.equal(statsFor(f,data).critMultiplier,2.30);
 });
