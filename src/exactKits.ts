@@ -58,7 +58,7 @@ export function exactAction(f:Fighter,data:Dataset,id:string,at=0):Action {
  const e=exactEffect(id);if(!e||e.champion!==f.champion)throw Error('Efeito incompatível com o campeão');if(data.version!==EXACT_PATCH)throw Error(`Efeito validado apenas no snapshot ${EXACT_PATCH}; catálogo ${data.version}`);
  const rank=skillRank(f,e.key);if(!rank)throw Error('Habilidade não evoluída');const sp=exactSource(f.champion).spells[e.spell],ui=data.champions[f.champion].spells[['Q','W','E','R'].indexOf(e.key)];
  const passive=['passive','tick','secondary'].includes(e.mode??'');
- return {id:crypto.randomUUID(),at,kitEffect:id,key:e.key,name:e.label,kind:id==='lux-w'||e.mode==='shield'?'shield':'spell',type:e.type,formula:{...EMPTY_FORMULA},cooldown:passive||id==='jinx-rocket'?0:sp.cooldown[rank]??ui?.cooldown[rank-1]??0,cost:passive?0:sp.cost[rank]??ui?.cost[rank-1]??0,cast:0,duration:id==='garen-w'?.75:id==='lux-w'||id==='shen-p'?2.5:id==='malphite-p'?999:0,hit:1,onHit:e.mode==='attack',custom:false,coverage:'verified'};
+ return {id:crypto.randomUUID(),at,kitEffect:id,key:e.key,name:e.label,kind:id==='lux-w'||e.mode==='shield'?'shield':'spell',type:e.type,formula:{...EMPTY_FORMULA},cooldown:passive||id==='jinx-rocket'?0:sp.cooldown[rank]??ui?.cooldown[rank-1]??0,cost:passive?0:sp.cost[rank-1]??ui?.cost[rank-1]??0,cast:0,duration:id==='garen-w'?.75:id==='lux-w'||id==='shen-p'?2.5:id==='malphite-p'?999:0,hit:1,onHit:e.mode==='attack',custom:false,coverage:'verified'};
 }
 /** Mathematical impact only; activation and state are handled separately. */
 export function exactRaw(id:string,f:Fighter,actor:Stats,base:Stats,target:Stats,currentHP:number,stacks=0):number {
