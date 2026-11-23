@@ -19,7 +19,7 @@ export const itemEligible=(id:string,data:Dataset,champion:string)=>{const i=dat
 export const isBoot=(id:string,data:Dataset)=>data.items[id]?.tags.includes('Boots')??false;
 export function statsFor(f:Fighter,data:Dataset):Stats{
  const c=data.champions[f.champion];if(!c)throw Error('Campeão ausente no snapshot');const s=c.stats,g=growth(f.level);const val=(k:string)=>s[k]+(s[`${k}perlevel`]??0)*g;
- const x:Stats={hp:val('hp'),ad:val('attackdamage'),ap:0,armor:val('armor'),mr:val('spellblock'),mana:val('mp'),as:s.attackspeed,baseAS:s.attackspeed,ratio:s.attackspeed,bonusAS:(s.attackspeedperlevel??0)*g/100,crit:0,critMultiplier:1.75,haste:0,move:s.movespeed,range:s.attackrange,hpRegen:val('hpregen'),manaRegen:val('mpregen'),lifesteal:0,armorPen:0,magicPen:0,armorPenPercent:0,magicPenPercent:0};
+ const x:Stats={hp:val('hp'),ad:val('attackdamage'),ap:0,armor:val('armor'),mr:val('spellblock'),mana:val('mp'),as:s.attackspeed,baseAS:s.attackspeed,ratio:s.attackspeed,bonusAS:(s.attackspeedperlevel??0)*g/100,crit:0,critMultiplier:2.0,haste:0,move:s.movespeed,range:s.attackrange,hpRegen:val('hpregen'),manaRegen:val('mpregen'),lifesteal:0,armorPen:0,magicPen:0,armorPenPercent:0,magicPenPercent:0};
  const map:Record<string,keyof Stats>={FlatHPPoolMod:'hp',FlatMPPoolMod:'mana',FlatPhysicalDamageMod:'ad',FlatMagicDamageMod:'ap',FlatArmorMod:'armor',FlatSpellBlockMod:'mr',FlatMovementSpeedMod:'move',PercentAttackSpeedMod:'bonusAS',FlatCritChanceMod:'crit',PercentLifeStealMod:'lifesteal'};
  let percentHPRegen=0,percentManaRegen=0,percentMove=0,critDamage=0;
  for(const id of f.items){const item=data.items[id];for(const [k,v]of Object.entries(item?.stats??{})){if(map[k])x[map[k]]+=v;}
