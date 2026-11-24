@@ -38,6 +38,9 @@ jobs:
       - name: Run automated tests
         run: npm test
 
+      - name: Check mechanics sync script syntax
+        run: node --check scripts/sync-mechanics.mjs
+
       - name: Check TypeScript
         run: npm run typecheck
 
