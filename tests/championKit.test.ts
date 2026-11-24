@@ -39,7 +39,7 @@ test('manual actions remain authoritative and simulation discloses unsupported k
 
 test('conditional native impacts use current formulas without being assumed in automatic builds',()=>{
  for(const [champion,key,spellName,value,coefficient] of [
-  ['Ezreal','W','EzrealW','BaseDamage',1],
+  ['Ezreal','W','EzrealW','BaseDamage',1.15],
   ['Yasuo','R','YasuoR','RBaseDamage',1.5],
   ['Riven','R','RivenFengShuiEngine','MinBase',.550000011920929],
  ] as const){
