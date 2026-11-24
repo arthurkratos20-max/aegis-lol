@@ -26,6 +26,10 @@ Os arrays de cooldown, custo, valores nomeados e árvores de cálculo são prese
 3. **Shen passiva:** há nós de tipo `{f3cbe7b2}` que referenciam outras chaves de cálculo. Ainda não há interpretador para esse nó.
 4. Habilidades utilitárias sem árvores de dano (por exemplo Shen W e Yasuo W) permanecem presentes no snapshot; não devem ser convertidas artificialmente em dano.
 
+## Ajuste de regressão após a auditoria
+
+- A suíte identificou uma expectativa antiga incorreta para Ezreal W: o snapshot 16.23 registra `mCoefficient = 1.15` para DdA adicional, não `1.0`. O teste independente foi alinhado ao coeficiente presente na fórmula extraída; o cálculo do jogo não foi alterado.
+
 ## Próximos passos
 
 - Adicionar contexto de estado/condições ao motor antes de interpretar cálculos condicionais.
