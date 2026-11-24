@@ -2,7 +2,7 @@
 
 Data: 2026-11-23  
 Escopo: Summoner's Rift, League of Legends base.  
-Catálogo de testes disponível no branch: Data Dragon 16.19.1.
+Catálogo principal disponível no branch: Data Dragon 16.23.1 (173 campeões).
 
 ## Campeões trabalhados
 
@@ -27,11 +27,11 @@ Pontos específicos:
 - Akali: Q/E/R têm múltiplos impactos, energia e ataques passivos condicionais; o perfil híbrido não substitui esses cálculos.
 - Alistar: Q/W/E têm dano mágico e controle; E é periódico e habilita ataque fortalecido; P cura aliados; R reduz dano recebido.
 - Amumu: W aplica dano periódico por vida máxima do alvo; Q possui cargas; E reduz dano; R aplica controle em área.
-- Annie: P controla stacks e atordoamento; E tem escudo e dano reativo; R exige pet com vida, ataques, aura e duração. A mudança de Tibbers do patch 26.23 não deve ser ativada enquanto o catálogo local não for atualizado para 16.23.1.
+- Annie: P controla stacks e atordoamento; E tem escudo e dano reativo; R exige pet com vida, ataques, aura e duração. O patch 26.23 já está representado no catálogo 16.23.1; porém, vida, ataques, aura e duração do pet ainda não são simulados pelo motor, então a durabilidade de Tibbers permanece fora da avaliação numérica.
 
 ## Próximos critérios para fechar o lote
 
-1. Sincronizar o catálogo Data Dragon e os snapshots de mecânicas para a mesma versão do patch.
+1. Atualizar o snapshot CommunityDragon de fórmulas exatas (ainda 16.20) e seus testes para uma versão compatível com o catálogo 16.23.1; não misturar os dois.
 2. Implementar passiva e Q/W/E/R com fontes por habilidade e condições explicitadas.
 3. Validar dano base, coeficientes, mitigação, recursos, cooldowns, recasts, ticks, pets e alvos.
 4. Testar como cada item e runa altera o resultado medido, e não apenas a afinidade estratégica.
