@@ -49,6 +49,20 @@ export const exactEffectsFor=(champion:string)=>exactEffects.filter(x=>x.champio
 export function exactSource(champion:string):ChampionMechanics{return (exactSnapshot as unknown as Record<string,ChampionMechanics>)[champion];}
 export const skillRank=(f:Fighter,key:string)=>key==='AA'||key==='P'?1:f.skills.slice(0,f.level).filter(k=>k===key).length;
 export function exactValue(champion:string,spell:string,name:string,rank:number):number {const v=exactSource(champion)?.spells[spell]?.values[name]?.[rank];if(!Number.isFinite(v))throw Error(`Valor ausente: ${champion}/${spell}/${name}/${rank}`);return v;}
+/** Evaluate an extracted CommunityDragon formula from the active Dataset snapshot.
+ * Unlike exactCalculation (the separately certified 16.20 adapter), this path is
+ * patch-bound to data.mechanics and deliberately does not certify the result.
+ */
+export function mechanicsCalculation(data:Dataset,champion:string,spell:string,name:string,rank:number,level:number,actor:Stats,base:Stats):number {
+ const source=data.mechanics?.[champion];
+ if(!source)throw Error(`Mechanics snapshot missing: ${champion}`);
+ const native=source.spells[spell];
+ if(!native)throw Error(`Mechanics spell missing: ${champion}/${spell}`);
+ if(!Number.isInteger(rank)||rank<1||rank>6)throw Error(`Mechanics rank outside supported range: ${rank}`);
+ const calc=native.calculations[name];
+ if(!calc)throw Error(`Mechanics calculation missing: ${champion}/${spell}/${name}`);
+ return calculateNative(calc as CalcNode,native as NativeSpell,rank,level,actor,base);
+}
 export function exactCalculation(champion:string,spell:string,name:string,rank:number,level:number,actor:Stats,base:Stats):number {
  const s=exactSource(champion)?.spells[spell],calc=s?.calculations[name];if(!calc)throw Error(`Fórmula ausente: ${champion}/${spell}/${name}`);
  return calculateNative(calc as CalcNode,s as NativeSpell,rank,level,actor,base);
