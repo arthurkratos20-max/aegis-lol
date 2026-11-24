@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: aegis-ci-${{ github.workflow }}-${{ github.ref }}
@@ -52,6 +52,21 @@ jobs:
 
       - name: Execute mechanics sync against CommunityDragon (ephemeral validation)
         run: npm run sync:mechanics
+
+      - name: Commit validated pilot mechanics snapshot to PR branch
+        if: success() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/mechanics.json
+          if git diff --cached --quiet; then
+            echo "Snapshot já está atualizado; nenhum commit necessário."
+          else
+            git commit -m "data: sync pilot mechanics snapshot 16.23.1"
+            git push origin "HEAD:${BRANCH_NAME}"
+          fi
 
       - name: Upload mechanics validation snapshot
         if: success()
