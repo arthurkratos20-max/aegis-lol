@@ -38,6 +38,11 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   const actor={...statsFor(fighter(dataset,'Shen'),dataset),hp:2000},base={...actor,hp:1000};
   close(mechanicsCalculation(dataset,'Shen','ShenE','TauntDamage',1,1,actor,base),170);
  });
+ test('não mascara referências inconsistentes nem cálculos condicionais sem estado',()=>{
+  const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
+  assert.throws(()=>mechanicsCalculation(dataset,'Yone','YoneW','WShield',1,1,ez,ez),/DataValue not found or invalid: ShieldBADRatio/);
+  assert.throws(()=>mechanicsCalculation(dataset,'Shen','ShenPassive','ShieldValue',1,1,ez,ez),/Calculation not implemented: GameCalculationConditional/);
+ });
  test('falha de forma explícita quando falta fórmula ou campeão',()=>{
   const actor=statsFor(fighter(dataset,'Ezreal'),dataset);
   assert.throws(()=>mechanicsCalculation(dataset,'Ezreal','EzrealQ','Unknown',1,1,actor,actor),/calculation missing/);
