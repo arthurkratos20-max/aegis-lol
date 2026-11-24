@@ -8,12 +8,48 @@ if (!catalog.version || catalog.version !== manifest.version) {
 }
 
 const ddragonVersion = catalog.version;
-if (!/^16\.23\.1$/.test(ddragonVersion)) {
+if (ddragonVersion !== '16.23.1') {
   throw new Error(`Patch não revisado para este sincronizador: ${ddragonVersion}`);
 }
 const gamePatch = ddragonVersion.replace(/\.\d+$/, '');
 const champions = ['Shen', 'Ezreal', 'Yasuo', 'Yone', 'Riven', 'Darius'];
 const output = {};
+
+function numeric(value) {
+  if (typeof value === 'number') return value;
+  if (value && typeof value === 'object' && typeof value.value === 'number') return value.value;
+  if (value && typeof value === 'object' && typeof value.baseValue === 'number') return value.baseValue;
+  return undefined;
+}
+
+function spellPayload(raw, objectPath, champion) {
+  const obj = raw[objectPath];
+  if (!obj || typeof obj !== 'object') {
+    throw new Error(`Objeto de habilidade ausente: ${champion}/${objectPath}`);
+  }
+  // CommunityDragon exports SpellObject fields on the object itself. Older
+  // snapshots wrapped them in mSpell; support both without guessing values.
+  const spell = obj.mSpell && typeof obj.mSpell === 'object' ? obj.mSpell : obj;
+  const calculations = spell.mSpellCalculations ?? spell.calculations;
+  if (!calculations || typeof calculations !== 'object' || !Object.keys(calculations).length) {
+    throw new Error(`Cálculos ausentes no SpellObject: ${champion}/${objectPath}; campos: ${Object.keys(spell).join(', ')}`);
+  }
+  const dataValues = spell.DataValues ?? spell.mDataValues ?? spell.dataValues ?? [];
+  const values = {};
+  for (const entry of dataValues) {
+    const name = entry.name ?? entry.mName;
+    const series = entry.values ?? entry.mValues;
+    if (typeof name === 'string' && Array.isArray(series) && series.every(Number.isFinite)) {
+      values[name] = series;
+    }
+  }
+  const cooldown = spell.cooldownTime ?? spell.cooldown ?? spell.mCooldownTime ?? [];
+  const cost = spell.mana ?? spell.cost ?? spell.mMana ?? [];
+  if (!Array.isArray(cooldown) || !Array.isArray(cost)) {
+    throw new Error(`Cooldown/custo em formato inesperado: ${champion}/${objectPath}`);
+  }
+  return { path: objectPath, values, calculations, cooldown, cost };
+}
 
 for (const champion of champions) {
   const slug = champion.toLowerCase();
@@ -22,44 +58,43 @@ for (const champion of champions) {
   if (!response.ok) throw new Error(`CommunityDragon HTTP ${response.status}: ${source}`);
 
   const raw = await response.json();
-  const root = raw[`Characters/${champion}/CharacterRecords/Root`];
+  const rootPath = `Characters/${champion}/CharacterRecords/Root`;
+  const root = raw[rootPath];
   if (!root) throw new Error(`Root de atributos ausente: ${champion}`);
 
+  const ratio = numeric(root.attackSpeedRatioModifiable) ?? numeric(root.attackSpeedModifiable);
+  if (!Number.isFinite(ratio) || ratio <= 0) {
+    throw new Error(`Attack speed ratio ausente/inválido: ${champion}`);
+  }
+
+  // Use the canonical spell paths declared by CharacterRecord, not a scan
+  // for a made-up nested mSpell property. Include the passive path explicitly.
+  const paths = [...(root.spells ?? []), root.mCharacterPassiveSpell].filter(Boolean);
+  if (paths.length < 5) {
+    throw new Error(`CharacterRecord não declarou Q/W/E/R + passiva para ${champion}: ${paths.length} caminhos`);
+  }
   const spells = {};
-  for (const [objectPath, obj] of Object.entries(raw)) {
-    const spell = obj?.mSpell;
-    if (!spell?.mSpellCalculations) continue;
-    const name = obj.mScriptName ?? obj.ObjectName;
-    if (!name) continue;
-
-    spells[name] = {
-      path: objectPath,
-      values: Object.fromEntries(
-        (spell.DataValues ?? [])
-          .filter(value => value.values)
-          .map(value => [value.name, value.values])
-      ),
-      calculations: spell.mSpellCalculations,
-      cooldown: spell.cooldownTime ?? [],
-      cost: spell.mana ?? []
-    };
+  for (const objectPath of paths) {
+    const payload = spellPayload(raw, objectPath, champion);
+    const name = objectPath.split('/').at(-1);
+    if (!name || spells[name]) throw new Error(`Identificador de habilidade duplicado/inválido: ${champion}/${objectPath}`);
+    spells[name] = payload;
   }
 
-  if (Object.keys(spells).length < 3) {
-    throw new Error(`Snapshot incompleto para ${champion}: somente ${Object.keys(spells).length} habilidades interpretáveis`);
+  if (Object.keys(spells).length !== 5) {
+    throw new Error(`Snapshot de habilidades incompleto: ${champion}; encontrados ${Object.keys(spells).length}`);
   }
-
-  const ratio = (root.attackSpeedRatioModifiable ?? root.attackSpeedModifiable)?.baseValue;
-  if (!Number.isFinite(ratio)) throw new Error(`Attack speed ratio ausente: ${champion}`);
 
   output[champion] = {
     ratio,
-    critMultiplier: root.critDamageMultiplier ?? 2,
+    critMultiplier: numeric(root.critDamageMultiplier) ?? 2,
     spells,
     source
   };
 }
 
+// Atomic write: only replace the previous snapshot after every pilot passes
+// the same structural checks. Coverage deliberately remains "testing".
 const payload = { version: ddragonVersion, coverage: 'testing', champions: output };
 const destination = 'public/data/mechanics.json';
 const temporary = destination + '.tmp';
@@ -67,6 +102,4 @@ await mkdir(path.dirname(destination), { recursive: true });
 await writeFile(temporary, JSON.stringify(payload));
 await rename(temporary, destination);
 
-console.log(
-  `Snapshot de mecânicas sincronizado: ${Object.keys(output).length} campeões; Data Dragon ${ddragonVersion}; CommunityDragon ${gamePatch}. Cobertura permanece testing.`
-);
+console.log(`Snapshot validado e sincronizado: ${Object.keys(output).length} campeões; Data Dragon ${ddragonVersion}; CommunityDragon ${gamePatch}. Cobertura permanece testing.`);
