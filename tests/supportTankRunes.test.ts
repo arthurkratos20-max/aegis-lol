@@ -20,7 +20,7 @@ test('lane tanks prefer durable trade keystones, never AS keystones across slide
 test('damage supports and offensive support kits preserve their identity',()=>{
  for(const [id,expected] of [['Lux',8229],['Brand',8229],['Senna',8021],['Pyke',9923]] as const){const s=initialScenario(data);s.player={...fighter(data,id),lane:'Support'};assert.equal(key(calculateOptimalRunes(s,data,100).selected),expected,id);}
  const s=initialScenario(data);s.player={...fighter(data,'Lulu'),lane:'Support',supportMode:'damage'};assert.equal(runeAffinity(s.player,data),'poke');
- for(const id of ['Aatrox','Darius'])assert.equal(runeAffinity(fighter(data,id),data),'other');
+ assert.equal(runeAffinity(fighter(data,'Aatrox'),data),'battle');assert.equal(runeAffinity(fighter(data,'Darius'),data),'other');
 });
 test('support/tank rune locks survive recalculation and resource constraints remain legal',()=>{
  const s=initialScenario(data);s.player={...fighter(data,'Shen'),lane:'Support'};const page=calculateOptimalRunes(s,data,50);assert.ok(!page.selected.includes(8226));s.player.runes={...page,locks:{runes:[8465],shards:[1]}};const next=calculateOptimalRunes(s,data,100);assert.ok(next.selected.includes(8465));assert.equal(next.shards[1],page.shards[1]);
