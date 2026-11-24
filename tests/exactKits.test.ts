@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import type {Action,Dataset} from '../src/contracts.ts';
 import {EMPTY_FORMULA} from '../src/contracts.ts';
-import {EXACT_PATCH,exactEffects,exactAction,exactRaw,exactFormulaStatus,exactCalculation} from '../src/exactKits.ts';
+import {EXACT_PATCH,exactEffects,exactAction,exactRaw,exactFormulaStatus,exactCalculation,mechanicsCalculation} from '../src/exactKits.ts';
 import {applyOfficialPatchCorrections} from '../src/patchCatalog.ts';
 import {fighter,initialScenario,statsFor,attackAction,combatResistance,mitigate} from '../src/model.ts';
 import {simulate} from '../src/engine.ts';
@@ -27,6 +27,23 @@ const expected:Record<string,number>={
  'malphite-q':130,'malphite-w':160,'malphite-e':200,'malphite-r':290,
  'darius-q':150,'darius-q-inner':52.5,'darius-w':140,'darius-e':0,'darius-r':162.5,
 };
+describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
+ const mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8'));
+ const dataset={...data,version:mechanics.version,mechanics:mechanics.champions} as Dataset;
+ test('Ezreal Q calcula base + AD + AP a partir do snapshot 16.23.1',()=>{
+  const actor={...statsFor(fighter(dataset,'Ezreal'),dataset),ad:100,ap:100},base={...actor,ad:50,ap:0};
+  close(mechanicsCalculation(dataset,'Ezreal','EzrealQ','Damage',1,1,actor,base),190);
+ });
+ test('Shen E lê vida bônus e dados de cálculo extraídos',()=>{
+  const actor={...statsFor(fighter(dataset,'Shen'),dataset),hp:2000},base={...actor,hp:1000};
+  close(mechanicsCalculation(dataset,'Shen','ShenE','TauntDamage',1,1,actor,base),145);
+ });
+ test('falha de forma explícita quando falta fórmula ou campeão',()=>{
+  const actor=statsFor(fighter(dataset,'Ezreal'),dataset);
+  assert.throws(()=>mechanicsCalculation(dataset,'Ezreal','EzrealQ','Unknown',1,1,actor,actor),/calculation missing/);
+  assert.throws(()=>mechanicsCalculation(dataset,'Aatrox','AatroxQ','Damage',1,1,actor,actor),/snapshot missing/);
+ });
+});
 describe('Camada 1 · Fórmulas isoladas',()=>{
  for(const e of exactEffects)test(`${e.champion}: ${e.id}, fixture independente`,()=>{
   const f={...fighter(data,e.champion),level:1,skills:e.key==='P'?['Q' as const]:[e.key as 'Q'|'W'|'E'|'R']};
