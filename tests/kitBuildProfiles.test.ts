@@ -8,7 +8,7 @@ import {runeAffinity} from '../src/runeAffinity.ts';
 import {recommend} from '../src/recommendation.ts';
 import {getChampionScaling} from '../src/championScaling.ts';
 
-const data:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
+const data:Dataset=JSON.parse(readFileSync(new URL('../public/data/pt_BR.json',import.meta.url),'utf8'));
 test('first six uncovered champions have explicit, non-certified build-facing kit profiles',()=>{
  const expected=['Aatrox','Ahri','Akali','Alistar','Amumu','Annie'];
  assert.deepEqual(Object.keys(KIT_BUILD_PROFILES).sort(),expected.sort());
