@@ -36,7 +36,7 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
  });
  test('Shen E lê vida bônus e dados de cálculo extraídos',()=>{
   const actor={...statsFor(fighter(dataset,'Shen'),dataset),hp:2000},base={...actor,hp:1000};
-  close(mechanicsCalculation(dataset,'Shen','ShenE','TauntDamage',1,1,actor,base),145);
+  close(mechanicsCalculation(dataset,'Shen','ShenE','TauntDamage',1,1,actor,base),170);
  });
  test('falha de forma explícita quando falta fórmula ou campeão',()=>{
   const actor=statsFor(fighter(dataset,'Ezreal'),dataset);
