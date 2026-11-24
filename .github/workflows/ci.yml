@@ -50,6 +50,18 @@ jobs:
       - name: Audit champion kit coverage (173 champions)
         run: npm run audit:coverage
 
+      - name: Execute mechanics sync against CommunityDragon (ephemeral validation)
+        run: npm run sync:mechanics
+
+      - name: Upload mechanics validation snapshot
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanics-validation-16.23.1
+          path: public/data/mechanics.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Upload static export
         if: success()
         uses: actions/upload-artifact@v4
