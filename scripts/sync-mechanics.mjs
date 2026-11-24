@@ -30,10 +30,13 @@ function spellPayload(raw, objectPath, champion) {
   // CommunityDragon exports SpellObject fields on the object itself. Older
   // snapshots wrapped them in mSpell; support both without guessing values.
   const spell = obj.mSpell && typeof obj.mSpell === 'object' ? obj.mSpell : obj;
-  const calculations = spell.mSpellCalculations ?? spell.calculations;
-  if (!calculations || typeof calculations !== 'object' || !Object.keys(calculations).length) {
-    throw new Error(`Cálculos ausentes no SpellObject: ${champion}/${objectPath}; campos: ${Object.keys(spell).join(', ')}`);
+  // Utility/CC abilities may legitimately expose no damage calculations.
+  // Preserve their data; validate calculation coverage at champion level.
+  const rawCalculations = spell.mSpellCalculations ?? spell.calculations ?? {};
+  if (typeof rawCalculations !== 'object' || Array.isArray(rawCalculations)) {
+    throw new Error(`Formato de cálculos inválido: ${champion}/${objectPath}`);
   }
+  const calculations = rawCalculations;
   const dataValues = spell.DataValues ?? spell.mDataValues ?? spell.dataValues ?? [];
   const values = {};
   for (const entry of dataValues) {
@@ -83,6 +86,10 @@ for (const champion of champions) {
 
   if (Object.keys(spells).length !== 5) {
     throw new Error(`Snapshot de habilidades incompleto: ${champion}; encontrados ${Object.keys(spells).length}`);
+  }
+  const calculatedSpells = Object.values(spells).filter(s => Object.keys(s.calculations).length > 0).length;
+  if (calculatedSpells < 3) {
+    throw new Error(`Cobertura de cálculos insuficiente: ${champion}; somente ${calculatedSpells}/5 habilidades com cálculos`);
   }
 
   output[champion] = {
