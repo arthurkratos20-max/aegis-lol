@@ -44,7 +44,7 @@ test('conditional native impacts use current formulas without being assumed in a
   ['Riven','R','RivenFengShuiEngine','MinBase',.550000011920929],
  ] as const){
   const f=fighter(data,champion);f.items=['3072','3089'];
-  const actor=statsFor(f,data),base=statsFor({...f,items:[],runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Lux'),data);
+  const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Lux'),data);
   const index=nativeOptions[champion].findIndex(o=>o.key===key&&o.automatic===false);
   const a=nativeAction(f,data,index),rank=f.skills.slice(0,f.level).filter(k=>k===key).length;
   const spell=data.mechanics![champion].spells[spellName];
