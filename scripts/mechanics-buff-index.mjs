@@ -22,7 +22,7 @@ export function indexBuffRequirements(root) {
       requirements.get(id).push(path);
     }
     for (const [key, child] of Object.entries(value)) {
-      if (typeof child === 'string' && /^\\{[0-9a-f]{8}\\}$/i.test(child)) {
+      if (key !== 'mBuffName' && typeof child === 'string' && /^\\{[0-9a-f]{8}\\}$/i.test(child)) {
         if (!occurrences.has(child)) occurrences.set(child, []);
         occurrences.get(child).push(`${path}.${key}`);
       }
