@@ -9,7 +9,7 @@ import {fighter,initialScenario,statsFor,attackAction,combatResistance,mitigate}
 import {simulate} from '../src/engine.ts';
 import {evaluateBuild} from '../src/buildEvaluation.ts';
 import {championKitCoverage} from '../src/championKit.ts';
-import {calculateNative,nativeDamage} from '../src/native.ts';
+import {calculateNative,nativeAction,nativeDamage} from '../src/native.ts';
 const fixture:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 // Exact effects are regression-tested only against their explicitly certified 16.20.1 snapshot.
 const data=applyOfficialPatchCorrections({...fixture,version:EXACT_PATCH});
@@ -51,9 +51,11 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   passive.calculations.plain={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]};
   passive.calculations.empowered={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]};
   passive.calculations.ShieldValue={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
-  const action={...attackAction(0),kind:'spell' as const,key:'Q',native:{spell:'ShenPassive',calculation:'ShieldValue'}};
-  close(nativeDamage(action,shen,synthetic,actor,actor),10);
-  close(nativeDamage({...action,native:{...action.native,buffs:['shen-quest']}},shen,synthetic,actor,actor),25);
+  const action=nativeAction(shen,synthetic,0);
+  const conditional={...action,kind:'spell' as const,native:{...action.native,spell:'ShenPassive',calculation:'ShieldValue'}};
+  close(nativeDamage(conditional,shen,synthetic,actor,actor),10);
+  const empowered=nativeAction(shen,synthetic,0,['shen-quest']);
+  close(nativeDamage({...empowered,kind:'spell' as const,native:{...empowered.native,spell:'ShenPassive',calculation:'ShieldValue'}},shen,synthetic,actor,actor),25);
  });
  test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
