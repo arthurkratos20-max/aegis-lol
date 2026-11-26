@@ -43,12 +43,17 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   const actor=statsFor(fighter(dataset,'Shen'),dataset);
   close(mechanicsCalculation(dataset,'Shen','ShenPassive','ShieldValue',1,1,actor,actor),47);
  });
- test('nativeDamage recebe o buff explícito da ação e seleciona o ramo de Shen',()=>{
+ test('nativeDamage encaminha buffs explícitos até a fórmula condicional',()=>{
   const shen=fighter(dataset,'Shen');shen.skills=['Q'];
-  const actor=statsFor(shen,dataset),base=statsFor({...shen,items:[],overrides:{},runes:{...shen.runes,shards:[]}},dataset);
+  const actor=statsFor(shen,dataset);
+  const synthetic=structuredClone(dataset);
+  const passive=synthetic.mechanics!.Shen.spells.ShenPassive;
+  passive.calculations.plain={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]};
+  passive.calculations.empowered={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]};
+  passive.calculations.ShieldValue={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
   const action={...attackAction(0),kind:'spell' as const,key:'Q',native:{spell:'ShenPassive',calculation:'ShieldValue'}};
-  close(nativeDamage(action,shen,dataset,actor,actor),47);
-  close(nativeDamage({...action,native:{...action.native,buffs:['{7dfdcd99}']}},shen,dataset,actor,actor),61.1);
+  close(nativeDamage(action,shen,synthetic,actor,actor),10);
+  close(nativeDamage({...action,native:{...action.native,buffs:['shen-quest']}},shen,synthetic,actor,actor),25);
  });
  test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
