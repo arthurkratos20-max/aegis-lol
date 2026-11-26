@@ -21,8 +21,10 @@ export function indexBuffRequirements(root) {
       if (!requirements.has(id)) requirements.set(id, []);
       requirements.get(id).push(path);
     }
+    const parentType = String(value.__type ?? value.mType ?? '').toLowerCase();
     for (const [key, child] of Object.entries(value)) {
-      if (key !== 'mBuffName' && typeof child === 'string' && /^\{[0-9a-f]{8}\}$/i.test(child)) {
+      const declarationNameField = parentType.includes('buff') && ['mName', 'name', 'mBuffName', 'mScriptName'].includes(key);
+      if (!declarationNameField && key !== 'mBuffName' && typeof child === 'string' && /^\\{[0-9a-f]{8}\\}$/i.test(child)) {
         if (!occurrences.has(child)) occurrences.set(child, []);
         occurrences.get(child).push(`${path}.${key}`);
       }
