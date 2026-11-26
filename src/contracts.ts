@@ -10,7 +10,8 @@ export interface Rune {id:number;key:string;name:string;icon:string;shortDesc:st
 export interface RuneTree {id:number;name:string;icon:string;slots:{runes:Rune[]}[]}
 export interface NativeSpell {values:Record<string,number[]>;calculations:Record<string,CalcNode>;cooldown:number[];cost:number[];path:string}
 export interface CalcNode {__type:string;[key:string]:unknown}
-export interface ChampionMechanics {ratio:number;critMultiplier:number;spells:Record<string,NativeSpell>;source:string}
+export interface BuffReference {id:string;requirementPaths:string[];referencePaths:string[];declarationPaths:string[];status:'unresolved'|'declaration-found-needs-semantic-audit'}
+export interface ChampionMechanics {ratio:number;critMultiplier:number;spells:Record<string,NativeSpell>;buffReferences?:BuffReference[];source:string}
 export interface Dataset {catalogWarnings?:string[];statCorrections?:{champion:string;stat:string;value:number;source:string}[];version:string;locale:string;generatedAt:string;source:string;champions:Record<string,Champion>;items:Record<string,Item>;runes:RuneTree[];mechanics?:Record<string,ChampionMechanics>}
 export interface RuneLocks {primaryTree?:boolean;secondaryTree?:boolean;runes?:number[];shards?:number[]}
 export interface RunePage {locks?:RuneLocks;primary:number;secondary:number;selected:number[];shards:string[];locked:boolean}
