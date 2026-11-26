@@ -9,7 +9,7 @@ import {fighter,initialScenario,statsFor,attackAction,combatResistance,mitigate}
 import {simulate} from '../src/engine.ts';
 import {evaluateBuild} from '../src/buildEvaluation.ts';
 import {championKitCoverage} from '../src/championKit.ts';
-import {calculateNative} from '../src/native.ts';
+import {calculateNative,nativeDamage} from '../src/native.ts';
 const fixture:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 // Exact effects are regression-tested only against their explicitly certified 16.20.1 snapshot.
 const data=applyOfficialPatchCorrections({...fixture,version:EXACT_PATCH});
@@ -42,6 +42,13 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
  test('seleciona a fórmula padrão de Shen quando o buff condicional não está ativo',()=>{
   const actor=statsFor(fighter(dataset,'Shen'),dataset);
   close(mechanicsCalculation(dataset,'Shen','ShenPassive','ShieldValue',1,1,actor,actor),47);
+ });
+ test('nativeDamage recebe o buff explícito da ação e seleciona o ramo de Shen',()=>{
+  const shen=fighter(dataset,'Shen');shen.skills=['Q'];
+  const actor=statsFor(shen,dataset),base=statsFor({...shen,items:[],overrides:{},runes:{...shen.runes,shards:[]}},dataset);
+  const action={...attackAction(0),kind:'spell' as const,key:'Q',native:{spell:'ShenPassive',calculation:'ShieldValue'}};
+  close(nativeDamage(action,shen,dataset,actor,actor),47);
+  close(nativeDamage({...action,native:{...action.native,buffs:['{7dfdcd99}']}},shen,dataset,actor,actor),61.1);
  });
  test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
