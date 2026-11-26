@@ -9,6 +9,7 @@ import {fighter,initialScenario,statsFor,attackAction,combatResistance,mitigate}
 import {simulate} from '../src/engine.ts';
 import {evaluateBuild} from '../src/buildEvaluation.ts';
 import {championKitCoverage} from '../src/championKit.ts';
+import {calculateNative} from '../src/native.ts';
 const fixture:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 // Exact effects are regression-tested only against their explicitly certified 16.20.1 snapshot.
 const data=applyOfficialPatchCorrections({...fixture,version:EXACT_PATCH});
@@ -38,10 +39,20 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   const actor={...statsFor(fighter(dataset,'Shen'),dataset),hp:2000},base={...actor,hp:1000};
   close(mechanicsCalculation(dataset,'Shen','ShenE','TauntDamage',1,1,actor,base),170);
  });
- test('não mascara referências inconsistentes nem cálculos condicionais sem estado',()=>{
+ test('seleciona a fórmula padrão de Shen quando o buff condicional não está ativo',()=>{
+  const actor=statsFor(fighter(dataset,'Shen'),dataset);
+  close(mechanicsCalculation(dataset,'Shen','ShenPassive','ShieldValue',1,1,actor,actor),47);
+ });
+ test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
   assert.throws(()=>mechanicsCalculation(dataset,'Yone','YoneW','WShield',1,1,ez,ez),/DataValue not found or invalid: ShieldBADRatio/);
-  assert.throws(()=>mechanicsCalculation(dataset,'Shen','ShenPassive','ShieldValue',1,1,ez,ez),/Calculation not implemented: GameCalculationConditional/);
+ });
+ test('GameCalculationConditional escolhe o ramo apenas com buff explicitamente informado',()=>{
+  const spell={values:{},cooldown:[],cost:[],path:'test',calculations:{plain:{__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]},empowered:{__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]}}};
+  const node={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
+  const actor=statsFor(fighter(dataset,'Shen'),dataset);
+  close(calculateNative(node as never,spell as never,1,1,actor,actor),10);
+  close(calculateNative(node as never,spell as never,1,1,actor,actor,0,{buffs:['shen-quest']}),25);
  });
  test('falha de forma explícita quando falta fórmula ou campeão',()=>{
   const actor=statsFor(fighter(dataset,'Ezreal'),dataset);
