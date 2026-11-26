@@ -49,7 +49,7 @@ test('conditional native impacts use current formulas without being assumed in a
   const a=nativeAction(f,data,index),rank=f.skills.slice(0,f.level).filter(k=>k===key).length;
   const spell=data.mechanics![champion].spells[spellName];
   const expected=spell.values[value][rank]+coefficient*(actor.ad-base.ad)+(champion==='Ezreal'?spell.values.APRatio[rank]*actor.ap:0);
-  assert.ok(Math.abs(nativeDamage(a,f,data,actor,target)-expected)<1e-8);
+  const actual=nativeDamage(a,f,data,actor,target);assert.ok(Math.abs(actual-expected)<1e-8,`${champion}/${spellName}: expected ${expected}, received ${actual}; rank=${rank}, AD=${actor.ad}, baseAD=${base.ad}, AP=${actor.ap}`);
   assert.ok(championKitCoverage(champion,data).covered.includes(key));
   assert.ok(!kitImpactPotential(f,data,actor,target)?.covered.includes(key));
  }
