@@ -1,4 +1,5 @@
 import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
+import { indexBuffRequirements } from './mechanics-buff-index.mjs';
 import path from 'node:path';
 
 const catalog = JSON.parse(await readFile('public/data/pt_BR.json', 'utf8'));
@@ -96,6 +97,7 @@ for (const champion of champions) {
     ratio,
     critMultiplier: numeric(root.critDamageMultiplier) ?? 2,
     spells,
+    buffReferences: indexBuffRequirements(raw),
     source
   };
 }
