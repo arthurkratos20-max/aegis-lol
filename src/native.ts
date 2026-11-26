@@ -2,15 +2,17 @@ import type {Action,CalcNode,Dataset,Fighter,NativeSpell,Stats,SkillKey} from '.
 import {EMPTY_FORMULA} from './contracts.ts';
 import {statsFor} from './model.ts';
 import {officialAdapterFor,evaluateOfficialAdapter} from './officialAdapters.ts';
-export function calculateNative(node:CalcNode,spell:NativeSpell,rank:number,level:number,stats:Stats,base:Stats,depth=0):number{
+export interface NativeCalculationContext {buffs?:readonly string[]}
+export function calculateNative(node:CalcNode,spell:NativeSpell,rank:number,level:number,stats:Stats,base:Stats,depth=0,context:NativeCalculationContext={}):number{
  if(depth>12)throw Error('Calculation depth exceeded');
  if(!Number.isInteger(rank)||rank<1||rank>6||!Number.isInteger(level)||level<1||level>18)throw Error('Rank/level outside supported range');
  if(!node||typeof node!=='object'||typeof node.__type!=='string')throw Error('Malformed calculation node');
- const child=(v:unknown)=>{if(!v||typeof v!=='object')throw Error('Malformed calculation child');return calculateNative(v as CalcNode,spell,rank,level,stats,base,depth+1);};
+ const child=(v:unknown)=>{if(!v||typeof v!=='object')throw Error('Malformed calculation child');return calculateNative(v as CalcNode,spell,rank,level,stats,base,depth+1,context);};
  const dataValue=(name:unknown)=>{const v=spell.values[String(name)];if(!Array.isArray(v)||!Number.isFinite(v[rank]))throw Error(`DataValue not found or invalid: ${String(name)}`);return v[rank];};
  const finite=(value:unknown,label:string)=>{const n=Number(value);if(!Number.isFinite(n))throw Error(`Invalid numeric value: ${label}`);return n;};
  const stat=()=>{const code=Number(node.mStat??0),total=code===0?stats.ap:code===1?stats.armor:code===8?stats.crit:code===2?stats.ad:code===12?stats.hp:code===9?stats.critMultiplier:NaN;const original=code===0?base.ap:code===1?base.armor:code===8?base.crit:code===2?base.ad:code===12?base.hp:code===9?base.critMultiplier:NaN;if(!Number.isFinite(total))throw Error(`Unsupported stat ${code}`);return Number(node.mStatFormula??0)===2?total-original:total;};
  switch(node.__type){
+ case 'GameCalculationConditional':{const requirement=node.mConditionalCalculationRequirements as CalcNode|undefined;if(!requirement||requirement.__type!=='HasBuffCastRequirement'||typeof requirement.mBuffName!=='string')throw Error('Unsupported conditional calculation requirement');const branch=(context.buffs??[]).includes(requirement.mBuffName)?node.mConditionalGameCalculation:node.mDefaultGameCalculation;if(typeof branch!=='string')throw Error('Conditional calculation branch missing');const selected=spell.calculations[branch];if(!selected)throw Error(`Conditional calculation reference missing: ${branch}`);return child(selected);}
  case 'GameCalculation':{if(!Array.isArray(node.mFormulaParts)||!node.mFormulaParts.length)throw Error('GameCalculation has no formula parts');const result=(node.mFormulaParts as CalcNode[]).reduce((a,n)=>a+child(n),0)*(node.mMultiplier?child(node.mMultiplier):1);if(!Number.isFinite(result))throw Error('Non-finite GameCalculation');return result;}
  case 'GameCalculationModified':{const ref=spell.calculations[String(node.mModifiedGameCalculation)];if(!ref)throw Error('Missing calculation reference');return child(ref)*(node.mMultiplier?child(node.mMultiplier):1);}
  case 'NamedDataValueCalculationPart':return dataValue(node.mDataValue);
