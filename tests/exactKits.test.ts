@@ -52,10 +52,10 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   passive.calculations.empowered={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]};
   passive.calculations.ShieldValue={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
   const action=nativeAction(shen,synthetic,0);
-  const conditional={...action,kind:'spell' as const,native:{...action.native,spell:'ShenPassive',calculation:'ShieldValue'}};
+  const conditional={...action,kind:'spell' as const,native:{...action.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}};
   close(nativeDamage(conditional,shen,synthetic,actor,actor),10);
   const empowered=nativeAction(shen,synthetic,0,['shen-quest']);
-  close(nativeDamage({...empowered,kind:'spell' as const,native:{...empowered.native,spell:'ShenPassive',calculation:'ShieldValue'}},shen,synthetic,actor,actor),25);
+  close(nativeDamage({...empowered,kind:'spell' as const,native:{...empowered.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}},shen,synthetic,actor,actor),25);
  });
  test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
