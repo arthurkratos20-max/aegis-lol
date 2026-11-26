@@ -22,7 +22,7 @@ export function indexBuffRequirements(root) {
       requirements.get(id).push(path);
     }
     for (const [key, child] of Object.entries(value)) {
-      if (key !== 'mBuffName' && typeof child === 'string' && /^\{[0-9a-f]{8}\\}$/i.test(child)) {
+      if (key !== 'mBuffName' && typeof child === 'string' && /^\{[0-9a-f]{8}\}$/i.test(child)) {
         if (!occurrences.has(child)) occurrences.set(child, []);
         occurrences.get(child).push(`${path}.${key}`);
       }
@@ -30,7 +30,7 @@ export function indexBuffRequirements(root) {
       if (candidate) {
         const id = candidate.mName ?? candidate.name ?? candidate.mBuffName ?? candidate.mScriptName;
         const type = String(candidate.__type ?? candidate.mType ?? key).toLowerCase();
-        if (typeof id === 'string' && /^\{[0-9a-f]{8}\\}$/i.test(id) && type.includes('buff')) {
+        if (typeof id === 'string' && /^\{[0-9a-f]{8}\}$/i.test(id) && type.includes('buff')) {
           if (!declarations.has(id)) declarations.set(id, []);
           declarations.get(id).push(`${path}.${key}`);
         }
