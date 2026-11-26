@@ -10,6 +10,7 @@ import {simulate} from '../src/engine.ts';
 import {evaluateBuild} from '../src/buildEvaluation.ts';
 import {championKitCoverage} from '../src/championKit.ts';
 import {calculateNative,nativeAction,nativeDamage} from '../src/native.ts';
+import {indexBuffRequirements} from '../scripts/mechanics-buff-index.mjs';
 const fixture:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 // Exact effects are regression-tested only against their explicitly certified 16.20.1 snapshot.
 const data=applyOfficialPatchCorrections({...fixture,version:EXACT_PATCH});
@@ -130,6 +131,20 @@ describe('Camada 6 · Regressão e cobertura',()=>{
  }assert.equal(count,720);});
 });
 
+test('indexa requisitos de buff sem confundir referências com declarações',()=>{
+ const indexed=indexBuffRequirements({
+  Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{abcdef01}'},mOtherRef:'{abcdef01}'},
+  Buff:{__type:'BuffData',mScriptName:'{abcdef01}'}
+ });
+ assert.equal(indexed.length,1);
+ assert.equal(indexed[0].id,'{abcdef01}');
+ assert.equal(indexed[0].requirementPaths.length,1);
+ assert.equal(indexed[0].referencePaths.length,1);
+ assert.equal(indexed[0].declarationPaths.length,1);
+ assert.equal(indexed[0].status,'declaration-found-needs-semantic-audit');
+ const unresolved=indexBuffRequirements({Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{12345678}'}}});
+ assert.equal(unresolved[0].status,'unresolved');
+});
 test("Foguete explícito substitui o ataque automático do mesmo instante",()=>{const s=scene("Jinx");s.duration=1;s.player.automaticAttacks=true;s.player.actions=[exactAction(s.player,data,"jinx-rocket",0)];const r=simulate(s,data);assert.equal(r.events.filter(e=>e.actor==="player"&&e.raw>0).length,1);close(r.player.raw,110);});
 
 
