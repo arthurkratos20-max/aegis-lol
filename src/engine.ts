@@ -24,7 +24,9 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
  for(const side of sides)if(kits[side].active){const champion=s[side].champion;if(['Shen','Ezreal','Yasuo','Yone','Riven','Darius'].includes(champion)&&data.version===EXACT_PATCH)warnings.push(`${side}: efeitos explícitos do snapshot 16.20; geometria e interações secundárias permanecem limitadas.`);else if(['Gragas','Graves','Gwen','Hecarim','Heimerdinger','Illaoi'].includes(champion))warnings.push(`${side}: interações nativas parciais do kit do Summoner’s Rift; alcance, geometria, múltiplos alvos e efeitos não declarados podem não estar simulados.`);}
  const hp={player:st.player.hp*s.player.initialHP,enemy:st.enemy.hp*s.enemy.initialHP};const resource={player:st.player.mana*s.player.initialResource,enemy:st.enemy.mana*s.enemy.initialResource};
  const summary=():CombatSummary=>({damage:0,raw:0,dps:0,hp:0,death:null,healing:0,shielding:0,ccSeconds:0,composition:{physical:0,magic:0,true:0}});
- const results={player:summary(),enemy:summary()};const cooldowns:Record<string,number>={};const locks={player:0,enemy:0};const cc={player:0,enemy:0};const stasis={player:0,enemy:0};const shields:{player:{amount:number;expires:number}[];enemy:{amount:number;expires:number}[]}={player:[],enemy:[]};
+ const results={player:summary(),enemy:summary()};const cooldowns:Record<string,number>={},activeBuffs:{player:Map<string,number>;enemy:Map<string,number>}={player:new Map(),enemy:new Map()};
+ function grantBuffs(side:'player'|'enemy',a:Action){for(const grant of a.buffGrants??[])if(grant.id.trim()&&Number.isFinite(grant.duration)&&grant.duration>0)activeBuffs[side].set(grant.id.trim(),a.at+grant.duration);}
+ function currentBuffs(side:'player'|'enemy',at:number){for(const [id,expires] of activeBuffs[side])if(expires<=at)activeBuffs[side].delete(id);return [...activeBuffs[side].keys()];}const locks={player:0,enemy:0};const cc={player:0,enemy:0};const stasis={player:0,enemy:0};const shields:{player:{amount:number;expires:number}[];enemy:{amount:number;expires:number}[]}={player:[],enemy:[]};
  const cleaver={player:{stacks:0,expires:0},enemy:{stacks:0,expires:0}},cleaverHits=new Set<string>();
  const queue:{side:'player'|'enemy';a:Action;order:number;automatic?:boolean;proc?:boolean;parentAction?:string}[]=[];let order=0;
  for(const side of sides){const f=s[side];for(const a of f.actions)queue.push({side,a,order:order++});if(f.automaticAttacks&&f.uptime>0&&s.distance<=st[side].range){const interval=1/(st[side].as*Math.max(.001,f.uptime));for(let t=0;t<s.duration;t+=interval)queue.push({side,a:attackAction(t),order:order++,automatic:true});}else if(f.automaticAttacks&&s.distance>st[side].range)warnings.push(`${side}: ataques fora do alcance inicial; nenhum ataque automático gerado.`);}
@@ -47,7 +49,7 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   if(s[side].champion==='Gragas'&&a.kind==='spell'&&['Q','W','E','R'].includes(a.key)&&a.at>=kits[side].gragasPassiveReadyAt){const level=s[side].level,passiveCooldown=level>=16?6:level>=11?8:level>=6?10:12,healing=Math.min(st[side].hp-hp[side],st[side].hp*.055*(1-s.conditions.grievous));hp[side]+=healing;results[side].healing+=healing;kits[side].gragasPassiveReadyAt=a.at+passiveCooldown;}
   if(ki?.deferCooldown)cooldowns[key]=a.at+3+actualCooldown;
   if(ki?.consumedQCooldown!==undefined)cooldowns[`${side}:Q`]=a.at+hasteCooldown(ki.consumedQCooldown,actor.haste+(actor.basicHaste??0));
-  if(ki?.passive){record(side,a,0,0,0,0,'Efeito ativado; não é impacto independente de dano');continue;}
+  if(ki?.passive){record(side,a,0,0,0,0,'Efeito ativado; não é impacto independente de dano');grantBuffs(side,a);continue;}
   if((ki?.resetAttack||def?.id==='jinx-rocket'||ki?.rescheduleAttack&&entry.automatic)&&s[side].automaticAttacks&&s[side].uptime>0&&s.distance<=actor.range){
    const future=queue.slice(cursor+1).filter(q=>!(q.side===side&&q.automatic));queue.splice(cursor+1,queue.length-cursor-1,...future);
    const nextActor=kitActorStats(s[side],st[side],bases[side],kits[side],a.at),interval=1/(nextActor.as*Math.max(.001,s[side].uptime));
@@ -61,12 +63,12 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   if(ki?.extra.length||ki?.resetAttack||def?.id==='jinx-rocket'||ki?.rescheduleAttack){const future=queue.slice(cursor+1).sort((x,y)=>x.a.at-y.a.at||x.order-y.order);queue.splice(cursor+1,future.length,...future);}
 
   const beneficial=a.kind==='heal'||a.kind==='shield';const target=beneficial?side:other;
-  const base=bases[side].ad;let raw=ki&&ki.raw>0?ki.raw:a.native?nativeDamage(a,s[side],data,actor,st[target])*(ki?.damageMultiplier??1):ki?.raw??formulaDamage(a.formula,actor,base,st[target],hp[target]);let spiritEchoRaw=0;const hasIllaoiSpirit=s[side].champion==='Illaoi'&&kits[side].illaoiSpiritExpires>a.at&&kits[side].illaoiSpiritHP>0&&raw>0&&a.kind!=='shield'&&a.kind!=='heal';const damageType=ki?.type??a.type;
-  if(a.kind==='stasis'){stasis[side]=a.at+a.duration;record(side,a);continue;}
-  if(a.kind==='heal'){const amount=Math.min(st[side].hp-hp[side],raw*a.hit*(1-s.conditions.grievous));hp[side]+=amount;results[side].healing+=amount;record(side,a,raw,0,0,0,`Cura útil ${amount.toFixed(1)}`);continue;}
-  if(a.kind==='shield'){shields[side].push({amount:raw*a.hit*(1-s.conditions.shieldReduction),expires:a.at+a.duration});record(side,a,raw);continue;}
+  const base=bases[side].ad;let raw=ki&&ki.raw>0?ki.raw:a.native?nativeDamage(a,s[side],data,actor,st[target],currentBuffs(side,a.at))*(ki?.damageMultiplier??1):ki?.raw??formulaDamage(a.formula,actor,base,st[target],hp[target]);let spiritEchoRaw=0;const hasIllaoiSpirit=s[side].champion==='Illaoi'&&kits[side].illaoiSpiritExpires>a.at&&kits[side].illaoiSpiritHP>0&&raw>0&&a.kind!=='shield'&&a.kind!=='heal';const damageType=ki?.type??a.type;
+  if(a.kind==='stasis'){stasis[side]=a.at+a.duration;record(side,a);grantBuffs(side,a);continue;}
+  if(a.kind==='heal'){const amount=Math.min(st[side].hp-hp[side],raw*a.hit*(1-s.conditions.grievous));hp[side]+=amount;results[side].healing+=amount;record(side,a,raw,0,0,0,`Cura útil ${amount.toFixed(1)}`);grantBuffs(side,a);continue;}
+  if(a.kind==='shield'){shields[side].push({amount:raw*a.hit*(1-s.conditions.shieldReduction),expires:a.at+a.duration});record(side,a,raw);grantBuffs(side,a);continue;}
   if(hp[other]<=0){record(side,a,0,0,0,0,'Alvo morto');continue;}if(a.at<stasis[other]){record(side,a,0,0,0,0,'Alvo em estase');continue;}
-  if(a.kind==='cc'){const end=Math.min(s.duration,a.at+a.duration*a.hit);results[side].ccSeconds+=Math.max(0,end-Math.max(a.at,cc[other]));cc[other]=Math.max(cc[other],end);record(side,a,0,0,0,0,a.hit<1?'CC com duração esperada pela chance configurada':undefined);continue;}
+  if(a.kind==='cc'){const end=Math.min(s.duration,a.at+a.duration*a.hit);results[side].ccSeconds+=Math.max(0,end-Math.max(a.at,cc[other]));cc[other]=Math.max(cc[other],end);record(side,a,0,0,0,0,a.hit<1?'CC com duração esperada pela chance configurada':undefined);grantBuffs(side,a);continue;}
   if(a.kind==='attack'&&!ki)raw*=1+actor.crit*(actor.critMultiplier-1);raw*=a.hit;
   const shred=shredBefore?exactValue('Garen','GarenE','ShredAmount',skillRank(s[side],'E')):0;
   const carve=cleaver[side].expires>a.at?.06*cleaver[side].stacks:0,combinedShred=1-(1-shred)*(1-carve);
@@ -83,7 +85,7 @@ export function simulate(s:Scenario,data:Dataset):CombatResult{
   if(hp[other]===0&&results[other].death===null)results[other].death=a.at;
   if((a.kind==='attack'||def?.mode==='attack')&&damageType==='physical'&&st[side].lifesteal>0){const h=Math.min(st[side].hp-hp[side],actual*st[side].lifesteal*(1-s.conditions.grievous));hp[side]+=h;results[side].healing+=h;}
   if(a.cooldownReduction&&a.hit>0)for(const k of Object.keys(cooldowns).filter(k=>k.startsWith(`${side}:`)))cooldowns[k]=Math.max(a.at,cooldowns[k]-a.cooldownReduction);
-  record(side,{...a,type:damageType},raw+spiritEchoRaw,actual,absorbed,overkill,a.hit<1?'Dano em valor esperado; chance configurada':undefined);
+  record(side,{...a,type:damageType},raw+spiritEchoRaw,actual,absorbed,overkill,a.hit<1?'Dano em valor esperado; chance configurada':undefined);grantBuffs(side,a);
  }
  for(const side of sides){results[side].hp=hp[side];results[side].dps=results[side].damage/s.duration;}
  return {events,player:results.player,enemy:results.enemy,warnings:[...new Set(warnings)],coverage:'testing',custom:s.player.actions.some(a=>a.custom)||s.enemy.actions.some(a=>a.custom)||Object.keys(s.player.overrides).length>0||Object.keys(s.enemy.overrides).length>0||s.player.runes.shards.length>0||s.enemy.runes.shards.length>0};
