@@ -68,10 +68,13 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   const base=nativeAction(shen,synthetic,0),conditional={...base,kind:'spell' as const,native:{...base.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}};
   const s=initialScenario(synthetic);s.player=shen;s.enemy=fighter(synthetic,'Lux');s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;
   const grant={...attackAction(0),kind:'spell' as const,key:'grant',name:'Ativar buff',formula:{...EMPTY_FORMULA},buffGrants:[{id:'shen-quest',duration:2}]};
-  s.player.actions=[grant,{...conditional,id:'cond-1',at:1,cooldown:0},{...conditional,id:'cond-2',at:2,cooldown:0}];
+  s.player.actions=[grant,{...grant,id:'refresh',at:1,buffGrants:[{id:'shen-quest',duration:2}]},{...conditional,id:'cond-1',at:1.5,cooldown:0},{...conditional,id:'cond-2',at:2.9,cooldown:0},{...conditional,id:'cond-3',at:3,cooldown:0}];
+  s.enemy.actions=[{...conditional,id:'enemy-cond',at:1.5,cooldown:0}];
   const result=simulate(s,synthetic);
   assert.equal(result.events.find(x=>x.actionId==='cond-1')?.raw,25);
-  assert.equal(result.events.find(x=>x.actionId==='cond-2')?.raw,10);
+  assert.equal(result.events.find(x=>x.actionId==='cond-2')?.raw,25);
+  assert.equal(result.events.find(x=>x.actionId==='cond-3')?.raw,10);
+  assert.equal(result.events.find(x=>x.actionId==='enemy-cond')?.raw,10);
 });
 test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
