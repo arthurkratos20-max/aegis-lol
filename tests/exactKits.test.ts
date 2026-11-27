@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import type {Action,Dataset} from '../src/contracts.ts';
 import {EMPTY_FORMULA} from '../src/contracts.ts';
-import {EXACT_PATCH,exactEffects,exactAction,exactRaw,exactFormulaStatus,exactCalculation} from '../src/exactKits.ts';
+import {EXACT_PATCH,exactEffects,exactAction,exactRaw,exactFormulaStatus,exactCalculation,mechanicsCalculation} from '../src/exactKits.ts';
 import {applyOfficialPatchCorrections} from '../src/patchCatalog.ts';
 import {fighter,initialScenario,statsFor,attackAction,combatResistance,mitigate} from '../src/model.ts';
 import {simulate} from '../src/engine.ts';
 import {evaluateBuild} from '../src/buildEvaluation.ts';
 import {championKitCoverage} from '../src/championKit.ts';
+import {calculateNative,nativeAction,nativeDamage} from '../src/native.ts';
+import {indexBuffRequirements} from '../scripts/mechanics-buff-index.mjs';
 const fixture:Dataset=JSON.parse(readFileSync(new URL('./fixtures/16.19.1-pt_BR.json',import.meta.url),'utf8'));
 // Exact effects are regression-tested only against their explicitly certified 16.20.1 snapshot.
 const data=applyOfficialPatchCorrections({...fixture,version:EXACT_PATCH});
@@ -27,10 +29,74 @@ const expected:Record<string,number>={
  'malphite-q':130,'malphite-w':160,'malphite-e':200,'malphite-r':290,
  'darius-q':150,'darius-q-inner':52.5,'darius-w':140,'darius-e':0,'darius-r':162.5,
 };
+describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
+ const mechanics=JSON.parse(readFileSync(new URL('../public/data/mechanics.json',import.meta.url),'utf8'));
+ const dataset={...data,version:mechanics.version,mechanics:mechanics.champions} as Dataset;
+ test('Ezreal Q calcula base + AD + AP a partir do snapshot 16.23.1',()=>{
+  const actor={...statsFor(fighter(dataset,'Ezreal'),dataset),ad:100,ap:100},base={...actor,ad:50,ap:0};
+  close(mechanicsCalculation(dataset,'Ezreal','EzrealQ','Damage',1,1,actor,base),190);
+ });
+ test('Shen E lê vida bônus e dados de cálculo extraídos',()=>{
+  const actor={...statsFor(fighter(dataset,'Shen'),dataset),hp:2000},base={...actor,hp:1000};
+  close(mechanicsCalculation(dataset,'Shen','ShenE','TauntDamage',1,1,actor,base),170);
+ });
+ test('seleciona a fórmula padrão de Shen quando o buff condicional não está ativo',()=>{
+  const actor=statsFor(fighter(dataset,'Shen'),dataset);
+  close(mechanicsCalculation(dataset,'Shen','ShenPassive','ShieldValue',1,1,actor,actor),47);
+ });
+ test('nativeDamage encaminha buffs explícitos até a fórmula condicional',()=>{
+  const shen=fighter(dataset,'Shen');shen.skills=['Q'];
+  const actor=statsFor(shen,dataset);
+  const synthetic=structuredClone(dataset);
+  const passive=synthetic.mechanics!.Shen.spells.ShenPassive;
+  passive.calculations.plain={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]};
+  passive.calculations.empowered={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]};
+  passive.calculations.ShieldValue={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
+  const action=nativeAction(shen,synthetic,0);
+  const conditional={...action,kind:'spell' as const,native:{...action.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}};
+  close(nativeDamage(conditional,shen,synthetic,actor,actor),10);
+  const empowered=nativeAction(shen,synthetic,0,['shen-quest']);
+  close(nativeDamage({...empowered,kind:'spell' as const,native:{...empowered.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}},shen,synthetic,actor,actor),25);
+ });
+ test('buffs concedidos por ação ativam fórmula condicional e expiram pelo relógio de combate',()=>{
+  const shen=fighter(dataset,'Shen');shen.skills=['Q'];
+  const synthetic=structuredClone(dataset);
+  const passive=synthetic.mechanics!.Shen.spells.ShenPassive;
+  passive.calculations.plain={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]};
+  passive.calculations.empowered={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]};
+  passive.calculations.ShieldValue={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
+  const base=nativeAction(shen,synthetic,0),conditional={...base,kind:'spell' as const,native:{...base.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}};
+  const s=initialScenario(synthetic);s.player=shen;s.enemy=fighter(synthetic,'Lux');s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;
+  const grant={...attackAction(0),kind:'spell' as const,key:'grant',name:'Ativar buff',formula:{...EMPTY_FORMULA},buffGrants:[{id:'shen-quest',duration:2}]};
+  s.player.actions=[grant,{...grant,id:'refresh',at:1,buffGrants:[{id:'shen-quest',duration:2}]},{...conditional,id:'cond-1',at:1.5,cooldown:0},{...conditional,id:'cond-2',at:2.9,cooldown:0},{...conditional,id:'cond-3',at:3,cooldown:0}];
+  s.enemy.actions=[{...conditional,id:'enemy-cond',at:1.5,cooldown:0}];
+  const result=simulate(s,synthetic);
+  assert.equal(result.events.find(x=>x.actionId==='cond-1')?.raw,25);
+  assert.equal(result.events.find(x=>x.actionId==='cond-2')?.raw,25);
+  assert.equal(result.events.find(x=>x.actionId==='cond-3')?.raw,10);
+  assert.equal(result.events.find(x=>x.actionId==='enemy-cond')?.raw,10);
+});
+test('não mascara referências inconsistentes no snapshot',()=>{
+  const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
+  assert.throws(()=>mechanicsCalculation(dataset,'Yone','YoneW','WShield',1,1,ez,ez),/DataValue not found or invalid: ShieldBADRatio/);
+ });
+ test('GameCalculationConditional escolhe o ramo apenas com buff explicitamente informado',()=>{
+  const spell={values:{},cooldown:[],cost:[],path:'test',calculations:{plain:{__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]},empowered:{__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]}}};
+  const node={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
+  const actor=statsFor(fighter(dataset,'Shen'),dataset);
+  close(calculateNative(node as never,spell as never,1,1,actor,actor),10);
+  close(calculateNative(node as never,spell as never,1,1,actor,actor,0,{buffs:['shen-quest']}),25);
+ });
+ test('falha de forma explícita quando falta fórmula ou campeão',()=>{
+  const actor=statsFor(fighter(dataset,'Ezreal'),dataset);
+  assert.throws(()=>mechanicsCalculation(dataset,'Ezreal','EzrealQ','Unknown',1,1,actor,actor),/calculation missing/);
+  assert.throws(()=>mechanicsCalculation(dataset,'Aatrox','AatroxQ','Damage',1,1,actor,actor),/snapshot missing/);
+ });
+});
 describe('Camada 1 · Fórmulas isoladas',()=>{
  for(const e of exactEffects)test(`${e.champion}: ${e.id}, fixture independente`,()=>{
   const f={...fighter(data,e.champion),level:1,skills:e.key==='P'?['Q' as const]:[e.key as 'Q'|'W'|'E'|'R']};
-  const actor={...statsFor(f,data),ad:100,ap:100,hp:2000,armor:200,crit:.5,critMultiplier:2},base={...actor,ad:50,ap:0,hp:1000,armor:50,crit:0,critMultiplier:1.75};
+  const actor={...statsFor(f,data),ad:100,ap:100,hp:2000,armor:200,crit:.5,critMultiplier:2},base={...actor,ad:50,ap:0,hp:1000,armor:50,crit:0,critMultiplier:2.0};
   close(exactRaw(e.id,f,actor,base,{...actor,hp:2000},1000),expected[e.id]);assert.equal(exactFormulaStatus(e.id,data).isExactFormula,true);
  });
  test('R Darius limita stacks; R Garen/Jinx usam vida perdida',()=>{
@@ -83,4 +149,51 @@ describe('Camada 6 · Regressão e cobertura',()=>{
  }assert.equal(count,720);});
 });
 
+test('indexa requisitos de buff sem confundir referências com declarações',()=>{
+ const indexed=indexBuffRequirements({
+  Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{abcdef01}'},mOtherRef:'{abcdef01}'},
+  Buff:{__type:'BuffData',mScriptName:'{abcdef01}'}
+ });
+ assert.equal(indexed.length,1);
+ assert.equal(indexed[0].id,'{abcdef01}');
+ assert.equal(indexed[0].requirementPaths.length,1);
+ assert.equal(indexed[0].referencePaths.length,1);
+ assert.equal(indexed[0].declarationPaths.length,1);
+ assert.equal(indexed[0].status,'declaration-found-needs-semantic-audit');
+ const unresolved=indexBuffRequirements({Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{12345678}'}}});
+ assert.equal(unresolved[0].status,'unresolved');
+});
 test("Foguete explícito substitui o ataque automático do mesmo instante",()=>{const s=scene("Jinx");s.duration=1;s.player.automaticAttacks=true;s.player.actions=[exactAction(s.player,data,"jinx-rocket",0)];const r=simulate(s,data);assert.equal(r.events.filter(e=>e.actor==="player"&&e.raw>0).length,1);close(r.player.raw,110);});
+
+
+test('exact spell costs use rank-1 indexing while cooldowns keep rank indexing',()=>{
+ const lux=fighter(data,'Lux');lux.level=1;lux.skills=['E'];assert.equal(exactAction(lux,data,'lux-e').cost,70);
+ lux.level=2;lux.skills=['E','E'];assert.equal(exactAction(lux,data,'lux-e').cost,80);
+ const darius=fighter(data,'Darius');darius.level=1;darius.skills=['Q'];assert.equal(exactAction(darius,data,'darius-q').cost,25);
+});
+test('mechanics snapshots cannot override the live 175 percent base critical multiplier',()=>{
+ for(const champion of ['Shen','Ezreal','Yasuo','Yone','Riven','Darius']){
+  const f=fighter(data,champion);assert.equal(statsFor(f,data).critMultiplier,2.0,champion);
+ }
+});
+
+test('Infinity Edge adds 30 percentage points to the 200 percent base critical multiplier',()=>{
+ const f=fighter(data,'Darius');f.items=['3031'];
+ assert.equal(statsFor(f,data).critMultiplier,2.30);
+});
+
+test('requisito HasBuffCastRequirement nunca é contado como declaração do próprio buff',()=>{
+ const onlyRequirement=indexBuffRequirements({
+  Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{abcdef01}'}}
+ });
+ assert.equal(onlyRequirement.length,1);
+ assert.deepEqual(onlyRequirement[0].declarationPaths,[]);
+ assert.equal(onlyRequirement[0].status,'unresolved');
+ const withDeclaration=indexBuffRequirements({
+  Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{abcdef01}'},mBuffReference:'{abcdef01}'},
+  Buff:{__type:'BuffData',mScriptName:'{abcdef01}'}
+ });
+ assert.equal(withDeclaration[0].referencePaths.length,1);
+ assert.equal(withDeclaration[0].declarationPaths.length,1);
+ assert.equal(withDeclaration[0].status,'declaration-found-needs-semantic-audit');
+});

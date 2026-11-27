@@ -19,7 +19,7 @@ export const itemEligible=(id:string,data:Dataset,champion:string)=>{const i=dat
 export const isBoot=(id:string,data:Dataset)=>data.items[id]?.tags.includes('Boots')??false;
 export function statsFor(f:Fighter,data:Dataset):Stats{
  const c=data.champions[f.champion];if(!c)throw Error('Campeão ausente no snapshot');const s=c.stats,g=growth(f.level);const val=(k:string)=>s[k]+(s[`${k}perlevel`]??0)*g;
- const x:Stats={hp:val('hp'),ad:val('attackdamage'),ap:0,armor:val('armor'),mr:val('spellblock'),mana:val('mp'),as:s.attackspeed,baseAS:s.attackspeed,ratio:s.attackspeed,bonusAS:(s.attackspeedperlevel??0)*g/100,crit:0,critMultiplier:1.75,haste:0,move:s.movespeed,range:s.attackrange,hpRegen:val('hpregen'),manaRegen:val('mpregen'),lifesteal:0,armorPen:0,magicPen:0,armorPenPercent:0,magicPenPercent:0};
+ const x:Stats={hp:val('hp'),ad:val('attackdamage'),ap:0,armor:val('armor'),mr:val('spellblock'),mana:val('mp'),as:s.attackspeed,baseAS:s.attackspeed,ratio:s.attackspeed,bonusAS:(s.attackspeedperlevel??0)*g/100,crit:0,critMultiplier:2.0,haste:0,move:s.movespeed,range:s.attackrange,hpRegen:val('hpregen'),manaRegen:val('mpregen'),lifesteal:0,armorPen:0,magicPen:0,armorPenPercent:0,magicPenPercent:0};
  const map:Record<string,keyof Stats>={FlatHPPoolMod:'hp',FlatMPPoolMod:'mana',FlatPhysicalDamageMod:'ad',FlatMagicDamageMod:'ap',FlatArmorMod:'armor',FlatSpellBlockMod:'mr',FlatMovementSpeedMod:'move',PercentAttackSpeedMod:'bonusAS',FlatCritChanceMod:'crit',PercentLifeStealMod:'lifesteal'};
  let percentHPRegen=0,percentManaRegen=0,percentMove=0,critDamage=0;
  for(const id of f.items){const item=data.items[id];for(const [k,v]of Object.entries(item?.stats??{})){if(map[k])x[map[k]]+=v;}
@@ -35,7 +35,7 @@ export function statsFor(f:Fighter,data:Dataset):Stats{
  for(const shard of f.runes.shards){if(shard==='ad')x.ad+=5.4;if(shard==='ap')x.ap+=9;if(shard==='as')x.bonusAS+=.1;if(shard==='hp')x.hp+=65;if(shard==='haste')x.haste+=8;if(shard==='scalingHP')x.hp+=10*f.level;if(shard==='move')x.move*=1.02;if(shard==='adaptive'){const bonusAD=x.ad-val('attackdamage');if(x.ap>bonusAD/.6||x.ap===0&&bonusAD===0&&c.tags.includes('Mage'))x.ap+=9;else x.ad+=5.4;}}
  applyStacks(x,f,data);
  // Attack speed ratio is not supplied by Data Dragon; approximation is declared by coverage.
- if(data.mechanics?.[f.champion]){x.ratio=data.mechanics[f.champion].ratio;x.critMultiplier=data.mechanics[f.champion].critMultiplier;}
+ if(data.mechanics?.[f.champion])x.ratio=data.mechanics[f.champion].ratio;
  x.critMultiplier+=critDamage;
  if(f.items.includes('3089')){const desc=plain(data.items['3089']?.description??'');const m=desc.match(/(?:aumenta|increases)[^%]{0,100}?(\d+)%/i);if(m)x.ap*=1+Number(m[1])/100;}
  x.as=Math.min(2.5,x.baseAS+x.ratio*x.bonusAS);x.crit=Math.min(1,x.crit);

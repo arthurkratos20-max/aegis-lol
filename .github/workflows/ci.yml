@@ -5,13 +5,19 @@ on:
     branches:
       - main
       - "aegis/**"
+      - "recovery/**"
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: aegis-ci-${{ github.workflow }}-${{ github.ref }}
@@ -25,6 +31,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,6 +46,9 @@ jobs:
       - name: Run automated tests
         run: npm test
 
+      - name: Check mechanics sync script syntax
+        run: node --check scripts/sync-mechanics.mjs
+
       - name: Check TypeScript
         run: npm run typecheck
 
@@ -46,6 +57,33 @@ jobs:
 
       - name: Audit champion kit coverage (173 champions)
         run: npm run audit:coverage
+
+      - name: Execute mechanics sync against CommunityDragon (ephemeral validation)
+        run: npm run sync:mechanics
+
+      - name: Commit validated pilot mechanics snapshot to PR branch
+        if: success() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/mechanics.json
+          if git diff --cached --quiet; then
+            echo "Snapshot já está atualizado; nenhum commit necessário."
+          else
+            git commit -m "data: sync pilot mechanics snapshot 16.23.1"
+            git push origin "HEAD:${BRANCH_NAME}"
+          fi
+
+      - name: Upload mechanics validation snapshot
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanics-validation-16.23.1
+          path: public/data/mechanics.json
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Upload static export
         if: success()

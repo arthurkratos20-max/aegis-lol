@@ -1,6 +1,6 @@
 import type {Action,CalcNode,ChampionMechanics,DamageType,Dataset,Fighter,NativeSpell,SkillKey,Stats} from './contracts.ts';
 import {EMPTY_FORMULA} from './contracts.ts';
-import {calculateNative} from './native.ts';
+import {calculateNative,type NativeCalculationContext} from './native.ts';
 import {exactSnapshot} from './exactSnapshot.ts';
 export const EXACT_PATCH='16.20.1';
 export interface ExactEffect {id:string;champion:string;key:SkillKey|'AA'|'P';label:string;spell:string;calculation?:string;type:DamageType;note:string;mode?:string}
@@ -49,6 +49,20 @@ export const exactEffectsFor=(champion:string)=>exactEffects.filter(x=>x.champio
 export function exactSource(champion:string):ChampionMechanics{return (exactSnapshot as unknown as Record<string,ChampionMechanics>)[champion];}
 export const skillRank=(f:Fighter,key:string)=>key==='AA'||key==='P'?1:f.skills.slice(0,f.level).filter(k=>k===key).length;
 export function exactValue(champion:string,spell:string,name:string,rank:number):number {const v=exactSource(champion)?.spells[spell]?.values[name]?.[rank];if(!Number.isFinite(v))throw Error(`Valor ausente: ${champion}/${spell}/${name}/${rank}`);return v;}
+/** Evaluate an extracted CommunityDragon formula from the active Dataset snapshot.
+ * Unlike exactCalculation (the separately certified 16.20 adapter), this path is
+ * patch-bound to data.mechanics and deliberately does not certify the result.
+ */
+export function mechanicsCalculation(data:Dataset,champion:string,spell:string,name:string,rank:number,level:number,actor:Stats,base:Stats,context:NativeCalculationContext={}):number {
+ const source=data.mechanics?.[champion];
+ if(!source)throw Error(`Mechanics snapshot missing: ${champion}`);
+ const native=source.spells[spell];
+ if(!native)throw Error(`Mechanics spell missing: ${champion}/${spell}`);
+ if(!Number.isInteger(rank)||rank<1||rank>6)throw Error(`Mechanics rank outside supported range: ${rank}`);
+ const calc=native.calculations[name];
+ if(!calc)throw Error(`Mechanics calculation missing: ${champion}/${spell}/${name}`);
+ return calculateNative(calc as CalcNode,native as NativeSpell,rank,level,actor,base,0,context);
+}
 export function exactCalculation(champion:string,spell:string,name:string,rank:number,level:number,actor:Stats,base:Stats):number {
  const s=exactSource(champion)?.spells[spell],calc=s?.calculations[name];if(!calc)throw Error(`Fórmula ausente: ${champion}/${spell}/${name}`);
  return calculateNative(calc as CalcNode,s as NativeSpell,rank,level,actor,base);
@@ -58,7 +72,7 @@ export function exactAction(f:Fighter,data:Dataset,id:string,at=0):Action {
  const e=exactEffect(id);if(!e||e.champion!==f.champion)throw Error('Efeito incompatível com o campeão');if(data.version!==EXACT_PATCH)throw Error(`Efeito validado apenas no snapshot ${EXACT_PATCH}; catálogo ${data.version}`);
  const rank=skillRank(f,e.key);if(!rank)throw Error('Habilidade não evoluída');const sp=exactSource(f.champion).spells[e.spell],ui=data.champions[f.champion].spells[['Q','W','E','R'].indexOf(e.key)];
  const passive=['passive','tick','secondary'].includes(e.mode??'');
- return {id:crypto.randomUUID(),at,kitEffect:id,key:e.key,name:e.label,kind:id==='lux-w'||e.mode==='shield'?'shield':'spell',type:e.type,formula:{...EMPTY_FORMULA},cooldown:passive||id==='jinx-rocket'?0:sp.cooldown[rank]??ui?.cooldown[rank-1]??0,cost:passive?0:sp.cost[rank]??ui?.cost[rank-1]??0,cast:0,duration:id==='garen-w'?.75:id==='lux-w'||id==='shen-p'?2.5:id==='malphite-p'?999:0,hit:1,onHit:e.mode==='attack',custom:false,coverage:'verified'};
+ return {id:crypto.randomUUID(),at,kitEffect:id,key:e.key,name:e.label,kind:id==='lux-w'||e.mode==='shield'?'shield':'spell',type:e.type,formula:{...EMPTY_FORMULA},cooldown:passive||id==='jinx-rocket'?0:sp.cooldown[rank]??ui?.cooldown[rank-1]??0,cost:passive?0:sp.cost[rank-1]??ui?.cost[rank-1]??0,cast:0,duration:id==='garen-w'?.75:id==='lux-w'||id==='shen-p'?2.5:id==='malphite-p'?999:0,hit:1,onHit:e.mode==='attack',custom:false,coverage:'verified'};
 }
 /** Mathematical impact only; activation and state are handled separately. */
 export function exactRaw(id:string,f:Fighter,actor:Stats,base:Stats,target:Stats,currentHP:number,stacks=0):number {

@@ -1,10 +1,12 @@
 import type {Dataset,Fighter} from './contracts.ts';
 import {supportIntent} from './championScaling.ts';
+import {kitBuildProfile} from './kitBuildProfiles.ts';
 export type RuneAffinity='burst'|'poke'|'battle'|'enchanter'|'attack'|'tank'|'engage'|'warden'|'supportAttack'|'other';
 const contains=(id:string,list:string)=>list.split(' ').includes(id);
 /** Curated kit affinities, not measured rune DPS or observed meta. */
 export function runeAffinity(f:Fighter,data:Dataset):RuneAffinity {
  const c=data.champions[f.champion],id=f.champion;
+ const curated=kitBuildProfile(id);if(curated)return curated.runeAffinity;
  if(supportIntent(f,data)==='utility'&&contains(id,'Lulu Janna Nami Milio Soraka Sona Yuumi Renata Ivern Karma Seraphine'))return 'enchanter';
  if(f.lane==='Support'&&contains(id,'Senna Pyke'))return 'supportAttack';
  if(f.lane==='Support'&&contains(id,'Braum Taric TahmKench Shen'))return 'warden';

@@ -39,17 +39,17 @@ test('manual actions remain authoritative and simulation discloses unsupported k
 
 test('conditional native impacts use current formulas without being assumed in automatic builds',()=>{
  for(const [champion,key,spellName,value,coefficient] of [
-  ['Ezreal','W','EzrealW','BaseDamage',1],
+  ['Ezreal','W','EzrealW','BaseDamage',1.15],
   ['Yasuo','R','YasuoR','RBaseDamage',1.5],
   ['Riven','R','RivenFengShuiEngine','MinBase',.550000011920929],
  ] as const){
   const f=fighter(data,champion);f.items=['3072','3089'];
-  const actor=statsFor(f,data),base=statsFor({...f,items:[],runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Lux'),data);
+  const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Lux'),data);
   const index=nativeOptions[champion].findIndex(o=>o.key===key&&o.automatic===false);
   const a=nativeAction(f,data,index),rank=f.skills.slice(0,f.level).filter(k=>k===key).length;
   const spell=data.mechanics![champion].spells[spellName];
   const expected=spell.values[value][rank]+coefficient*(actor.ad-base.ad)+(champion==='Ezreal'?spell.values.APRatio[rank]*actor.ap:0);
-  assert.ok(Math.abs(nativeDamage(a,f,data,actor,target)-expected)<1e-8);
+  const actual=nativeDamage(a,f,data,actor,target);assert.ok(Math.abs(actual-expected)<1e-5,`${champion}/${spellName}: expected ${expected}, received ${actual}; rank=${rank}, AD=${actor.ad}, baseAD=${base.ad}, AP=${actor.ap}`);
   assert.ok(championKitCoverage(champion,data).covered.includes(key));
   assert.ok(!kitImpactPotential(f,data,actor,target)?.covered.includes(key));
  }

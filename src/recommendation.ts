@@ -1,4 +1,5 @@
 import {championForCounter} from './counterAdapters.ts';
+import {kitBuildProfile} from './kitBuildProfiles.ts';
 import {supportIntent} from './championScaling.ts';
 import type {Dataset,Fighter,RunePage,Scenario,CombatResult} from './contracts.ts';
 import {itemEligible,isBoot,statsFor} from './model.ts';
@@ -57,7 +58,7 @@ export function runeSuggestion(profile:Profile,s:Scenario,data:Dataset,mode:Tact
 export interface QuickRecommendation {decisions?:{selected:string;candidates:import('./continuousBuild.ts').ItemScore[]}[];profile:Profile;cores:string[];boots:string|null;target:string[];runes:RunePage;verdict:string;reasons:Record<string,string>;warnings:string[];total:number}
 export function recommend(s:Scenario,data:Dataset,mode:TacticalMode='balanced'):QuickRecommendation {
  const profile=supportIntent(s.player,data)==='utility'?profileFor(s.player.champion,'Support',data):profileFor(s.player.champion,s.player.lane==='Support'&&s.player.supportMode==='damage'?'Mid':s.player.lane,data),axis=enemyAxis(s,data),isAP=['enchanter','supportDamage','fighterAP','assassinAP','mageControl','mageBurn','mageBurst'].includes(profile),isTank=['tank','supportTank'].includes(profile);
- const pool=[...(SPECIFIC[s.player.champion]??CORE[profile])];
+ const pool=[...new Set([...(kitBuildProfile(s.player.champion)?.coreItems??[]),...(SPECIFIC[s.player.champion]??CORE[profile])])];
  if(isTank&&axis==='magic')pool.unshift('3065','6664');if(isTank&&axis==='physical')pool.unshift(profile==='supportTank'?'3109':'2502');
  const defense=s.weights.defense>s.weights.offense;
  if(defense)pool.unshift(isAP?(profile==='enchanter'?'3107':axis==='physical'?'3157':'3102'):profile==='assassinAD'?'3814':profile==='marksman'?'3072':profile==='fighterAD'?'6333':isTank?(axis==='magic'?'3065':'2502'):'3053');

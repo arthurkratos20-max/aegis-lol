@@ -1,4 +1,5 @@
 import type {Champion,Dataset,Fighter} from './contracts.ts';
+import {kitBuildProfile} from './kitBuildProfiles.ts';
 export type ChampionClass='Mage'|'Marksman'|'Fighter'|'Tank'|'Assassin'|'Support';
 export interface ChampionScaling {
  hasADScaling:boolean;hasAPScaling:boolean;hasCritScaling:boolean;hasAttackSpeedScaling:boolean;
@@ -14,6 +15,16 @@ export function getChampionScaling(champion:Champion,data:Dataset):ChampionScali
  const tags=champion.tags.filter((tag):tag is ChampionClass=>classes.includes(tag as ChampionClass)),primaryClass=tags[0]??'Fighter';
  const hasClass=(tag:ChampionClass)=>tags.includes(tag),evidence:string[]=[];
  const result:ChampionScaling={hasADScaling:hasClass('Marksman')||hasClass('Fighter')||hasClass('Assassin')&&!hasClass('Mage'),hasAPScaling:hasClass('Mage'),hasCritScaling:hasClass('Marksman')||members(champion.id,'Yasuo Yone Tryndamere'),hasAttackSpeedScaling:hasClass('Marksman')||hasClass('Fighter'),hasHealthScaling:hasClass('Tank'),hasArmorResistScaling:false,primaryClass,secondaryClass:tags[1],coverage:'estimated',evidence};
+ // Explicit kit profiles correct hybrid/support scalings that class tags cannot express.
+ const profile=kitBuildProfile(champion.id);
+ if(profile){
+  result.hasADScaling=profile.damageScaling.some(tag=>['AD','bonusAD'].includes(tag));
+  result.hasAPScaling=profile.damageScaling.includes('AP');
+  result.hasCritScaling=profile.damageScaling.includes('crit');
+  result.hasAttackSpeedScaling=profile.damageScaling.includes('attackSpeed');
+  result.hasHealthScaling=profile.damageScaling.includes('ownMaxHP');
+  evidence.push(`kit-profile:${profile.status}:${profile.damageScaling.join(',')}`);
+ }
  // Per-champion kit adapters, never pair/draft tables. Presence unlocks pools, not damage formulas.
  if(members(champion.id,'Volibear Kaisa Varus Shyvana Twitch Katarina Ezreal Akali Jax Kayle KogMaw Corki Udyr Warwick')){result.hasADScaling=true;result.hasAPScaling=true;evidence.push('curated-hybrid-kit');}
  if(members(champion.id,'Ekko Ahri Syndra Lux Lulu Janna Karma Milio Azir Mordekaiser Rumble Amumu Zac Malphite Rammus Shen')){result.hasAPScaling=true;result.hasADScaling=false;}
