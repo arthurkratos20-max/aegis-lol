@@ -39,3 +39,17 @@ Os arrays de cooldown, custo, valores nomeados e árvores de cálculo são prese
 - Manter `coverage: testing` até validação por habilidade e cenário.
 
 **Status:** piloto de extração validado; cobertura de kits permanece parcial/experimental. Nenhum campeão deste piloto está certificado como kit completo.
+
+## Índice de requisitos de buff — inventário sem inferências
+
+O sincronizador agora produz `buffReferences` por campeão usando `scripts/mechanics-buff-index.mjs`. O índice separa três evidências:
+
+- `requirementPaths`: locais onde uma fórmula exige explicitamente um buff via `HasBuffCastRequirement`;
+- `referencePaths`: outros campos que referenciam o mesmo identificador;
+- `declarationPaths`: objetos do tipo buff que declaram esse identificador.
+
+Os estados são deliberadamente conservadores: `unresolved` quando não há declaração independente e `declaration-found-needs-semantic-audit` quando uma declaração foi encontrada. O segundo estado **não** significa que a condição esteja semanticamente compreendida ou que o buff possa ser ativado automaticamente.
+
+A indexação ignora campos internos da própria declaração ao contar referências externas, evitando confundir `mScriptName`/nomes de declaração com referências de uso. Testes sintéticos cobrem tanto a separação entre requisito, referência e declaração quanto o caso sem declaração.
+
+Nenhum ID é inferido a partir do nome do campeão ou de semelhança textual. O índice serve para orientar investigação; não liga ainda o ciclo de vida do buff (ativação, consumo, expiração) ao simulador.
