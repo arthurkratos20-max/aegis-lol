@@ -32,7 +32,7 @@ export function indexBuffRequirements(root) {
       if (candidate) {
         const id = candidate.mName ?? candidate.name ?? candidate.mBuffName ?? candidate.mScriptName;
         const type = String(candidate.__type ?? candidate.mType ?? key).toLowerCase();
-        if (typeof id === 'string' && /^\{[0-9a-f]{8}\}$/i.test(id) && type.includes('buff')) {
+        if (typeof id === 'string' && /^\{[0-9a-f]{8}\}$/i.test(id) && type.includes('buff') && !type.includes('requirement')) {
           if (!declarations.has(id)) declarations.set(id, []);
           declarations.get(id).push(`${path}.${key}`);
         }
