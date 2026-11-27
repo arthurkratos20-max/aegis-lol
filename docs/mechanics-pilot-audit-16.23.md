@@ -22,7 +22,7 @@ Os arrays de cooldown, custo, valores nomeados e árvores de cálculo são prese
 ## Bloqueios encontrados na auditoria estática
 
 1. **Yone W / WShield:** a árvore usa o DataValue `ShieldBADRatio`, mas o snapshot contém `ShieldbADRatio`. A referência não é resolvida e o avaliador deve falhar explicitamente. Não foi aplicada correção por suposição.
-2. **Shen passiva / ShieldValue:** é um `GameCalculationConditional` dependente do buff `{7dfdcd99}`. A avaliação requer estado de buff/condição que a API escalar atual não recebe.
+2. **Shen passiva / ShieldValue:** é um `GameCalculationConditional` dependente do buff `{7dfdcd99}`. O interpretador agora recebe buffs explícitos via `NativeCalculationContext`; o motor também mantém buffs concedidos por ações até a expiração. Porém, a declaração e o vínculo semântico desse ID continuam sem confirmação no snapshot, então a ativação real da passiva de Shen ainda não é automática.
 3. **Shen passiva:** há nós de tipo `{f3cbe7b2}` que referenciam outras chaves de cálculo. Ainda não há interpretador para esse nó.
 4. Habilidades utilitárias sem árvores de dano (por exemplo Shen W e Yasuo W) permanecem presentes no snapshot; não devem ser convertidas artificialmente em dano.
 
@@ -32,13 +32,19 @@ Os arrays de cooldown, custo, valores nomeados e árvores de cálculo são prese
 
 ## Próximos passos
 
-- Adicionar contexto de estado/condições ao motor antes de interpretar cálculos condicionais.
+- Auditar as declarações e os eventos reais que concedem/consomem cada buff antes de ligar IDs a habilidades de campeões.
 - Resolver e confirmar a inconsistência de nomenclatura Yone W com fonte oficial independente antes de normalizar o alias.
 - Criar ações nativas por habilidade com condições explícitas, incluindo custos, recargas, stacks, recasts, escudos, passivas e impactos múltiplos.
 - Testar as ações dentro de `simulate`, não apenas a aritmética isolada.
 - Manter `coverage: testing` até validação por habilidade e cenário.
 
 **Status:** piloto de extração validado; cobertura de kits permanece parcial/experimental. Nenhum campeão deste piloto está certificado como kit completo.
+
+## Ciclo temporal genérico de buffs — experimental
+
+`Action.buffGrants` permite conceder um ID de buff após uma ação válida, com duração em segundos. `simulate` mantém o estado separado por lado, disponibiliza os IDs ativos às fórmulas nativas condicionais e remove o buff quando o relógio alcança sua expiração. Uma nova concessão do mesmo ID atualiza sua expiração. O editor permite configurar esses grants manualmente; o campo de buffs ativos de uma ação continua sendo um override pontual.
+
+O teste de integração sintético verifica o ramo fortalecido durante a janela de duração e o retorno ao ramo padrão no instante da expiração. Isso valida o mecanismo genérico, não a fidelidade da ativação de buffs de campeões reais. Ainda não há automação de consumo, stacks ou concessão automática por eventos reais de habilidades.
 
 ## Índice de requisitos de buff — inventário sem inferências
 
@@ -52,4 +58,4 @@ Os estados são deliberadamente conservadores: `unresolved` quando não há decl
 
 A indexação ignora campos internos da própria declaração ao contar referências externas, evitando confundir `mScriptName`/nomes de declaração com referências de uso. Testes sintéticos cobrem tanto a separação entre requisito, referência e declaração quanto o caso sem declaração.
 
-Nenhum ID é inferido a partir do nome do campeão ou de semelhança textual. O índice serve para orientar investigação; não liga ainda o ciclo de vida do buff (ativação, consumo, expiração) ao simulador.
+Nenhum ID é inferido a partir do nome do campeão ou de semelhança textual. O índice serve para orientar investigação. O motor agora suporta o ciclo temporal genérico de buffs concedidos por uma ação (ativação e expiração); consumo, acúmulos, substituição/renovação e vínculos automáticos com habilidades reais ainda exigem regras semânticas por campeão.
