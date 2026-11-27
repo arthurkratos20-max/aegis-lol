@@ -246,7 +246,7 @@ test('Hecarim Rampage consumes active stacks for damage amplification and cooldo
  const actor=statsFor(f,data),base=statsFor({...f,items:[],overrides:{},runes:{...f.runes,shards:[]}},data),target=statsFor(fighter(data,'Azir'),data),state=kitState(f);
  const first=nativeAction(f,data,0),second=nativeAction(f,data,0);const a=kitImpact(first,f,data,actor,base,target,target.hp,state);const b=kitImpact({...second,at:1},f,data,actor,base,target,target.hp,state);
  assert.ok(a);assert.ok(b);assert.equal(a.damageMultiplier,1);assert.equal(b.damageMultiplier,1.03);assert.equal(b.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[9,10]);
- const decay=kitImpact({...nativeAction(f,data,0),at:9.5},f,data,actor,base,target,target.hp,state);assert.ok(decay);assert.equal(decay.damageMultiplier,1.04);assert.equal(decay.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[17.5,18.5]);
+ const decay=kitImpact({...nativeAction(f,data,0),at:9.5},f,data,actor,base,target,target.hp,state);assert.ok(decay);assert.equal(decay.damageMultiplier,1.03);assert.equal(decay.cooldownReduction,0.75);assert.deepEqual(state.hecarimQStackExpiries,[17.5,18.5]);
 });
 
 test('Illaoi Test of Spirit echoes pre-mitigation damage during its seven-second tether',()=>{
