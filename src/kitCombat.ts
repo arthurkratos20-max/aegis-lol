@@ -42,7 +42,9 @@ export function kitImpact(a:Action,f:Fighter,data:Dataset,actor:Stats,base:Stats
  if(f.champion==='Hecarim'&&a.native?.spell==='HecarimQ'&&a.native.calculation==='Damage'){
   const stacks=state.hecarimQStackExpiries.filter(expires=>expires>at).length;
   const bonusAD=Math.max(0,actor.ad-base.ad);
-  impact.damageMultiplier=1+stacks*(.04+.03*bonusAD/100);
+  // Fonte: patch 26.03 (https://www.leagueoflegends.com/en-gb/news/game-updates/patch-26-3-notes/)
+  // "Damage amp per Rampage stack: 3% (+ 4% per 100 Bonus AD) ⇒ 3% (+ 3% per 100 Bonus AD)"
+  impact.damageMultiplier=1+stacks*(.03+.03*bonusAD/100);
   impact.cooldownReduction=stacks*.75;
   state.hecarimQStacks=Math.min(3,stacks+1);state.hecarimQExpires=at+8;
   state.hecarimQStackExpiries=Array.from({length:state.hecarimQStacks},(_,index)=>at+8+index);
