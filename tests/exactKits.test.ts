@@ -163,3 +163,19 @@ test('Infinity Edge adds 30 percentage points to the 200 percent base critical m
  const f=fighter(data,'Darius');f.items=['3031'];
  assert.equal(statsFor(f,data).critMultiplier,2.30);
 });
+
+test('requisito HasBuffCastRequirement nunca é contado como declaração do próprio buff',()=>{
+ const onlyRequirement=indexBuffRequirements({
+  Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{abcdef01}'}}
+ });
+ assert.equal(onlyRequirement.length,1);
+ assert.deepEqual(onlyRequirement[0].declarationPaths,[]);
+ assert.equal(onlyRequirement[0].status,'unresolved');
+ const withDeclaration=indexBuffRequirements({
+  Spell:{mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'{abcdef01}'},mBuffReference:'{abcdef01}'},
+  Buff:{__type:'BuffData',mScriptName:'{abcdef01}'}
+ });
+ assert.equal(withDeclaration[0].referencePaths.length,1);
+ assert.equal(withDeclaration[0].declarationPaths.length,1);
+ assert.equal(withDeclaration[0].status,'declaration-found-needs-semantic-audit');
+});
