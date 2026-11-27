@@ -58,7 +58,22 @@ describe('Snapshot CommunityDragon · cálculo genérico experimental',()=>{
   const empowered=nativeAction(shen,synthetic,0,['shen-quest']);
   close(nativeDamage({...empowered,kind:'spell' as const,native:{...empowered.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}},shen,synthetic,actor,actor),25);
  });
- test('não mascara referências inconsistentes no snapshot',()=>{
+ test('buffs concedidos por ação ativam fórmula condicional e expiram pelo relógio de combate',()=>{
+  const shen=fighter(dataset,'Shen');shen.skills=['Q'];
+  const synthetic=structuredClone(dataset);
+  const passive=synthetic.mechanics!.Shen.spells.ShenPassive;
+  passive.calculations.plain={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:10}]};
+  passive.calculations.empowered={__type:'GameCalculation',mFormulaParts:[{__type:'NumberCalculationPart',mNumber:25}]};
+  passive.calculations.ShieldValue={__type:'GameCalculationConditional',mDefaultGameCalculation:'plain',mConditionalGameCalculation:'empowered',mConditionalCalculationRequirements:{__type:'HasBuffCastRequirement',mBuffName:'shen-quest'}};
+  const base=nativeAction(shen,synthetic,0),conditional={...base,kind:'spell' as const,native:{...base.native,spell:'ShenPassive',calculation:'ShieldValue',targetHP:false,flatCalculation:undefined}};
+  const s=initialScenario(synthetic);s.player=shen;s.enemy=fighter(synthetic,'Lux');s.player.automaticAttacks=false;s.enemy.automaticAttacks=false;
+  const grant={...attackAction(0),kind:'spell' as const,key:'grant',name:'Ativar buff',formula:{...EMPTY_FORMULA},buffGrants:[{id:'shen-quest',duration:2}]};
+  s.player.actions=[grant,{...conditional,id:'cond-1',at:1},{...conditional,id:'cond-2',at:2}];
+  const result=simulate(s,synthetic);
+  assert.equal(result.events.find(x=>x.actionId==='cond-1')?.raw,25);
+  assert.equal(result.events.find(x=>x.actionId==='cond-2')?.raw,10);
+});
+test('não mascara referências inconsistentes no snapshot',()=>{
   const ez=statsFor(fighter(dataset,'Ezreal'),dataset);
   assert.throws(()=>mechanicsCalculation(dataset,'Yone','YoneW','WShield',1,1,ez,ez),/DataValue not found or invalid: ShieldBADRatio/);
  });
