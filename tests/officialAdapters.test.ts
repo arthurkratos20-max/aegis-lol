@@ -21,7 +21,9 @@ test('Gragas Q standard Summoner\'s Rift minimum and fully fermented impacts are
  const e=officialAdapterFor('Gragas','GragasE','Damage','16.23.1');assert.ok(e);assert.equal(evaluateOfficialAdapter(e,5,{ap:100}),320);
  const r=officialAdapterFor('Gragas','GragasR','Damage','16.23.1');assert.ok(r);assert.equal(evaluateOfficialAdapter(r,3,{ap:100}),480);
  const f=fighter(data,'Gragas');f.level=1;f.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];f.actions=[];f.automaticAttacks=false;
- const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);const minimum=nativeAction(f,data,0),fermented=nativeAction(f,data,1);
+ const actor=statsFor(f,data),target=statsFor(fighter(data,'Azir'),data);
+ // índice 0 = Damage (mínimo), índice 1 = HalfFermentedDamage (125%), índice 2 = MaxFermentedDamage (150%)
+ const minimum=nativeAction(f,data,0),fermented=nativeAction(f,data,2);
  assert.equal(nativeDamage(minimum,f,data,actor,target),80+0.8*actor.ap);assert.equal(nativeDamage(fermented,f,data,actor,target),120+1.2*actor.ap);
  const fW={...f,level:18,skills:['Q','W','E','W','W','R','W','Q','Q','W','R','E','E','E','E','R','Q','Q'] as SkillKey[]};const wAction=nativeAction(fW,data,2);assert.equal(nativeDamage(wAction,fW,data,actor,{...target,hp:2000}),140+0.7*actor.ap+140);
  assert.equal(nativeOptions.Gragas[1].automatic,false);assert.equal(nativeOptions.Gragas[2].automatic,false);assert.equal(nativeOptions.Gragas.length,5);const coverage=championKitCoverage('Gragas',data);assert.equal(coverage.status,'partial');assert.deepEqual(coverage.covered,['Q','W','E','R']);assert.deepEqual(coverage.missing,['P']);assert.equal(coverage.isExactFormula,false);
@@ -30,7 +32,10 @@ test('Gragas Q standard Summoner\'s Rift minimum and fully fermented impacts are
 test('Gragas Happy Hour heals on cast and respects its level-scaled static cooldown',()=>{
  const s=initialScenario(data);s.player=fighter(data,'Gragas');s.player.level=1;s.player.overrides={hp:1000,mana:500};s.player.initialHP=.5;s.player.automaticAttacks=false;s.duration=20;s.player.actions=[nativeAction(s.player,data,0)];s.enemy.automaticAttacks=false;
  const result=simulate(s,data);assert.equal(result.player.healing,55);assert.equal(result.player.hp,555);
- const defense=initialScenario(data);defense.player=fighter(data,'Gragas');defense.player.level=2;defense.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];defense.player.overrides={hp:1000,mr:100,mana:500};defense.player.automaticAttacks=false;defense.duration=4;defense.player.actions=[nativeAction(defense.player,data,2)];defense.enemy=fighter(data,'Azir');defense.enemy.level=1;defense.enemy.overrides={hp:1000,ap:0,mr:0};defense.enemy.automaticAttacks=false;defense.enemy.actions=[{id:'incoming',at:1,kind:'spell',key:'Q',name:'Incoming',type:'magic',formula:{base:100,ad:0,bonusAD:0,ap:0,ownMaxHP:0,targetMaxHP:0,targetCurrentHP:0,targetMissingHP:0},cooldown:0,cost:0,cast:0,duration:0,hit:1,onHit:false,custom:true,coverage:'testing'}];assert.equal(simulate(defense,data).player.hp,955);
+ // defense: Gragas lança Q (HalfFermentedDamage, índice 2) com HP cheio (overrides hp:1000, initialHP padrão = 1).
+ // A cura do Happy Hour só ocorre quando hp < máximo; aqui hp == máximo → cura = 0.
+ // Incoming de 100 de dano mágico com MR=100 do Gragas → mitigação 50% → 50 de dano líquido → HP final = 950.
+ const defense=initialScenario(data);defense.player=fighter(data,'Gragas');defense.player.level=2;defense.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];defense.player.overrides={hp:1000,mr:100,mana:500};defense.player.automaticAttacks=false;defense.duration=4;defense.player.actions=[nativeAction(defense.player,data,2)];defense.enemy=fighter(data,'Azir');defense.enemy.level=1;defense.enemy.overrides={hp:1000,ap:0,mr:0};defense.enemy.automaticAttacks=false;defense.enemy.actions=[{id:'incoming',at:1,kind:'spell',key:'Q',name:'Incoming',type:'magic',formula:{base:100,ad:0,bonusAD:0,ap:0,ownMaxHP:0,targetMaxHP:0,targetCurrentHP:0,targetMissingHP:0},cooldown:0,cost:0,cast:0,duration:0,hit:1,onHit:false,custom:true,coverage:'testing'}];assert.equal(simulate(defense,data).player.hp,950);
  const empowered=initialScenario(data);empowered.player=fighter(data,'Gragas');empowered.player.level=2;empowered.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];empowered.player.overrides={hp:1000,mana:500};empowered.player.automaticAttacks=false;empowered.duration=3;empowered.player.actions=[nativeAction(empowered.player,data,2),attackAction(1)];empowered.enemy=fighter(data,'Azir');empowered.enemy.overrides={hp:1000,armor:0,mr:0};empowered.enemy.automaticAttacks=false;const combo=simulate(empowered,data);assert.equal(combo.player.composition.magic,90);
  const mid=initialScenario(data);mid.player=fighter(data,'Gragas');mid.player.level=6;mid.player.skills=['Q','W','E','Q','Q','R','Q','W','Q','W','R','W','W','E','E','R','E','E'] as SkillKey[];mid.player.overrides={hp:1000,mana:500};mid.player.initialHP=.5;mid.player.automaticAttacks=false;mid.duration=20;const q=nativeAction(mid.player,data,0);const wAction=nativeAction(mid.player,data,2);mid.player.actions=[q,{...wAction,at:9}];mid.enemy.automaticAttacks=false;assert.equal(simulate(mid,data).player.healing,55);
 });
@@ -125,7 +130,7 @@ test('Hecarim W supports four separately timed ticks within one cooldown',()=>{
  const ap=statsFor(s.player,data).ap;assert.equal(result.player.composition.magic,240+.8*ap);
 });
 
-test('Heimerdinger Q beam and R+Q Apex turret use Summoner’s Rift values',()=>{
+test('Heimerdinger Q beam and R+Q Apex turret use Summoner's Rift values',()=>{
  const beam=officialAdapterFor('Heimerdinger','HeimerdingerQ','TurretBeam','16.23.1');assert.ok(beam);
  assert.equal(evaluateOfficialAdapter(beam,5,{ap:100}),175);
  const shot=officialAdapterFor('Heimerdinger','HeimerdingerR','ApexTurretShot','16.23.1');assert.ok(shot);
@@ -184,7 +189,7 @@ test('Gwen, Hecarim, Heimerdinger and Illaoi expose only scoped, source-traceabl
 
 
 
-test('Gwen E empowered hit and R recasts are separate modern Summoner’s Rift variants',()=>{
+test('Gwen E empowered hit and R recasts are separate modern Summoner's Rift variants',()=>{
  const get=(calculation:string)=>{const a=officialAdapterFor('Gwen',calculation==='EmpoweredAttack'?'GwenE':'GwenR',calculation,'16.23.1');assert.ok(a);return a;};
  assert.equal(evaluateOfficialAdapter(get('EmpoweredAttack'),5,{ap:100}),35);
  assert.equal(evaluateOfficialAdapter(get('SecondCast'),3,{ap:100,targetMaxHP:2000}),285+30+0.048*2000);
@@ -197,7 +202,8 @@ test('Gwen E empowered hit and R recasts are separate modern Summoner’s Rift v
 
 test('Hecarim E charge bounds, R riders and Heimerdinger E/R upgraded grenade use base SR values',()=>{
  const get=(champion:string,spell:string,calculation:string)=>{const a=officialAdapterFor(champion,spell,calculation,'16.23.1');assert.ok(a,champion+' '+spell+'/'+calculation);return a;};
- assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),255);
+ // Hecarim Q rank 5 com 100 bAD: 180 + 90% × 100 = 270 (patch 26.03+; era 255 pré-patch 26.11)
+ assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimQ','Damage'),5,{ap:0,bonusAD:100}),270);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimE','MinimumDamage'),5,{ap:0,bonusAD:100}),140);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimE','MaximumDamage'),5,{ap:0,bonusAD:100}),280);
  assert.equal(evaluateOfficialAdapter(get('Hecarim','HecarimR','SpectralRiders'),3,{ap:100}),450);
@@ -224,7 +230,9 @@ test('Graves True Grit, Gwen defensive/offensive states and Heimerdinger passive
  const wActor=statsFor(gwen,data),wBase=statsFor({...gwen,items:[],overrides:{},runes:{...gwen.runes,shards:[]}},data),wTarget=statsFor(fighter(data,'Azir'),data),wState=kitState(gwen);
  const wIndex=nativeOptions.Gwen.findIndex(x=>x.spell==='GwenW'&&x.calculation==='Activate');assert.ok(wIndex>=0);const w=kitImpact(nativeAction(gwen,data,wIndex),gwen,data,wActor,wBase,wTarget,wTarget.hp,wState);assert.ok(w?.passive);
  const mist=kitActorStats(gwen,wActor,wBase,wState,1);assert.ok(mist.armor>wActor.armor&&mist.mr>wActor.mr);
- const eState=kitImpact(nativeAction(gwen,data,3),gwen,data,mist,wBase,wTarget,wTarget.hp,wState);assert.ok(eState?.resetAttack);
+ // índice 4 = E · Activate (GwenE/Activate → resetAttack=true); índice 3 = W · Activate (passive=true, sem resetAttack)
+ const eIndex=nativeOptions.Gwen.findIndex(x=>x.spell==='GwenE'&&x.calculation==='Activate');assert.ok(eIndex>=0);
+ const eState=kitImpact(nativeAction(gwen,data,eIndex),gwen,data,mist,wBase,wTarget,wTarget.hp,wState);assert.ok(eState?.resetAttack);
  const empowered=kitActorStats(gwen,wActor,wBase,wState,2);assert.ok(empowered.as>mist.as);
  const empoweredHit=kitImpact(attackAction(2),gwen,data,empowered,wBase,wTarget,wTarget.hp,wState);assert.ok(empoweredHit);assert.deepEqual(empoweredHit.extra.map(x=>x.name),['P · A Thousand Cuts','E · ataque fortalecido']);
  const heimer=fighter(data,'Heimerdinger');const hActor=statsFor(heimer,data),hBase=statsFor({...heimer,items:[],overrides:{},runes:{...heimer.runes,shards:[]}},data),hState=kitState(heimer);heimer.stacks['heimer-turret-nearby']=1;
@@ -254,7 +262,7 @@ test('Graves conservative basic attack baseline uses current first-pellet level 
  assert.equal(impact.raw,actor.ad*1.1);
 });
 
-test('Graves Summoner’s Rift Q, W and R use current modern kit formulas',()=>{
+test('Graves Summoner's Rift Q, W and R use current modern kit formulas',()=>{
  const initial=officialAdapterFor('Graves','GravesQ','InitialHit','16.23.1');assert.ok(initial);
  assert.deepEqual(initial.baseByRank,[50,75,100,125,150]);assert.equal(evaluateOfficialAdapter(initial,5,{ap:0,bonusAD:100}),215);
  const det=officialAdapterFor('Graves','GravesQ','Detonation','16.23.1');assert.ok(det);
