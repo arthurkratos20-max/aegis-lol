@@ -37,11 +37,11 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  Bard:[{key:'Q',spell:'BardQ',calculation:'Damage',type:'magic',label:'Q · Prisão Cósmica (um impacto)',note:'Fórmula oficial 26.23. Requer acerto confirmado; colisão, segundo alvo, atordoamento e passiva não simulados.'}],
  MasterYi:[{key:'Q',spell:'MasterYiQ',calculation:'Damage',type:'physical',label:'Q · dano padrão (um alvo)',note:'Fórmula oficial 26.23: 20/40/60/80/100 + 60% AD total. Não simula crítico, múltiplos acertos nem efeitos ao contato.'},{key:'Q',spell:'MasterYiQ',calculation:'MaxSingleTargetDamage',type:'physical',automatic:false,label:'Q · máximo em um único alvo',note:'Fórmula oficial 26.23: 35/70/105/140/175 + 105% AD total. Variante manual; crítico adicional, efeitos ao contato e distribuição de alvos não simulados.'}],
  Graves:[
-  {key:'Q',spell:'GravesQ',calculation:'InitialHit',type:'physical',label:'Q · impacto inicial',note:'Summoner’s Rift: 50/75/100/125/150 + 65% DdA adicional.'},
-  {key:'Q',spell:'GravesQ',calculation:'Detonation',type:'physical',automatic:false,label:'Q · detonação',note:'Summoner’s Rift: 80/125/170/215/260 + 55/70/85/100/115% DdA adicional; não soma automaticamente ao impacto.'},
-  {key:'W',spell:'GravesW',calculation:'Impact',type:'magic',label:'W · impacto inicial',note:'Summoner’s Rift: 60/110/160/210/260 + 60% AP; nuvem/slow/nearsight pendentes.'},
-  {key:'R',spell:'GravesR',calculation:'DirectHit',type:'physical',label:'R · impacto direto',note:'Summoner’s Rift: 275/425/575 + 150% DdA adicional.'},
-  {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · explosão em cone',note:'Summoner’s Rift: 200/320/440 + 120% DdA adicional; variante separada.'},
+  {key:'Q',spell:'GravesQ',calculation:'InitialHit',type:'physical',label:'Q · impacto inicial',note:'Summoner's Rift: 50/75/100/125/150 + 65% DdA adicional.'},
+  {key:'Q',spell:'GravesQ',calculation:'Detonation',type:'physical',automatic:false,label:'Q · detonação',note:'Summoner's Rift: 80/125/170/215/260 + 55/70/85/100/115% DdA adicional; não soma automaticamente ao impacto.'},
+  {key:'W',spell:'GravesW',calculation:'Impact',type:'magic',label:'W · impacto inicial',note:'Summoner's Rift: 60/110/160/210/260 + 60% AP; nuvem/slow/nearsight pendentes.'},
+  {key:'R',spell:'GravesR',calculation:'DirectHit',type:'physical',label:'R · impacto direto',note:'Summoner's Rift: 275/425/575 + 150% DdA adicional.'},
+  {key:'R',spell:'GravesR',calculation:'ConeExplosion',type:'physical',automatic:false,label:'R · explosão em cone',note:'Summoner's Rift: 200/320/440 + 120% DdA adicional; variante separada.'},
   {key:'E',spell:'GravesE',calculation:'Activate',type:'physical',label:'E · Quickdraw / True Grit',note:'Ativa um stack de armadura e resistência mágica por 4s; recarga de munição e redução de cooldown por pellets pendentes.'}
  ],
  Gwen:[
@@ -65,14 +65,22 @@ export const nativeOptions:Record<string,{key:SkillKey;spell:string;calculation:
  ],
  Heimerdinger:[
   {key:'Q',spell:'HeimerdingerQ',calculation:'TurretShot',type:'magic',label:'Q · um tiro de torreta',note:'7/11/15/19/23 + 35% AP por tiro; sem cadência, alvo, duração ou raio carregado.'},
-  {key:'Q',spell:'HeimerdingerQ',calculation:'TurretBeam',type:'magic',automatic:false,label:'Q · raio carregado da torreta',note:'40/60/80/100/120 + 55% AP; descarga manual isolada.'},{key:'W',spell:'HeimerdingerW',calculation:'FirstRocket',type:'magic',label:'W · primeiro foguete',note:'50/75/100/125/150 + 55% AP; apenas um foguete, sem convergência ou dano reduzido dos seguintes.'},
+  {key:'Q',spell:'HeimerdingerQ',calculation:'TurretBeam',type:'magic',automatic:false,label:'Q · raio carregado da torreta',note:'40/60/80/100/120 + 55% AP; descarga manual isolada.'},
+  {key:'W',spell:'HeimerdingerW',calculation:'FirstRocket',type:'magic',label:'W · primeiro foguete',note:'50/75/100/125/150 + 55% AP; apenas um foguete, sem convergência ou dano reduzido dos seguintes.'},
   {key:'W',spell:'HeimerdingerW',calculation:'FullSalvo',type:'magic',automatic:false,label:'W · salva completa (5 foguetes, um campeão)',note:'90/135/180/225/270 + 103% AP contra um campeão: primeiro foguete + quatro subsequentes reduzidos. Variante manual, não soma ao primeiro foguete isolado; geometria e distribuição não simuladas.'},
   {key:'E',spell:'HeimerdingerE',calculation:'Impact',type:'magic',label:'E · impacto da granada',note:'60/100/140/180/220 + 60% AP; stun central e slow não simulados.'},
-  {key:'Q',spell:'HeimerdingerR',calculation:'ApexTurretShot',type:'magic',automatic:false,label:'R+Q · tiro da torreta Apex',note:'80/100/120 + 35% AP por ataque; não inclui duração/cadência.'},{key:'Q',spell:'HeimerdingerR',calculation:'ApexTurretBeam',type:'magic',automatic:false,label:'R+Q · raio da torreta Apex',note:'100/140/180 + 70% AP; descarga isolada manual.'},{key:'W',spell:'HeimerdingerR',calculation:'RocketSwarm',type:'magic',automatic:false,label:'R+W · enxame completo (20 foguetes)',note:'503/697,5/892 + 183% AP contra um campeão; variante manual, sem geometria.'},{key:'R',spell:'HeimerdingerR',calculation:'UpgradedGrenade',type:'magic',automatic:false,label:'R+E · uma explosão aprimorada',note:'100/200/300 + 60% AP por explosão; três ricochetes e limites por campeão não simulados.'}
+  // R+Q e R+W usam key:'R' para resolver o rank de ultimate (3 ranks), não o rank de Q ou W.
+  // Correção: key era 'Q'/'W' — isso fazia nativeAction contar o rank de Q/W (5 ranks) e passar
+  // rank 5 a um adaptador com baseByRank de 3 elementos → 'Rank fora da tabela oficial'.
+  {key:'R',spell:'HeimerdingerR',calculation:'ApexTurretShot',type:'magic',automatic:false,label:'R+Q · tiro da torreta Apex',note:'80/100/120 + 35% AP por ataque; não inclui duração/cadência.'},
+  {key:'R',spell:'HeimerdingerR',calculation:'ApexTurretBeam',type:'magic',automatic:false,label:'R+Q · raio da torreta Apex',note:'100/140/180 + 70% AP; descarga isolada manual.'},
+  {key:'R',spell:'HeimerdingerR',calculation:'RocketSwarm',type:'magic',automatic:false,label:'R+W · enxame completo (20 foguetes)',note:'503/697,5/892 + 183% AP contra um campeão; variante manual, sem geometria.'},
+  {key:'R',spell:'HeimerdingerR',calculation:'UpgradedGrenade',type:'magic',automatic:false,label:'R+E · uma explosão aprimorada',note:'100/200/300 + 60% AP por explosão; três ricochetes e limites por campeão não simulados.'}
  ],
  Illaoi:[
   {key:'E',spell:'IllaoiE',calculation:'Activate',type:'physical',label:'E · ativar Teste de Espírito',note:'Marca o alvo por 7s; o dano pré-mitigação causado ao espírito ecoa em 25–45% + 8% por 100 AD, limitado pela vida do espírito.'},
-  {key:'W',spell:'IllaoiW',calculation:'Activate',type:'physical',automatic:false,label:'W · preparar ataque fortalecido',note:'Prepara o próximo ataque básico por até 6s; o bônus de vida máxima é aplicado ao ataque que consumir a preparação.'},{key:'W',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',type:'physical',label:'W · bônus de vida máxima',note:'3/3,5/4/4,5/5% da vida máxima + 0,035% por ponto de AD total; ataque básico e tentáculos não incluídos.'},
+  {key:'W',spell:'IllaoiW',calculation:'Activate',type:'physical',automatic:false,label:'W · preparar ataque fortalecido',note:'Prepara o próximo ataque básico por até 6s; o bônus de vida máxima é aplicado ao ataque que consumir a preparação.'},
+  {key:'W',spell:'IllaoiW',calculation:'BonusMaxHealthDamage',type:'physical',label:'W · bônus de vida máxima',note:'3/3,5/4/4,5/5% da vida máxima + 0,035% por ponto de AD total; ataque básico e tentáculos não incluídos.'},
   {key:'Q',spell:'IllaoiQ',calculation:'TentacleStrike',type:'physical',label:'Q · golpe de tentáculo',note:'9–200,12 por nível + 110% AD total + 40% AP, amplificado em 10–30% pelo rank de Q; um golpe isolado.'},
   {key:'R',spell:'IllaoiR',calculation:'Damage',type:'physical',label:'R · impacto inicial',note:'150/250/350 + 50% DdA adicional; sem área, tentáculos invocados ou golpes subsequentes.'}
  ]
